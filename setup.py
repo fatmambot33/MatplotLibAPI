@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='MatplotLibAPI',
-    version='v2.0.1',
+    version='v2.0.2',
     packages=find_packages(),
     install_requires=[
         "pandas",
