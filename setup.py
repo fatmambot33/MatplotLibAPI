@@ -8,8 +8,6 @@ setup(
         "pandas",
         "matplotlib",
         "seaborn",
-        "json",
-        "logging",
         "scikit-learn"
     ],
     long_description=open('README.md').read(),
