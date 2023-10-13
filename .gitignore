@@ -1,0 +1,9 @@
+__pycache__
+credentials
+.vscode
+.env
+data
+config.py
+.DS_Store
+pycache
+test*
