@@ -7,3 +7,4 @@ config.py
 .DS_Store
 pycache
 test*
+scratch*
