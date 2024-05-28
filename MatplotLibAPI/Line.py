@@ -1,23 +1,31 @@
-
+# Hint for Visual Code Python Interactive window
+# %%
 import pandas as pd
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
 from .Utils import (TIMESERIE_STYLE_TEMPLATE,
-                    DynamicFuncFormatter, StyleTemplate, string_formatter)
+                    DynamicFuncFormatter, StyleTemplate, string_formatter, _validate_panda)
 from typing import Optional
 
 # region Line
 
 
 def plot_line(pd_df: pd.DataFrame,
-                   label: str,
-                   x: str,
-                   y: str,
-                   title: Optional[str] = None,
-                   style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
-                   ax: Optional[Axes] = None) -> Axes:
+              label: str,
+              x: str,
+              y: str,
+              title: Optional[str] = None,
+              style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
+              sort_by: Optional[str] = None,
+              ascending: bool = False,
+              ax: Optional[Axes] = None) -> Axes:
+    columns = [label, x, y]
+    if sort_by:
+        columns.append(sort_by)
+    columns = list(set(columns))
+    _validate_panda(pd_df, columns)
 
     df = pd_df[[label, x, y]].sort_values(by=[label, x])
     df[x] = pd.to_datetime(df[x])
@@ -26,7 +34,7 @@ def plot_line(pd_df: pd.DataFrame,
     sns.set_palette(style.palette)
     if ax is None:
         ax = plt.gca()
-    
+
     # Get unique dimension_types
     label_types = df[label].unique()
 

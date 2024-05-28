@@ -2,7 +2,7 @@ from typing import List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
-from .Utils import (TABLE_STYLE_TEMPLATE, StyleTemplate)
+from .Utils import (TABLE_STYLE_TEMPLATE, StyleTemplate, _validate_panda)
 
 
 def plot_table(pd_df: pd.DataFrame,
@@ -14,8 +14,14 @@ def plot_table(pd_df: pd.DataFrame,
                ascending: bool = False,
                ax: Optional[Axes] = None
                ) -> Axes:
+
+    if sort_by:
+        cols.append(sort_by)
+    cols = list(set(cols))
+    _validate_panda(pd_df, cols)
     if not sort_by:
         sort_by = cols[0]
+
     plot_df = pd_df[cols].sort_values(
         by=sort_by, ascending=ascending).head(max_values)
 
@@ -23,7 +29,8 @@ def plot_table(pd_df: pd.DataFrame,
 
     if style.format_funcs:
         for col, func in style.format_funcs.items():
-            plot_df[col] = plot_df[col].apply(func)
+            if col in plot_df.columns:
+                plot_df[col] = plot_df[col].apply(func)
 
     def format_table(table):
         table.auto_set_font_size(False)

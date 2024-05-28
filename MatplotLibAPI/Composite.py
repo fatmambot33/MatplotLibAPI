@@ -1,109 +1,84 @@
 # Hint for Visual Code Python Interactive window
 # %%
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import pandas as pd
 from .Bubble import plot_bubble
 from .Table import plot_table
-from typing import Callable, Dict, Optional, List
-from matplotlib.axes import Axes
+from typing import Optional, Tuple
+from .Utils import (BUBBLE_STYLE_TEMPLATE, StyleTemplate,_validate_panda)
 
 
-def plot_composite(data: pd.DataFrame,
-                   sort_column: str,
-                   mappings: Dict[str, Callable],
-                   num_rows: int = 10,
-                   font_size: int = 12,
-                   fig_title: str = 'Bubble Plot',
-                   fig_background_color: str = 'skyblue',
-                   fig_border: str = 'steelblue',
-                   font_name: str = 'Arial',
-                   font_color: str = 'black') -> None:
+def plot_bubble_composite(
+        pd_df: pd.DataFrame,
+        label: str,
+        x: str,
+        y: str,
+        z: str,
+        title: Optional[str] = "Test",
+        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        max_values: int = BUBBLE_STYLE_TEMPLATE,
+        center_to_mean: bool = False,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        table_rows:int=10,
+        figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+    columns = [label, x, y, z]
+    if sort_by:
+        columns.append(sort_by)
+    columns = list(set(columns))
+    _validate_panda(pd_df, columns)
 
-    data['uniques_quintile'] = pd.qcut(data['uniques'], 5, labels=False)
-    text_size_mapping = {0: 8, 1: 9, 2: 10, 3: 12, 4: 14}
-    data["font_size"] = data['uniques_quintile'].map(text_size_mapping)
-
-    data['audience_quintile'] = pd.qcut(data['audience'], 5, labels=False)
-    data['INDEX_quintile'] = pd.qcut(data['INDEX'], 5, labels=False)
-    # Adjust font size for better readability
-    plt.rc('font', size=font_size)
-
-    fig = plt.figure("Graph", figsize=(10, 10))
-
-    axgrid = fig.add_gridspec(5, 4)
-
-    ax0 = fig.add_subplot(axgrid[0:3, :])
-    plot_bubble(ax=ax0,
-                data=data,
-                font_size=font_size,
-                fig_background_color=fig_background_color,
-                fig_border=fig_border,
-                font_name=font_name)
-    ax0.set_title(fig_title)  # Add title
-    ax0.set_axis_off()
-
-    ax1 = fig.add_subplot(axgrid[3:, :2])
-    top_10 = data.sort_values(by="INDEX", ascending=False).head(10)
-
-    plot_table(ax=ax1,
-               data=top_10,
-               mappings=mappings,
-               sort_column=sort_column,
-               num_rows=num_rows,
-               fig_background_color=fig_background_color,
-               fig_border=fig_border,
-               font_name=font_name,
-               font_size=font_size,
-               font_color=font_color)
-    ax1.set_title('Top Items')  # Add title
-    ax1.set_axis_off()
-
-    ax2 = fig.add_subplot(axgrid[3:, 2:])
-    worst_10 = data.sort_values(by="INDEX").head(10)
-    plot_table(ax=ax2,
-               data=worst_10,
-               mappings=mappings,
-               sort_column=sort_column,
-               num_rows=num_rows,
-               fig_background_color=fig_background_color,
-               fig_border=fig_border,
-               font_name=font_name,
-               font_size=font_size,
-               sort_ascending=True)
-    ax2.set_title('Worst Items')  # Add title
-    ax2.set_axis_off()
-
-    fig.tight_layout()
+    
+    fig = plt.figure(figsize=figsize)
+    fig.patch.set_facecolor("black")
+    grid = plt.GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
+    ax = fig.add_subplot(grid[0, 0:])
+    ax = plot_bubble(pd_df=pd_df,
+                     label=label,
+                     x=x,
+                     y=y,
+                     z=z,
+                     title=title,
+                     style=style,
+                     max_values=max_values,
+                     center_to_mean=center_to_mean,
+                     sort_by=sort_by,
+                     ascending=ascending,
+                     ax=ax)
+    
 
 
-def plot_composite_12(plot_func1, plot_func2, plot_func3,
-                      data1, data2, data3,
-                      metrics1, metrics2, metrics3,
-                      highlights: Optional[List[str]] = None,
-                      font_size: int = 12,
-                      fig_title: str = 'Bubble Plot',
-                      fig_background_color: str = 'skyblue',
-                      fig_border: str = 'steelblue',
-                      font_name: str = 'Arial',
-                      font_color: str = 'black') -> None:
-
-    # Create a new figure and define the grid
-    fig = plt.figure(fig_title, figsize=(10, 10))
-    axgrid = fig.add_gridspec(5, 4)
-
-    # Create individual axes based on the grid
-    ax0 = fig.add_subplot(axgrid[0:3, :])
-    ax1 = fig.add_subplot(axgrid[3:, :2])
-    ax2 = fig.add_subplot(axgrid[3:, 2:])
-
-    # Call the individual plot functions with the respective axes and data
-    plot_func1(ax=ax0, data=data1, metrics=metrics1, highlights=highlights, font_size=font_size, fig_background_color=fig_background_color,
-               fig_border=fig_border, font_name=font_name, font_color=font_color)
-    plot_func2(ax=ax1, data=data2, metrics=metrics2, highlights=highlights, font_size=font_size, fig_background_color=fig_background_color,
-               fig_border=fig_border, font_name=font_name, font_color=font_color)
-    plot_func3(ax=ax2, data=data3, metrics=metrics3, highlights=highlights, font_size=font_size, fig_background_color=fig_background_color,
-               fig_border=fig_border, font_name=font_name, font_color=font_color)
-
-    fig.suptitle(fig_title, fontsize=16)
+    if "label" in style.format_funcs:
+        style.format_funcs[x] = style.format_funcs["label"]
+    if "x" in style.format_funcs:
+        style.format_funcs[x] = style.format_funcs["x"]
+    if "y" in style.format_funcs:
+        style.format_funcs[y] = style.format_funcs["y"]
+    if "z" in style.format_funcs:
+        style.format_funcs[z] = style.format_funcs["z"]
+    
+    ax2 = fig.add_subplot(grid[1, 0])
+    ax2 = plot_table(
+        pd_df=pd_df,
+        cols=[label, z, x, y],
+        title=f"Top {table_rows}",
+        ax=ax2,
+        sort_by=sort_by,
+        ascending=False,
+        max_values=table_rows,
+        style=style
+    )
+    ax3 = fig.add_subplot(grid[1, 1])
+    ax3 = plot_table(
+        pd_df=pd_df,
+        cols=[label, z, x, y],
+        title=f"Worst {table_rows}",
+        ax=ax3,
+        sort_by=sort_by,
+        ascending=True,
+        max_values=table_rows,
+        style=style
+    )
     fig.tight_layout()
     return fig

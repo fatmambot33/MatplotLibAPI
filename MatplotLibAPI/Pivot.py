@@ -1,3 +1,5 @@
+# Hint for Visual Code Python Interactive window
+# %%
 from typing import List, Optional, Union
 
 import pandas as pd
@@ -8,18 +10,25 @@ from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, MonthLocator
 
 from .Utils import (PIVOTBARS_STYLE_TEMPLATE, PIVOTLINES_STYLE_TEMPLATE,
-                    DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter)
+                    DynamicFuncFormatter, StyleTemplate, generate_ticks,string_formatter, _validate_panda)
 
 
-def plot_pivotbar(data: pd.DataFrame,
+def plot_pivotbar(pd_df: pd.DataFrame,
                   label: str,
                   x: str,
                   y: str,
                   agg: str = "sum",
                   style: StyleTemplate = PIVOTBARS_STYLE_TEMPLATE,
                   title: Optional[str] = None,
+                  sort_by: Optional[str] = None,
+                  ascending: bool = False,
                   ax: Optional[Axes] = None):
-    pivot_df = pd.pivot_table(data, values=y, index=[
+    columns = [label, x, y]
+    if sort_by:
+        columns.append(sort_by)
+    columns = list(set(columns))
+    _validate_panda(pd_df, columns)
+    pivot_df = pd.pivot_table(pd_df, values=y, index=[
                               x], columns=[label], aggfunc=agg)
     # Reset index to make x a column again
     pivot_df = pivot_df.reset_index()
@@ -29,9 +38,12 @@ def plot_pivotbar(data: pd.DataFrame,
 
     # Plot each label's data
     for column in pivot_df.columns[1:]:
+        _label=column
+        if style.format_funcs.get(column):
+            _label=style.format_funcs[column](column)
         ax.bar(x=pivot_df[x],
                height=pivot_df[column],
-               label=string_formatter(column), alpha=0.7)
+               label=_label, alpha=0.7)
 
     # Set labels and title
     ax.set_ylabel(string_formatter(y))
