@@ -10,7 +10,7 @@ from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, MonthLocator
 
 from .Utils import (PIVOTBARS_STYLE_TEMPLATE, PIVOTLINES_STYLE_TEMPLATE,
-                    DynamicFuncFormatter, StyleTemplate, generate_ticks,string_formatter, _validate_panda)
+                    DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda)
 
 
 def plot_pivotbar(pd_df: pd.DataFrame,
@@ -23,11 +23,9 @@ def plot_pivotbar(pd_df: pd.DataFrame,
                   sort_by: Optional[str] = None,
                   ascending: bool = False,
                   ax: Optional[Axes] = None):
-    columns = [label, x, y]
-    if sort_by:
-        columns.append(sort_by)
-    columns = list(set(columns))
-    _validate_panda(pd_df, columns)
+
+    _validate_panda(pd_df, cols=[label, x, y], sort_by=sort_by)
+
     pivot_df = pd.pivot_table(pd_df, values=y, index=[
                               x], columns=[label], aggfunc=agg)
     # Reset index to make x a column again
@@ -38,9 +36,9 @@ def plot_pivotbar(pd_df: pd.DataFrame,
 
     # Plot each label's data
     for column in pivot_df.columns[1:]:
-        _label=column
+        _label = column
         if style.format_funcs.get(column):
-            _label=style.format_funcs[column](column)
+            _label = style.format_funcs[column](column)
         ax.bar(x=pivot_df[x],
                height=pivot_df[column],
                label=_label, alpha=0.7)

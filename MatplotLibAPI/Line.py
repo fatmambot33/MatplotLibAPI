@@ -21,11 +21,8 @@ def plot_line(pd_df: pd.DataFrame,
               sort_by: Optional[str] = None,
               ascending: bool = False,
               ax: Optional[Axes] = None) -> Axes:
-    columns = [label, x, y]
-    if sort_by:
-        columns.append(sort_by)
-    columns = list(set(columns))
-    _validate_panda(pd_df, columns)
+
+    _validate_panda(pd_df, cols=[label, x, y], sort_by=sort_by)
 
     df = pd_df[[label, x, y]].sort_values(by=[label, x])
     df[x] = pd.to_datetime(df[x])

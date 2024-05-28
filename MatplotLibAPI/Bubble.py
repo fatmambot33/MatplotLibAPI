@@ -23,11 +23,8 @@ def plot_bubble(
         sort_by: Optional[str] = None,
         ascending: bool = False,
         ax: Optional[Axes] = None):
-    columns = [label, x, y, z]
-    if sort_by:
-        columns.append(sort_by)
-    columns = list(set(columns))
-    _validate_panda(pd_df, columns)
+
+    _validate_panda(pd_df, cols=[label, x, y, z], sort_by=sort_by)
 
     if not sort_by:
         sort_by = z

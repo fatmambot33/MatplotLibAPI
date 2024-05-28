@@ -14,11 +14,8 @@ def plot_table(pd_df: pd.DataFrame,
                ascending: bool = False,
                ax: Optional[Axes] = None
                ) -> Axes:
+    _validate_panda(pd_df, cols=cols,sort_by=sort_by)
 
-    if sort_by:
-        cols.append(sort_by)
-    cols = list(set(cols))
-    _validate_panda(pd_df, cols)
     if not sort_by:
         sort_by = cols[0]
 

@@ -13,7 +13,8 @@ from networkx import Graph
 from networkx.classes.graph import Graph
 
 
-from .Utils import (NETWORK_STYLE_TEMPLATE, StyleTemplate, string_formatter,_validate_panda)
+from .Utils import (NETWORK_STYLE_TEMPLATE, StyleTemplate,
+                    string_formatter, _validate_panda)
 
 DEFAULT = {"MAX_EDGES": 100,
            "MAX_NODES": 30,
@@ -187,7 +188,7 @@ class Graph(nx.Graph):
         sns.set_palette(style.palette)
         if ax is None:
             ax = plt.gca()
-        
+
         node_sizes, edge_widths, font_sizes = self.layout(
             min_node_size=DEFAULT["MIN_NODE_SIZE"]/5,
             max_node_size=DEFAULT["MAX_NODE_SIZE"],
@@ -329,14 +330,11 @@ def plot_network(pd_df: pd.DataFrame,
                  weight: str = "weight",
                  title: str = "Test",
                  style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                 sort_by:Optional[str]=None,
+                 sort_by: Optional[str] = None,
                  ascending: bool = False,
                  ax: Optional[Axes] = None) -> Axes:
-    columns = [source, target, weight]
-    if sort_by:
-        columns.append(sort_by)
-    columns = list(set(columns))
-    _validate_panda(pd_df, columns)
+
+    _validate_panda(pd_df, cols=[source, target, weight], sort_by=sort_by)
     graph = Graph.from_pandas_edgelist(pd_df,
                                        source=source,
                                        target=target,

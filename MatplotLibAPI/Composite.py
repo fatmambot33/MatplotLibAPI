@@ -6,7 +6,7 @@ import pandas as pd
 from .Bubble import plot_bubble
 from .Table import plot_table
 from typing import Optional, Tuple
-from .Utils import (BUBBLE_STYLE_TEMPLATE, StyleTemplate,_validate_panda)
+from .Utils import (BUBBLE_STYLE_TEMPLATE, StyleTemplate, _validate_panda)
 
 
 def plot_bubble_composite(
@@ -21,15 +21,11 @@ def plot_bubble_composite(
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
         ascending: bool = False,
-        table_rows:int=10,
+        table_rows: int = 10,
         figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
-    columns = [label, x, y, z]
-    if sort_by:
-        columns.append(sort_by)
-    columns = list(set(columns))
-    _validate_panda(pd_df, columns)
 
-    
+    _validate_panda(pd_df, cols=[label, x, y, z], sort_by=sort_by)
+
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor("black")
     grid = plt.GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
@@ -46,8 +42,6 @@ def plot_bubble_composite(
                      sort_by=sort_by,
                      ascending=ascending,
                      ax=ax)
-    
-
 
     if "label" in style.format_funcs:
         style.format_funcs[x] = style.format_funcs["label"]
@@ -57,7 +51,7 @@ def plot_bubble_composite(
         style.format_funcs[y] = style.format_funcs["y"]
     if "z" in style.format_funcs:
         style.format_funcs[z] = style.format_funcs["z"]
-    
+
     ax2 = fig.add_subplot(grid[1, 0])
     ax2 = plot_table(
         pd_df=pd_df,
