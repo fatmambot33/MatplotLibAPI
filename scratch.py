@@ -4,7 +4,7 @@ import pandas as pd
 
 
 # Create a new figure
-fig = plt.figure(figsize=(19.2, 10.8), layout="tight")
+fig = plt.figure()
 fig.patch.set_facecolor("black")
 grid = plt.GridSpec(4, 2)
 
@@ -51,4 +51,5 @@ ax5 = plot_pivotbar(ts_df,
                     x="dimension",
                     y="segment_users",
                     title='Example Pivot Bar')
+fig.tight_layout()
 plt.show()

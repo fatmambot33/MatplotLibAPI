@@ -41,8 +41,6 @@ def plot_line(pd_df: pd.DataFrame,
                 label=label_type)
 
     ax.legend(
-        bbox_to_anchor=(1.05, 1),
-        loc='upper left',
         fontsize=style.font_size-2,
         title_fontsize=style.font_size+2,
         labelcolor='linecolor',

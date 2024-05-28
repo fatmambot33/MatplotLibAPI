@@ -15,38 +15,33 @@ def plot_pivotbar(data: pd.DataFrame,
                   label: str,
                   x: str,
                   y: str,
-                  agg:str="sum",
-                  sort_by: Optional[str] = None,
-                  ascending: bool = False,
-                  max_values: int = 10,
+                  agg: str = "sum",
                   style: StyleTemplate = PIVOTBARS_STYLE_TEMPLATE,
                   title: Optional[str] = None,
                   ax: Optional[Axes] = None):
-    pivot_df = pd.pivot_table(data, values=y, index=[x], columns=[label], aggfunc=agg)
-
-    if not sort_by:
-        sort_by = y
-    # Sort the data by metric column in descending order
-    pivot_df = pivot_df.sort_values(by=sort_by, ascending=ascending)
-
-    # Select the top rows
-    top_rows = pivot_df.head(max_values)
+    pivot_df = pd.pivot_table(data, values=y, index=[
+                              x], columns=[label], aggfunc=agg)
+    # Reset index to make x a column again
+    pivot_df = pivot_df.reset_index()
 
     if not ax:
         ax = plt.gca()
 
     # Plot each label's data
-    for column in pivot_df.columns:
-        ax.bar(x=top_rows[x],
-               height=top_rows[column],
+    for column in pivot_df.columns[1:]:
+        ax.bar(x=pivot_df[x],
+               height=pivot_df[column],
                label=string_formatter(column), alpha=0.7)
-
 
     # Set labels and title
     ax.set_ylabel(string_formatter(y))
     ax.set_xlabel(string_formatter(x))
-    ax.set_title(f'{title}\nTop {max_values}')
-    ax.legend()
+    if title:
+        ax.set_title(f'{title}')
+    ax.legend(fontsize=style.font_size-2,
+              title_fontsize=style.font_size+2,
+              labelcolor='linecolor',
+              facecolor=style.background_color)
 
     ax.tick_params(axis='x', rotation=90)
     return ax
