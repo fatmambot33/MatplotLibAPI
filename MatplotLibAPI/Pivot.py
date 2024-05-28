@@ -8,112 +8,82 @@ from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, MonthLocator
 
 from .Utils import (PIVOTBARS_STYLE_TEMPLATE, PIVOTLINES_STYLE_TEMPLATE,
-                    DynamicFuncFormatter, StyleTemplate, generate_ticks)
+                    DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter)
 
 
-def plot_pivotbar(data, metric, n_top, title):
+def plot_pivotbar(data: pd.DataFrame,
+                  label: str,
+                  x: str,
+                  y: str,
+                  agg:str="sum",
+                  sort_by: Optional[str] = None,
+                  ascending: bool = False,
+                  max_values: int = 10,
+                  style: StyleTemplate = PIVOTBARS_STYLE_TEMPLATE,
+                  title: Optional[str] = None,
+                  ax: Optional[Axes] = None):
+    pivot_df = pd.pivot_table(data, values=y, index=[x], columns=[label], aggfunc=agg)
+
+    if not sort_by:
+        sort_by = y
     # Sort the data by metric column in descending order
-    data_sorted = data.sort_values(by=metric, ascending=False)
+    pivot_df = pivot_df.sort_values(by=sort_by, ascending=ascending)
 
     # Select the top rows
-    top_rows = data_sorted.head(n_top)
+    top_rows = pivot_df.head(max_values)
 
-    # Plotting the top 50 data points with tag labels
-    fig, ax = plt.subplots(figsize=(12, 6))
+    if not ax:
+        ax = plt.gca()
 
-    # Plot the 'Used' data points (where Used == 1) in green
-    used_data = top_rows[top_rows['used'] == 1]
-    ax.bar(used_data.tag, used_data[metric],
-           color='green', label='Used', alpha=0.7)
+    # Plot each label's data
+    for column in pivot_df.columns:
+        ax.bar(x=top_rows[x],
+               height=top_rows[column],
+               label=string_formatter(column), alpha=0.7)
 
-    # Plot the 'Not Used' data points (where Used == 0) in red
-    not_used_data = top_rows[top_rows['used'] == 0]
-    ax.bar(not_used_data.tag, not_used_data[metric],
-           color='red', label='Not Used', alpha=0.7)
 
     # Set labels and title
-    ax.set_ylabel('UVs')
-    ax.set_title(f'{title}\nTop {n_top} tags')
+    ax.set_ylabel(string_formatter(y))
+    ax.set_xlabel(string_formatter(x))
+    ax.set_title(f'{title}\nTop {max_values}')
     ax.legend()
 
     ax.tick_params(axis='x', rotation=90)
-    return fig
+    return ax
 
 
-def plot_lines(ax: Axes,
-               data: pd.DataFrame,
-               x_col: str,
-               y_col: Union[str, List[str]],
-               style: Optional[StyleTemplate] = None,
-               fig_title: Optional[str] = None,
-               n_top: int = 4,
-               z_col: str = "browser") -> Axes:
-    """
-    This function plots time series lines for the top n elements in the specified dimension.
+def plot_lines(
+    data: pd.DataFrame,
+    label: str,
+    x: str,
+    y: Union[str, List[str]],
+    title: Optional[str] = None,
+    style: Optional[StyleTemplate] = PIVOTBARS_STYLE_TEMPLATE,
+    max_values: int = 4,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    ax: Optional[Axes] = None
+) -> Axes:
 
-    Parameters:
-    ax (matplotlib.axes._axes.Axes): The ax to plot on.
-    data (pd.DataFrame): The data to plot.
-    metrics (Union[str, List[str]]): The column name(s) in data to plot.
-    date_col (str): The column name containing the date information.
-    ... (other parameters): Various parameters to customize the plot.
-    date_format (str): The format of the date to display on the x-axis.
-    date_locator (matplotlib.dates.Locator): Locator object to determine the date ticks on the x-axis.
-
-    Returns:
-    ax (matplotlib.axes._axes.Axes): The ax with the plot.
-    """
-
-    # Validate inputs
-    if x_col not in data.columns:
-        raise ValueError(f"'{x_col}' column not found in the data")
-    if not isinstance(y_col, list) and not isinstance(y_col, str):
-        raise TypeError("'metrics' should be a string or a list of strings")
-    if isinstance(y_col, list) and not len(y_col) >= 2:
-        raise ValueError(
-            f"metrics should be 2 of lengths column not found in the data")
-    ax.clear()
-    if fig_title is not None:
-        ax.set_title(fig_title)
-    if style is None:
-        style = PIVOTLINES_STYLE_TEMPLATE
+    if title is not None:
+        ax.set_title(title)
     ax.figure.set_facecolor(style.background_color)
     ax.figure.set_edgecolor(style.fig_border)
-
-    display_metric = y_col[0]
-    sort_metric = y_col[1]
     # Get the top n elements in the specified z
     top_elements = data.groupby(
-        z_col)[sort_metric].sum().nlargest(n_top).index.tolist()
-    top_elements_df = data[data[z_col].isin(top_elements)]
+        label)[y].sum().nlargest(max_values).index.tolist()
+    top_elements_df = data[data[label].isin(top_elements)]
     y_min = 0
     # Plot the time series lines for each of the top elements
     for element in top_elements:
-        subset = top_elements_df[top_elements_df[z_col] == element]
-        # Define the line style based on the element name
-        if element == "Chrome":
-            line_style = '-'
-            color = 'green'
-        elif element == "Android Webview":
-            line_style = '--'
-            color = 'green'
-        elif element == "Safari":
-            line_style = '-'
-            color = 'red'
-        elif element == "Safari (in-app)":
-            line_style = '--'
-            color = 'red'
-        else:
-            line_style = '-'
-            color = 'black'
-        y_min = min(y_min, subset[display_metric].min())
-
-        ax.plot(subset[x_col], subset[display_metric], label=element)
+        subset = top_elements_df[top_elements_df[label] == element]
+        y_min = min(y_min, subset[y].min())
+        ax.plot(subset[x], subset[y], label=element)
 
     # Set x-axis date format and locator
         if style.x_formatter is not None:
-            x_min = data[x_col].min()
-            x_max = data[x_col].max()
+            x_min = data[x].min()
+            x_max = data[x].max()
 
             if style.x_formatter == "year_month_formatter":
                 ax.xaxis.set_major_locator(plt.matplotlib.dates.MonthLocator())
@@ -126,11 +96,11 @@ def plot_lines(ax: Axes,
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
 
     # Set title and labels
-    ax.set_xlabel(x_col)
-    y_max = data[display_metric].dropna().quantile(0.95)
+    ax.set_xlabel(x)
+    y_max = data[y].dropna().quantile(0.95)
 
     ax.set_ylim(y_min, y_max)
-    ax.set_ylabel(display_metric)
+    ax.set_ylabel(y)
     if style.y_formatter is not None:
         ax.yaxis.set_major_formatter(
             DynamicFuncFormatter(style.y_formatter))

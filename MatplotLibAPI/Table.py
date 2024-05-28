@@ -7,11 +7,12 @@ from .Utils import (TABLE_STYLE_TEMPLATE, StyleTemplate)
 
 def plot_table(pd_df: pd.DataFrame,
                cols: List[str],
-               title: str = "test",
+               title: Optional[str] = None,
                style: StyleTemplate = TABLE_STYLE_TEMPLATE,
                max_values: int = 20,
                sort_by: Optional[str] = None,
-               ascending: bool = False
+               ascending: bool = False,
+               ax: Optional[Axes] = None
                ) -> Axes:
     if not sort_by:
         sort_by = cols[0]
@@ -33,24 +34,21 @@ def plot_table(pd_df: pd.DataFrame,
             cell.set_fontsize(style.font_size)
             cell.set_facecolor(style.background_color)
             cell.get_text().set_color(style.font_color)
-        table.auto_set_font_size(False)
-        table.set_fontsize(style.font_size)
-        table.scale(1.2, 1.2)
 
-    ax = plt.gca()
-    ax.xaxis.set_visible(False)
-    ax.yaxis.set_visible(False)
+    if ax is None:
+        ax = plt.gca()
 
-    # Table for Top 10
-    table = plt.table(cellText=plot_df.values,
-                      colLabels=col_labels,
-                      cellLoc='center',
-                      loc='center',
-                      bbox=[0.05, 0.1, 0.4, 0.8],
-                      colWidths=style.col_widths)
-    format_table(table)
-
-    ax.set_title(title,
-                 color=style.font_color,
-                 fontsize=style.font_size*2)
+    table_plot = ax.table(
+        cellText=plot_df.values,
+        colLabels=col_labels,
+        cellLoc='center',
+        colWidths=style.col_widths,
+        bbox=[0, -0.3, 1, 1.3])
+    format_table(table_plot)
+    ax.set_facecolor(style.background_color)
+    ax.set_axis_off()
+    ax.grid(False)
+    if title:
+        ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
+        ax.title.set_position([0.5, 1.05])
     return ax

@@ -4,11 +4,16 @@ from collections.abc import Iterable
 from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+import seaborn as sns
 import networkx as nx
 import numpy as np
 import pandas as pd
 from networkx import Graph
 from networkx.classes.graph import Graph
+
+
+from .Utils import (NETWORK_STYLE_TEMPLATE, StyleTemplate, string_formatter)
 
 DEFAULT = {"MAX_EDGES": 100,
            "MAX_NODES": 30,
@@ -16,7 +21,7 @@ DEFAULT = {"MAX_EDGES": 100,
            "MAX_NODE_SIZE": 2000,
            "MAX_EDGE_WIDTH": 10,
            "GRAPH_SCALE": 2,
-           "MAX_FONT_SIZE": 12,
+           "MAX_FONT_SIZE": 20,
            "MIN_FONT_SIZE": 8
            }
 
@@ -25,7 +30,7 @@ def softmax(x):
     return (np.exp(x - np.max(x)) / np.exp(x - np.max(x)).sum())
 
 
-def scale_weights(weights, scale_min=0,scale_max=1):
+def scale_weights(weights, scale_min=0, scale_max=1):
     deciles = np.percentile(weights, [10, 20, 30, 40, 50, 60, 70, 80, 90])
     outs = np.searchsorted(deciles, weights)
     return [out * (scale_max-scale_min)/len(deciles)+scale_min for out in outs]
@@ -160,8 +165,9 @@ class Graph(nx.Graph):
     def subgraphX(self, node_list=None, max_edges: int = DEFAULT["MAX_EDGES"]):
         if node_list is None:
             node_list = self.nodes.sort("weight")[:DEFAULT["MAX_NODES"]]
-        connected_subgraph_nodes=list(self.find_connected_subgraph())
-        node_list = [node for node in node_list if node in connected_subgraph_nodes]
+        connected_subgraph_nodes = list(self.find_connected_subgraph())
+        node_list = [
+            node for node in node_list if node in connected_subgraph_nodes]
 
         subgraph = nx.subgraph(
             self, nbunch=node_list)
@@ -169,30 +175,39 @@ class Graph(nx.Graph):
         subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
         return subgraph
 
-    def plotX(self):
+    def plotX(self,
+              title: str = "Test",
+              style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+              ax: Optional[Axes] = None) -> Axes:
         """
         Plots the degree distribution of the graph, including a degree rank plot and a degree histogram.
         """
         degree_sequence = sorted([d for n, d in self.degree()], reverse=True)
         dmax = max(degree_sequence)
-
-        fig, ax = plt.subplots()
-
+        sns.set_palette(style.palette)
+        if ax is None:
+            ax = plt.gca()
+        
         node_sizes, edge_widths, font_sizes = self.layout(
-            DEFAULT["MAX_NODE_SIZE"], DEFAULT["MAX_EDGE_WIDTH"], 14)
+            min_node_size=DEFAULT["MIN_NODE_SIZE"]/5,
+            max_node_size=DEFAULT["MAX_NODE_SIZE"],
+            max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
+            min_font_size=style.font_mapping.get(0),
+            max_font_size=style.font_mapping.get(4))
         pos = nx.spring_layout(self, k=1)
         # nodes
         nx.draw_networkx_nodes(self,
                                pos,
                                ax=ax,
                                node_size=list(node_sizes),
-                               # node_color=list(node_sizes.values()),
-                               cmap=plt.cm.Blues)
+                               node_color=node_sizes,
+                               cmap=plt.cm.get_cmap(style.palette))
         # edges
         nx.draw_networkx_edges(self,
                                pos,
                                ax=ax,
-                               alpha=0.4,
+                               edge_color=style.font_color,
+                               edge_cmap=plt.cm.get_cmap(style.palette),
                                width=edge_widths)
         # labels
         for font_size, nodes in font_sizes.items():
@@ -201,16 +216,13 @@ class Graph(nx.Graph):
                 pos,
                 ax=ax,
                 font_size=font_size,
-                labels={n: n for n in nodes},
-                alpha=0.4)
-
-        ax.set_title(self.name)
+                font_color=style.font_color,
+                labels={n: string_formatter(n) for n in nodes})
+        ax.set_facecolor(style.background_color)
+        ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
         ax.set_axis_off()
 
-
-
-        fig.tight_layout()
-        return fig
+        return ax
 
     def analysis(self, node_list: Optional[List] = None,
                  scale: int = DEFAULT["GRAPH_SCALE"],
@@ -242,12 +254,14 @@ class Graph(nx.Graph):
             for node in list(H.nodes):
                 if H.degree(node) < 2:
                     # Remove the node and its incident edges
-                    logging.info(f'Removing the {node} node and its incident edges')
+                    logging.info(
+                        f'Removing the {node} node and its incident edges')
                     H.remove_node(node)
                     removed_node = True
                     break
 
         return H
+
     def top_k_edges(self, attribute: str, reverse: bool = True, k: int = 5) -> Dict[Any, List[Tuple[Any, Dict]]]:
         """
         Returns the top k edges per node based on the given attribute.
@@ -275,10 +289,10 @@ class Graph(nx.Graph):
         return top_list
 
     @staticmethod
-    def from_pandas_edgelist(df,
-                             source: Optional[str] = "source",
-                             target: Optional[str] = "target",
-                             weight: Optional[str] = "weight"):
+    def from_pandas_edgelist(df: pd.DataFrame,
+                             source: str = "source",
+                             target: str = "target",
+                             weight: str = "weight"):
         """
         Initialize netX instance with a simple dataframe
 
@@ -291,7 +305,7 @@ class Graph(nx.Graph):
         G = Graph()
         G = nx.from_pandas_edgelist(
             df, source=source, target=target, edge_attr=weight, create_using=G)
-        G=G.find_connected_subgraph()
+        G = G.find_connected_subgraph()
 
         edge_aggregates = G.top_k_edges(attribute=weight, k=10)
         node_aggregates = {}
@@ -308,11 +322,18 @@ class Graph(nx.Graph):
         G = G.edge_subgraph(edges=G.top_k_edges(attribute=weight))
         return G
 
-def plot_network(data:pd.DataFrame):
-    graph = Graph.from_pandas_edgelist(data)
-    graph = graph.subgraphX()
-    return graph.analysis()
 
-
-
-
+def plot_network(pd_df: pd.DataFrame,
+                 source: str = "source",
+                 target: str = "target",
+                 weight: str = "weight",
+                 title: str = "Test",
+                 style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                 ax: Optional[Axes] = None) -> Axes:
+    graph = Graph.from_pandas_edgelist(pd_df,
+                                       source=source,
+                                       target=target,
+                                       weight=weight)
+    return graph.plotX(title=title,
+                       style=style,
+                       ax=ax)

@@ -2,7 +2,7 @@
 
 import pandas as pd
 import seaborn as sns
-
+from typing import Optional
 from .Utils import (BUBBLE_STYLE_TEMPLATE, DynamicFuncFormatter,
                     StyleTemplate, generate_ticks)
 
@@ -13,7 +13,7 @@ def plot_bubble(
         x: str,
         y: str,
         z: str,
-        title: str = "Test",
+        title: Optional[str] = "Test",
         style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
         max_values: int = BUBBLE_STYLE_TEMPLATE,
         center_to_mean: bool = False):
@@ -79,8 +79,8 @@ def plot_bubble(
                 s_value,
                 horizontalalignment='center',
                 fontdict={'color': style.font_color, 'fontsize': fs})
-
-    ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
+    if title:
+        ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
     return ax
 
 

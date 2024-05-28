@@ -99,9 +99,10 @@ PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
     format_funcs={ "y": percent_formatter,"label":string_formatter}
 )
 PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
-    background_color='white',
-    fig_border='lightgrey',
-    palette='viridis',
+    background_color='black',
+    fig_border='darkgrey',
+    font_color='white',
+    palette='magma',
     format_funcs={ "y": percent_formatter,"label":string_formatter}
 )
 
@@ -110,6 +111,9 @@ TABLE_STYLE_TEMPLATE = StyleTemplate(
     fig_border='darkgrey',
     font_color='white',
     palette='magma'
+)
+
+NETWORK_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
@@ -193,7 +197,7 @@ def plot_func(plot_type, ax: Axes,
               **kwargs):
     from .Bubble import plot_bubble
     from .Pivot import plot_bars, plot_lines
-    from .Timeserie import plot_timeseries
+    from .Line import plot_timeseries
     if plot_type == "bubble":
         plot_bubble(ax=ax,
                     data=data,
@@ -215,9 +219,9 @@ def plot_func(plot_type, ax: Axes,
     elif plot_type == "lines":
         plot_lines(ax=ax,
                    data=data,
-                   x_col=x_col,
-                   y_col=y_col,
-                   fig_title=fig_title,
+                   x=x_col,
+                   y=y_col,
+                   title=fig_title,
                    style=style,
                    **kwargs)
     elif plot_type == "bars":

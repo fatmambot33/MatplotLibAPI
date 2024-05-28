@@ -4,12 +4,12 @@ import warnings
 from typing import Optional, List
 from matplotlib.axes import Axes
 import pandas as pd
-from .Utils import (StyleTemplate, BUBBLE_STYLE_TEMPLATE,TIMESERIE_STYLE_TEMPLATE,TABLE_STYLE_TEMPLATE)
+from .Utils import (StyleTemplate, BUBBLE_STYLE_TEMPLATE,
+                    TIMESERIE_STYLE_TEMPLATE, TABLE_STYLE_TEMPLATE)
 from .Bubble import (plot_bubble)
-from .Timeserie import (plot_timeserie)
+from .Line import (plot_line)
 from .Table import (plot_table)
-
-
+from .Network import (Graph)
 
 
 warnings.filterwarnings('ignore')
@@ -35,28 +35,28 @@ class MatPlotLibAccessor:
                     y: str,
                     z: str,
                     title: str = "Test",
-                    style:StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+                    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
                     max_values: int = 50,
-                    center_to_mean: bool = False)->Axes:
+                    center_to_mean: bool = False) -> Axes:
 
         MatPlotLibAccessor._validate(pd_df=self._obj, cols=[label, x, y, z])
         return plot_bubble(pd_df=self._obj,
-                          label=label,
-                          x=x,
-                          y=y,
-                          z=z,
-                          title=title,
-                          style=style,
-                          max_values=max_values,
-                          center_to_mean=center_to_mean)
+                           label=label,
+                           x=x,
+                           y=y,
+                           z=z,
+                           title=title,
+                           style=style,
+                           max_values=max_values,
+                           center_to_mean=center_to_mean)
 
     def plot_table(self,
-               cols: List[str],
-               title: str = "test",
-               style:StyleTemplate=TABLE_STYLE_TEMPLATE,
-               max_values:int=20,
-               sort_by: Optional[str] = None,
-               ascending:bool=False):
+                   cols: List[str],
+                   title: str = "test",
+                   style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+                   max_values: int = 20,
+                   sort_by: Optional[str] = None,
+                   ascending: bool = False)-> Axes:
 
         MatPlotLibAccessor._validate(pd_df=self._obj,
                                      cols=cols)
@@ -68,19 +68,35 @@ class MatPlotLibAccessor:
                           sort_by=sort_by,
                           ascending=ascending)
 
-    def plot_timeserie(self,
+    def plot_line(self,
                        label: str,
                        x: str,
                        y: str,
                        title: str = "Test",
-                       style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE):
+                       style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE)-> Axes:
 
         MatPlotLibAccessor._validate(pd_df=self._obj, cols=[label, x, y])
-        return plot_timeserie(pd_df=self._obj,
+        return plot_line(pd_df=self._obj,
                               label=label,
                               x=x,
                               y=y,
                               title=title,
                               style=style)
-    
-    
+
+    def plot_network(self,
+                     source: str = "source",
+                     target: str = "target",
+                     weight: str = "weight",
+                     title: str = "Test",
+                     style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE)-> Axes:
+
+        MatPlotLibAccessor._validate(pd_df=self._obj, 
+                                     cols=[source, target, weight])
+       
+        graph = Graph.from_pandas_edgelist(df=self._obj,
+                                           source=source,
+                                           target=target,
+                                           weight=weight)
+        
+
+        return graph.plotX(title,style)
