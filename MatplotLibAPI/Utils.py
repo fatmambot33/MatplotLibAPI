@@ -11,8 +11,9 @@ from matplotlib.ticker import FuncFormatter
 
 # region Panda
 
+
 def _validate_panda(pd_df: pd.DataFrame,
-                cols: List[str]):
+                    cols: List[str]):
     for col in cols:
         if col not in pd_df.columns:
             raise AttributeError(f"{col} is not a DataFrame's column")
@@ -20,6 +21,7 @@ def _validate_panda(pd_df: pd.DataFrame,
 # endregion
 
 # region Style
+
 
 MAX_RESULTS = 50
 X_COL = "index"
@@ -99,7 +101,7 @@ def year_month_formatter(x, pos: Optional[int] = None):
     return num2date(x).strftime('%Y-%m')
 
 
-def percent_formatter(x, pos):
+def percent_formatter(x,  pos: Optional[int] = None):
     return f"{x * 100:.0f}%"
 
 
