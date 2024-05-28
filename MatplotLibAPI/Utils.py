@@ -1,7 +1,7 @@
 
 from dataclasses import dataclass
 
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict, Callable
 
 import numpy as np
 import pandas as pd
@@ -13,69 +13,100 @@ from matplotlib.ticker import FuncFormatter
 
 
 # region Style
+MAX_RESULTS = 50
+X_COL = "index"
+Y_COL = "overlap"
+Z_COL = "users"
+FIG_SIZE = (19.2, 10.8)
+BACKGROUND_COLOR = 'black'
+TEXT_COLOR = 'white'
+PALETTE = "Greys_r"
+FONT_SIZE = 14
+FONT_SIZE_MAPPING = {0: FONT_SIZE-4, 1: FONT_SIZE -
+                     2, 2: FONT_SIZE, 3: FONT_SIZE+2, 4: FONT_SIZE+4}
 
+
+def percent_formatter(val, pos: Optional[int] = None):
+    if val*100 <= 0.1:  # For 0.1%
+        return f"{val*100:.2f}%"
+    elif val*100 <= 1:  # For 1%
+        return f"{val*100:.1f}%"
+    else:
+        return f"{val*100:.0f}%"
+
+
+def bmk_formatter(val, pos: Optional[int] = None):
+    if val >= 1_000_000_000:  # Billions
+        return f"{val / 1_000_000_000:.2f}B"
+    elif val >= 1_000_000:  # Millions
+        return f"{val / 1_000_000:.1f}M"
+    elif val >= 1_000:  # Thousands
+        return f"{val / 1_000:.1f}K"
+    else:
+        return f"{val/ 1_000:.2f}K"
+
+
+def integer_formatter(value, pos: Optional[int] = None):
+    # Example formatting function: here we simply return the value as a string with some prefix
+    return f"{int(value)}"
+
+
+def string_formatter(value, pos: Optional[int] = None):
+    # Example formatting function: here we simply return the value as a string with some prefix
+    return str(value).replace("-", " ").replace("_", " ").title()
+
+def year_month_formatter(x, pos: Optional[int] = None):
+    return num2date(x).strftime('%Y-%m')
 
 @dataclass
 class StyleTemplate:
-    fig_background_color: str = 'skyblue'
-    fig_border: str = 'steelblue'
+    background_color: str = BACKGROUND_COLOR
+    fig_border: str = BACKGROUND_COLOR
     font_name: str = 'Arial'
-    font_size: int = 10
-    font_color: str = 'black'
-    palette: str = 'rocket'
+    font_size: int = FONT_SIZE
+    font_color: str = TEXT_COLOR
+    palette: str = PALETTE
     legend: bool = True
-    x_formatter: Optional[str] = None
+    xscale: Optional[str] = None
     x_ticks: int = 10
-    y_formatter: Optional[str] = None
+    yscale: Optional[str] = None
     y_ticks: int = 5
+    format_funcs: Optional[Dict[str, Optional[Callable[[
+        Union[int, float, str]], str]]]] = None
+    col_widths: Optional[List[float] ]=None
+
+    @property
+    def font_mapping(self):
+        return {0: self.font_size-4,
+                1: self.font_size - 2,
+                2: self.font_size,
+                3: self.font_size+2,
+                4: self.font_size+4}
 
 
-KILO_STYLE_TEMPLATE = StyleTemplate(
-    fig_background_color='white',
-    fig_border='lightgrey',
-    palette='viridis',
-    y_formatter="kilo_formatter"
-)
-
-PERCENT_STYLE_TEMPLATE = StyleTemplate(
-    fig_background_color='white',
-    fig_border='lightgrey',
-    palette='viridis',
-    y_formatter="percent_formatter"
-)
 BUBBLE_STYLE_TEMPLATE = StyleTemplate(
-    fig_background_color='white',
-    fig_border='lightgrey',
-    palette='rocket',
-    x_formatter="integer_formatter",
-    y_formatter="percent_formatter",
+    format_funcs={"x": integer_formatter, "y": percent_formatter,"label":string_formatter},
     y_ticks=5
 )
-TIMESERIES_STYLE_TEMPLATE = StyleTemplate(
-    fig_background_color='white',
-    fig_border='lightgrey',
-    palette='viridis',
-    x_formatter="year_month_formatter",
-    y_formatter="percent_formatter"
+TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
+    palette='rocket',
+    format_funcs={"y": bmk_formatter}
 )
 PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
-    fig_background_color='white',
+    background_color='white',
     fig_border='lightgrey',
     palette='viridis',
-    x_formatter="year_month_formatter",
-    y_formatter="percent_formatter"
+    format_funcs={ "y": percent_formatter,"label":string_formatter}
 )
 PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
-    fig_background_color='white',
+    background_color='white',
     fig_border='lightgrey',
     palette='viridis',
-    x_formatter="year_month_formatter",
-    y_formatter="kilo_formatter"
+    format_funcs={ "y": percent_formatter,"label":string_formatter}
 )
 
-
-DARK_STYLE_TEMPLATE = StyleTemplate(
-    fig_background_color='black',
+TABLE_STYLE_TEMPLATE = StyleTemplate(
+    background_color='black',
     fig_border='darkgrey',
     font_color='white',
     palette='magma'
@@ -125,8 +156,7 @@ def generate_ticks(min_val, max_val, num_ticks="10"):
 
 class DynamicFuncFormatter(FuncFormatter):
     def __init__(self, func_name):
-        self.func = globals()[func_name]
-        super().__init__(self.func)
+        super().__init__(func_name)
 
 
 def kilo_formatter(value, pos):
@@ -134,7 +164,7 @@ def kilo_formatter(value, pos):
     if value >= 1000000:
         return f"{value/1000000:.2f}M"
     elif value >= 10000:
-        return f"{value/110000:.2f}K"
+        return f"{value/10000:.2f}K"
     else:
         return str(value)
 
@@ -147,8 +177,7 @@ def integer_formatter(x, pos):
     return f"{x:.0f}"
 
 
-def year_month_formatter(x, pos):
-    return num2date(x).strftime('%Y-%m')
+
 # endregion
 
 # region Wrapper
@@ -164,7 +193,7 @@ def plot_func(plot_type, ax: Axes,
               **kwargs):
     from .Bubble import plot_bubble
     from .Pivot import plot_bars, plot_lines
-    from .TimeSeries import plot_timeseries
+    from .Timeserie import plot_timeseries
     if plot_type == "bubble":
         plot_bubble(ax=ax,
                     data=data,

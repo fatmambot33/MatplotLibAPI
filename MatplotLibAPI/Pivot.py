@@ -77,7 +77,7 @@ def plot_lines(ax: Axes,
         ax.set_title(fig_title)
     if style is None:
         style = PIVOTLINES_STYLE_TEMPLATE
-    ax.figure.set_facecolor(style.fig_background_color)
+    ax.figure.set_facecolor(style.background_color)
     ax.figure.set_edgecolor(style.fig_border)
 
     display_metric = y_col[0]

@@ -1,108 +1,87 @@
 
 
-from typing import List, Optional, Union
-
-import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.preprocessing import StandardScaler
-
-from matplotlib.axes import Axes
 
 from .Utils import (BUBBLE_STYLE_TEMPLATE, DynamicFuncFormatter,
                     StyleTemplate, generate_ticks)
 
-# region Bubble
 
+def plot_bubble(
+        pd_df: pd.DataFrame,
+        label: str,
+        x: str,
+        y: str,
+        z: str,
+        title: str = "Test",
+        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        max_values: int = BUBBLE_STYLE_TEMPLATE,
+        center_to_mean: bool = False):
 
-def plot_bubble(ax: Axes,
-                data: pd.DataFrame,
-                x_col: str,
-                y_col: Union[str, List[str]],
-                fig_title: Optional[str] = None,
-                style: Optional[StyleTemplate] = None,
-                legend: bool = False,
-                z_col: str = "uniques",
-                hue_col: str = "uniques_quintile",
-                l_col: str = "dimension",
-                normalize_x: bool = True,
-                sizes: tuple = (20, 2000), **kwargs) -> Axes:
+    plot_df = pd_df[[label, x, y, z]].sort_values(
+        by=z, ascending=False).head(max_values)
+    if center_to_mean:
+        x_col_mean = plot_df[x].mean()
+        plot_df[x] = plot_df[x] - x_col_mean
+    plot_df['quintile'] = pd.qcut(
+        plot_df[z], 5, labels=False)
 
-    # Clear the axis before plotting
-    ax.clear()
+    # styling
 
-    # Start formatting
-    if fig_title is not None:
-        ax.set_title(fig_title)
-    if style is None:
-        style = BUBBLE_STYLE_TEMPLATE
-    ax.figure.set_facecolor(style.fig_background_color)
-    ax.figure.set_edgecolor(style.fig_border)
-    if normalize_x:
-        # Step 1: Standardize the data to have mean=0 and variance=1
-        scaler = StandardScaler()
-        scaled_data = scaler.fit_transform(data[[x_col]])
+    plot_df["fontsize"] = plot_df['quintile'].map(style.font_mapping)
 
-        # Step 2: Find a scaling factor to confine data within [-100, 100]
-        scale_factor = 100 / np.max(np.abs(scaled_data))
+    ax = sns.scatterplot(
+        data=plot_df,
+        x=x,
+        y=y,
+        size=z,
+        hue='quintile',
+        sizes=(100, 2000),
+        legend=False,
+        palette=sns.color_palette(style.palette, as_cmap=True),
+        edgecolor=style.background_color)
+    ax.set_facecolor(style.background_color)
+    if style.xscale:
+        ax.set(xscale=style.xscale)
+    if style.yscale:
+        ax.set(yscale=style.yscale)
 
-        # Apply scaling factor
-        scaled_data *= scale_factor
+    x_min = pd_df[x].min()
+    x_max = pd_df[x].max()
+    ax.set_xticks(generate_ticks(x_min, x_max, num_ticks=style.x_ticks))
+    ax.xaxis.grid(True, "major", linewidth=.5, color=style.font_color)
+    if style.format_funcs.get("x"):
+        ax.xaxis.set_major_formatter(
+            DynamicFuncFormatter(style.format_funcs.get("x")))
 
-        # Round to the nearest integer
-        data[f"{x_col}"] = np.round(scaled_data).astype(int)
+    y_mean = pd_df[y].mean()
+    ax.yaxis.grid(True, "major", linewidth=.5, color=style.font_color)
+    if style.format_funcs.get("y"):
+        ax.yaxis.set_major_formatter(
+            DynamicFuncFormatter(style.format_funcs.get("y")))
 
-    if type(y_col) == list:
-        y_col = y_col[0]
+    ax.tick_params(axis='both',
+                   which='major',
+                   colors=style.font_color,
+                   labelsize=style.font_size)
+    ax.hlines(y=y_mean, xmin=x_min, xmax=x_max,
+              linestyle='--', colors=style.font_color)
 
-    g = sns.scatterplot(data=data,
-                        x=x_col,
-                        y=y_col,
-                        size=z_col,
-                        hue=hue_col,
-                        palette=style.palette,
-                        legend=legend,
-                        sizes=sizes,
-                        ax=ax)
+    for index, row in plot_df.iterrows():
+        x_value = row[x]
+        y_value = row[y]
+        s_value = str(row[label])
+        if style.format_funcs.get("label"):
+            s_value = style.format_funcs.get("label")(s_value)
+        fs = row["fontsize"]
+        ax.text(x_value,
+                y_value,
+                s_value,
+                horizontalalignment='center',
+                fontdict={'color': style.font_color, 'fontsize': fs})
 
-    g.set(yscale="log")
-
-    g.axes.xaxis.grid(True, "minor", linewidth=.25)
-    g.axes.yaxis.grid(True, "minor", linewidth=.25)
-
-    g.axes.axvline(x=0, linestyle='--')
-
-    y_min = data[y_col].min()
-    y_max = data[y_col].max()
-    if style.y_formatter is not None:
-        g.axes.yaxis.set_major_formatter(
-            DynamicFuncFormatter(style.y_formatter))
-        g.set_yticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
-    else:
-        ylabels = ['{:,.0f}%'.format(y) for y in g.get_yticks()*100]
-        g.set_yticklabels(ylabels)
-
-    y_mean = data[y_col].mean()
-
-    if style.x_formatter is not None:
-        x_min = data[x_col].min()
-        x_max = data[x_col].max()
-        g.xaxis.set_major_formatter(
-            DynamicFuncFormatter(style.x_formatter))
-        g.set_xticks(generate_ticks(x_min, x_max, num_ticks=style.x_ticks))
-
-    g.axes.xaxis.grid(True, "minor", linewidth=.25)
-    g.axes.yaxis.grid(True, "minor", linewidth=.25)
-    g.hlines(y=y_mean, xmin=x_min, xmax=x_max,
-             linestyle='--', colors=style.font_color)
-
-    for index, row in data.iterrows():
-        x = row[x_col]
-        y = row[y_col[0] if type(y_col) == List else y_col]
-        s = row[l_col]
-        g.text(x, y, s, horizontalalignment='center',
-               fontsize=style.font_size*row[hue_col], color=style.font_color)
-
+    ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
     return ax
+
 
 # endregion

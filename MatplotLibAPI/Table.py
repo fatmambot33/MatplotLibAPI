@@ -1,70 +1,56 @@
-import logging
-from typing import List, Optional, Dict, Callable
+from typing import List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from .Utils import (TABLE_STYLE_TEMPLATE, StyleTemplate)
 
 
-def plot_table(ax: Axes,
-               data: pd.DataFrame,
-               mappings: Dict[str, Callable[[pd.Series], pd.Series]],
-               sort_column: str = "INDEX",
-               sort_ascending: bool = False,
-               num_rows: int = None,
-               fig_background_color: str = 'black',
-               fig_border: str = 'white',
-               font_name: str = 'Arial',
-               font_size: int = 10,
-               font_color="black",
-               fig_title: Optional[str] = None,
-               col_widths: Optional[List[float]] = None) -> Axes:
-    """
-    Plots a table using Matplotlib in the provided axis.
+def plot_table(pd_df: pd.DataFrame,
+               cols: List[str],
+               title: str = "test",
+               style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+               max_values: int = 20,
+               sort_by: Optional[str] = None,
+               ascending: bool = False
+               ) -> Axes:
+    if not sort_by:
+        sort_by = cols[0]
+    plot_df = pd_df[cols].sort_values(
+        by=sort_by, ascending=ascending).head(max_values)
 
-    Parameters:
-        ax (Axes): The Matplotlib axis to plot the table in.
-        data (pd.DataFrame): The pandas DataFrame containing the table data.
-        mappings (dict): Dictionary mapping column names to functions that transform the column data.
-        sort_column (str, optional): Column to sort the data by. Default is "INDEX".
-        sort_ascending (bool, optional): Whether to sort in ascending order. Default is False.
-        num_rows (int, optional): Number of rows to display. Default is 10.
-        fig_background_color (str, optional): Background color of the figure. Default is 'skyblue'.
-        fig_border (str, optional): Border color of the figure. Default is 'steelblue'.
-        font_name (str, optional): Font name for the table cells. Default is 'Arial'.
-        font_size (int, optional): Font size for the table cells. Default is 10.
-        col_widths (list, optional): List of relative column widths. Default is None.
+    col_labels = cols
 
-    Returns:
-        Axes: The Matplotlib axis with the plotted table.
-    """
+    if style.format_funcs:
+        for col, func in style.format_funcs.items():
+            plot_df[col] = plot_df[col].apply(func)
 
-    if num_rows is None:
-        num_rows = len(data.index)
-    cols = list(mappings.keys())
-    plot_data = data[cols].copy().sort_values(
-        by=sort_column, ascending=sort_ascending).head(num_rows).reset_index(drop=True)
+    def format_table(table):
+        table.auto_set_font_size(False)
+        table.set_fontsize(style.font_size)
+        table.scale(1.2, 1.2)
 
-    for col, func in mappings.items():
-        plot_data[col] = plot_data[col].apply(func)
-    if fig_title is not None:
-        ax.text(0.5, 1.05,
-                fig_title,
-                va='top',
-                ha='center',
-                fontsize=font_size*1.5,
-                fontname=font_name,
-                color=font_color,
-                transform=ax.transAxes)
-    table = ax.table(cellText=plot_data.values, colLabels=plot_data.columns,
-                     cellLoc='center', colWidths=col_widths, loc="center")
-    table.auto_set_font_size(False)
-    table.set_fontsize(font_size)
+        for key, cell in table.get_celld().items():
+            cell.set_fontsize(style.font_size)
+            cell.set_facecolor(style.background_color)
+            cell.get_text().set_color(style.font_color)
+        table.auto_set_font_size(False)
+        table.set_fontsize(style.font_size)
+        table.scale(1.2, 1.2)
 
-    for key, cell in table.get_celld().items():
-        cell.get_text().set_fontname(font_name)
-        cell.get_text().set_color(font_color)
-    table.scale(1, 4)
-    table.auto_set_column_width(col=list(range(len(plot_data.columns))))
-    ax.axis('off')
+    ax = plt.gca()
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
 
+    # Table for Top 10
+    table = plt.table(cellText=plot_df.values,
+                      colLabels=col_labels,
+                      cellLoc='center',
+                      loc='center',
+                      bbox=[0.05, 0.1, 0.4, 0.8],
+                      colWidths=style.col_widths)
+    format_table(table)
+
+    ax.set_title(title,
+                 color=style.font_color,
+                 fontsize=style.font_size*2)
     return ax

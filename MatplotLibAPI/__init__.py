@@ -1,10 +1,12 @@
 
+
+
+
+
 from .Table import plot_table
-from .TimeSeries import plot_timeseries
+from .Timeserie import plot_timeserie
 from .Bubble import plot_bubble
-import requirements
+from .pdAccessor import MatPlotLibAccessor
 
-requirements.main()
+__all__ = ["plot_bubble","plot_timeserie","plot_table","MatPlotLibAccessor"]
 
-
-__all__ = ["plot_bubble","plot_timeseries","plot_table"]
