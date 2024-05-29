@@ -6,7 +6,7 @@ import pandas as pd
 from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import plot_table
 from typing import Optional, Tuple
-from .Style import StyleTemplate, _validate_panda,format_func
+from .Style import StyleTemplate, _validate_panda, format_func
 
 
 def plot_composite_bubble(
@@ -19,18 +19,27 @@ def plot_composite_bubble(
         style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
         max_values: int = 50,
         center_to_mean: bool = False,
+        filter_by:Optional[str] = None,
         sort_by: Optional[str] = None,
         ascending: bool = False,
         table_rows: int = 10,
         figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
 
     _validate_panda(pd_df, cols=[label, x, y, z], sort_by=sort_by)
-    style.format_funcs=format_func(style.format_funcs,label=label,x=x,y=y)
+
+    if not sort_by:
+        sort_by = z
+    if not filter_by:
+        filter_by = z
+    plot_df = pd_df.sort_values(by=filter_by,
+                                ascending=ascending)[[label, x, y, z]].head(max_values)
+    style.format_funcs = format_func(
+        style.format_funcs, label=label, x=x, y=y, z=z)
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor("black")
     grid = plt.GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
-    ax = plot_bubble(pd_df=pd_df,
+    ax = plot_bubble(pd_df=plot_df,
                      label=label,
                      x=x,
                      y=y,
@@ -54,7 +63,7 @@ def plot_composite_bubble(
 
     ax2 = fig.add_subplot(grid[1, 0])
     ax2 = plot_table(
-        pd_df=pd_df,
+        pd_df=plot_df,
         cols=[label, z, y, x],
         title=f"Top {table_rows}",
         ax=ax2,
@@ -65,7 +74,7 @@ def plot_composite_bubble(
     )
     ax3 = fig.add_subplot(grid[1, 1])
     ax3 = plot_table(
-        pd_df=pd_df,
+        pd_df=plot_df,
         cols=[label, z, y, x],
         title=f"Worst {table_rows}",
         ax=ax3,

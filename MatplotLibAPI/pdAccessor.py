@@ -47,7 +47,7 @@ class MatPlotLibAccessor:
                            sort_by=sort_by,
                            ascending=ascending)
 
-    def plot_bubble_composite(self,
+    def plot_composite_bubble(self,
                               label: str,
                               x: str,
                               y: str,

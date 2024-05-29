@@ -15,9 +15,7 @@ BUBBLE_STYLE_TEMPLATE = StyleTemplate(
                   "y": percent_formatter,
                   "label": string_formatter,
                   "z": bmk_formatter},
-    yscale="log",
-    y_ticks=8,
-    x_ticks=8
+    yscale="log"
 )
 
 
