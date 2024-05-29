@@ -3,10 +3,10 @@
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import pandas as pd
-from .Bubble import plot_bubble
+from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import plot_table
 from typing import Optional, Tuple
-from .Utils import (BUBBLE_STYLE_TEMPLATE, StyleTemplate, _validate_panda)
+from .Style import StyleTemplate, _validate_panda
 
 
 def plot_bubble_composite(

@@ -11,7 +11,7 @@ from matplotlib.dates import DateFormatter, MonthLocator
 
 
 
-from .Utils import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda, percent_formatter
+from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda, percent_formatter
 
 PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',

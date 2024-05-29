@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
 from typing import Optional
-from .Utils import (DynamicFuncFormatter,
+from .Style import (DynamicFuncFormatter,
                     StyleTemplate, generate_ticks, _validate_panda, string_formatter, bmk_formatter, percent_formatter)
 
 

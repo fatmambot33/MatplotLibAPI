@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
-from .Utils import DynamicFuncFormatter, StyleTemplate, string_formatter, _validate_panda, bmk_formatter
+from .Style import DynamicFuncFormatter, StyleTemplate, string_formatter, _validate_panda, bmk_formatter
 from typing import Optional
 
 TIMESERIE_STYLE_TEMPLATE = StyleTemplate(

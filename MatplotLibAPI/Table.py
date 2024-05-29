@@ -2,7 +2,7 @@ from typing import List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
-from .Utils import (StyleTemplate, _validate_panda, string_formatter)
+from .Style import (StyleTemplate, _validate_panda, string_formatter)
 
 TABLE_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',

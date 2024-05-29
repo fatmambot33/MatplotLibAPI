@@ -13,7 +13,7 @@ from networkx import Graph
 from networkx.classes.graph import Graph
 
 
-from .Utils import StyleTemplate, string_formatter, _validate_panda
+from .Style import StyleTemplate, string_formatter, _validate_panda
 
 NETWORK_STYLE_TEMPLATE = StyleTemplate(
 )
