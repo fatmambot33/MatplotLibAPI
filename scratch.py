@@ -1,68 +1,86 @@
 # Hint for Visual Code Python Interactive window
 # %%
-from MatplotLibAPI import plot_timeserie, plot_network, plot_table, plot_pivotbar, MatPlotLibAccessor
+from MatplotLibAPI import plot_timeserie, plot_network, plot_table, plot_pivotbar, plot_composite_bubble, MatPlotLibAccessor
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
-bb_df = pd.read_csv('ts.csv')
-fig = bb_df.mpl.plot_bubble_composite(label="dimension",
-                                      x="index",
-                                      y="overlap",
-                                      z="users",
-                                      sort_by="index")
+# bb_df = pd.read_csv('ts.csv')
+# fig = bb_df.mpl.plot_bubble_composite(label="dimension",
+#                                       x="index",
+#                                       y="overlap",
+#                                       z="users",
+#                                       sort_by="index")
+# fig.show()
+
+
+nw_df = pd.read_csv('nw.csv')
+ts_df = pd.read_csv('ts.csv')
+
+fig, ax = plt.subplots()
+ax = plot_network(pd_df=nw_df,
+                  title='Network',
+                  ax=ax)
 fig.show()
 
 
-# Create a new figure
-fig = plt.figure()
-fig.patch.set_facecolor("black")
-grid = plt.GridSpec(4, 2)
+fig, ax1 = plt.subplots()
+ax1 = plot_composite_bubble(
+    pd_df=ts_df,
+    label="dimension",
+    x="index",
+    y="overlap",
+    z="users",
+    title='Example TimeSerie'
+)
+fig.show()
 
 
-# Plot the time series on the new figure's axes
-nw_df = pd.read_csv('nw.csv')
-ax = fig.add_subplot(grid[0, 0:])
-ax = plot_network(pd_df=nw_df, ax=ax)
-
-ts_df = pd.read_csv('ts.csv')
-ax2 = fig.add_subplot(grid[1, 0:])
+fig, ax2 = plt.subplots()
 ax2 = plot_timeserie(
     pd_df=ts_df,
     label="dimension_type",
     x="dimension",
     y="segment_users",
-    title="Campaign",
+    title='Example TimeSerie',
     ax=ax2
 )
-table_df = pd.read_csv('ts.csv')
-ax3 = fig.add_subplot(grid[2, 0])
+fig.show()
+
+
+fig, ax3 = plt.subplots()
 ax3 = plot_table(
     pd_df=ts_df,
     cols=["dimension_type", "dimension", "segment_users"],
-    title="Top",
+    title='Example Top Table',
     ax=ax3,
     sort_by="segment_users",
     ascending=False,
     max_values=10
 )
-ax4 = fig.add_subplot(grid[2, 1])
+fig.show()
+
+
+fig, ax4 = plt.subplots()
 ax4 = plot_table(
     pd_df=ts_df,
     cols=["dimension_type", "dimension", "segment_users"],
-    title="Worst",
+    title='Example Worst Table',
     ax=ax4,
     sort_by="segment_users",
     ascending=True,
     max_values=10
 )
-ax5 = fig.add_subplot(grid[3, 0:])
+fig.show()
+
+fig, ax5 = plt.subplots()
 ax5 = plot_pivotbar(ts_df,
                     label="dimension_type",
                     x="dimension",
                     y="segment_users",
                     title='Example Pivot Bar')
-fig.tight_layout()
-plt.show()
+
+fig.show()
+
 
 # %%

@@ -22,6 +22,24 @@ def _validate_panda(pd_df: pd.DataFrame,
         if col not in pd_df.columns:
             raise AttributeError(f"{col} is not a DataFrame's column")
 
+
+def format_func(
+                format_funcs: Optional[Dict[str, Optional[Callable[[Union[int, float, str]], str]]]],
+                label: Optional[str] = None,
+                x: Optional[str] = None,
+                y: Optional[str] = None,
+                z: Optional[str] = None):
+
+    if label and "label" in format_funcs:
+        format_funcs[label] = format_funcs["label"]
+    if x and "x" in format_funcs:
+        format_funcs[x] = format_funcs["x"]
+    if y and "y" in format_funcs:
+        format_funcs[y] = format_funcs["y"]
+    if z and "z" in format_funcs:
+        format_funcs[z] = format_funcs["z"]
+    return format_funcs
+
 # endregion
 
 # region Style
@@ -100,8 +118,10 @@ def string_formatter(value, pos: Optional[int] = None):
 def yy_mm__formatter(x, pos: Optional[int] = None):
     return num2date(x).strftime('%Y-%m')
 
+
 def yy_mm_dd__formatter(x, pos: Optional[int] = None):
     return num2date(x).strftime('%Y-%m-%D')
+
 
 def percent_formatter(x,  pos: Optional[int] = None):
     return f"{x * 100:.0f}%"

@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
-from .Style import DynamicFuncFormatter, StyleTemplate, string_formatter, _validate_panda, bmk_formatter
+from .Style import DynamicFuncFormatter, StyleTemplate, string_formatter, _validate_panda, bmk_formatter,format_func
 from typing import Optional
 
 TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
@@ -27,6 +27,8 @@ def plot_timeserie(pd_df: pd.DataFrame,
                    ax: Optional[Axes] = None) -> Axes:
 
     _validate_panda(pd_df, cols=[label, x, y], sort_by=sort_by)
+    style.format_funcs=format_func(style.format_funcs,label=label,x=x,y=y)
+
 
     df = pd_df[[label, x, y]].sort_values(by=[label, x])
     df[x] = pd.to_datetime(df[x])
@@ -49,12 +51,7 @@ def plot_timeserie(pd_df: pd.DataFrame,
 
         if style.format_funcs.get("label"):
             label_type = style.format_funcs.get("label")(label_type)
-        ax.plot(temp_df.index,
-                temp_df[y],
-                linestyle='-',
-                label=label_type,
-                color=color,
-                alpha=0.5)
+
         ma = temp_df[y].rolling(window=7, min_periods=1).mean()
         std_dev = temp_df[y].rolling(window=7, min_periods=1).std()
 
@@ -62,7 +59,7 @@ def plot_timeserie(pd_df: pd.DataFrame,
         last_ma_value = ma.iloc[-1]
 
         # Dynamically creating the legend label
-        label_str = f"{string_formatter(y)} (avg 7d: {style.format_funcs[y](last_ma_value)})"
+        label_str = f"{string_formatter(label_type)} (avg 7d: {style.format_funcs[y](last_ma_value)})"
 
         # Plot moving average and include the last MA value in the label for the legend
         plt.plot(temp_df.index, ma, color=color,

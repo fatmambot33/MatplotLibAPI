@@ -13,7 +13,7 @@ from networkx import Graph
 from networkx.classes.graph import Graph
 
 
-from .Style import StyleTemplate, string_formatter, _validate_panda
+from .Style import StyleTemplate, string_formatter, _validate_panda,format_func
 
 NETWORK_STYLE_TEMPLATE = StyleTemplate(
 )
@@ -337,6 +337,7 @@ def plot_network(pd_df: pd.DataFrame,
                  ax: Optional[Axes] = None) -> Axes:
 
     _validate_panda(pd_df, cols=[source, target, weight], sort_by=sort_by)
+    
     graph = Graph.from_pandas_edgelist(pd_df,
                                        source=source,
                                        target=target,

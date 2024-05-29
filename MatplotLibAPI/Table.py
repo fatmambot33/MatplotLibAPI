@@ -2,7 +2,7 @@ from typing import List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
-from .Style import (StyleTemplate, _validate_panda, string_formatter)
+from .Style import StyleTemplate, _validate_panda, string_formatter
 
 TABLE_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',
@@ -22,7 +22,7 @@ def plot_table(pd_df: pd.DataFrame,
                ax: Optional[Axes] = None
                ) -> Axes:
     _validate_panda(pd_df, cols=cols, sort_by=sort_by)
-
+    
     if not sort_by:
         sort_by = cols[0]
 

@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 import pandas as pd
 from .Style import StyleTemplate
 from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
-from .Composite import plot_bubble_composite
+from .Composite import plot_composite_bubble
 from .Timeserie import plot_timeserie,TIMESERIE_STYLE_TEMPLATE
 from .Table import plot_table, TABLE_STYLE_TEMPLATE
 from .Network import (Graph)
@@ -59,7 +59,7 @@ class MatPlotLibAccessor:
                               sort_by: Optional[str] = None,
                               ascending: bool = False) -> Figure:
 
-        return plot_bubble_composite(pd_df=self._obj,
+        return plot_composite_bubble(pd_df=self._obj,
                                      label=label,
                                      x=x,
                                      y=y,

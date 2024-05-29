@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
 from typing import Optional
-from .Style import (DynamicFuncFormatter,
-                    StyleTemplate, generate_ticks, _validate_panda, string_formatter, bmk_formatter, percent_formatter)
+from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, _validate_panda, string_formatter, bmk_formatter, percent_formatter, format_func
 
 
 BUBBLE_STYLE_TEMPLATE = StyleTemplate(
@@ -37,7 +36,8 @@ def plot_bubble(
         ax: Optional[Axes] = None):
 
     _validate_panda(pd_df, cols=[label, x, y, z], sort_by=sort_by)
-
+    style.format_funcs = format_func(
+        style.format_funcs, label=label, x=x, y=y, z=z)
     if not sort_by:
         sort_by = z
 

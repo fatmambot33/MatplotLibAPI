@@ -11,7 +11,7 @@ from matplotlib.dates import DateFormatter, MonthLocator
 
 
 
-from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda, percent_formatter
+from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda, percent_formatter,format_func
 
 PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',
@@ -40,7 +40,7 @@ def plot_pivotbar(pd_df: pd.DataFrame,
                   ax: Optional[Axes] = None):
 
     _validate_panda(pd_df, cols=[label, x, y], sort_by=sort_by)
-
+    style.format_funcs=format_func(style.format_funcs,label=label,x=x,y=y)
     pivot_df = pd.pivot_table(pd_df, values=y, index=[
                               x], columns=[label], aggfunc=agg)
     # Reset index to make x a column again
