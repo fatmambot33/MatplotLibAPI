@@ -11,7 +11,7 @@ if os.path.exists(requirements_file):
 
 setup(
     name='MatplotLibAPI',
-    version='v3.0.2',
+    version='v3.0.3',
     packages=find_packages(),
     install_requires=requirements,
     long_description=open('README.md').read(),
