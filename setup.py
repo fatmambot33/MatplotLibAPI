@@ -1,17 +1,13 @@
 import os
 from setuptools import setup, find_packages
 
-# Function to read requirements.txt
-def parse_requirements(filename):
-    if os.path.isfile(filename):
-        with open(filename, 'r') as file:
-            lines = file.read().splitlines()
-        # Filter out any empty lines or comments
-        return [line.strip() for line in lines if line.strip() and not line.startswith('#')]
-    return []
+requirements = []
+requirements_file = 'requirements.txt'
 
-# Read the requirements from requirements.txt
-requirements = parse_requirements('requirements.txt')
+# Check if the file exists
+if os.path.exists(requirements_file):
+    with open(requirements_file) as f:
+        requirements = f.read().splitlines()
 
 setup(
     name='MatplotLibAPI',
