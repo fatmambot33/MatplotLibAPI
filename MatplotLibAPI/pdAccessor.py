@@ -9,7 +9,7 @@ from .Utils import (StyleTemplate, BUBBLE_STYLE_TEMPLATE,
                     TIMESERIE_STYLE_TEMPLATE, TABLE_STYLE_TEMPLATE)
 from .Bubble import plot_bubble
 from .Composite import plot_bubble_composite
-from .Line import plot_line
+from .Timeserie import plot_timeserie
 from .Table import plot_table
 from .Network import (Graph)
 
@@ -32,7 +32,9 @@ class MatPlotLibAccessor:
                     title: str = "Test",
                     style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
                     max_values: int = 50,
-                    center_to_mean: bool = False) -> Axes:
+                    center_to_mean: bool = False,
+                    sort_by: Optional[str] = None,
+                    ascending: bool = False) -> Axes:
 
         return plot_bubble(pd_df=self._obj,
                            label=label,
@@ -42,17 +44,21 @@ class MatPlotLibAccessor:
                            title=title,
                            style=style,
                            max_values=max_values,
-                           center_to_mean=center_to_mean)
+                           center_to_mean=center_to_mean,
+                           sort_by=sort_by,
+                           ascending=ascending)
 
     def plot_bubble_composite(self,
                               label: str,
                               x: str,
                               y: str,
                               z: str,
-                              title: str = "Test",
+                              title: Optional[str] = None,
                               style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
                               max_values: int = 50,
-                              center_to_mean: bool = False) -> Figure:
+                              center_to_mean: bool = False,
+                              sort_by: Optional[str] = None,
+                              ascending: bool = False) -> Figure:
 
         return plot_bubble_composite(pd_df=self._obj,
                                      label=label,
@@ -62,11 +68,13 @@ class MatPlotLibAccessor:
                                      title=title,
                                      style=style,
                                      max_values=max_values,
-                                     center_to_mean=center_to_mean)
+                                     center_to_mean=center_to_mean,
+                                     sort_by=sort_by,
+                                     ascending=ascending)
 
     def plot_table(self,
                    cols: List[str],
-                   title: str = "test",
+                   title: Optional[str] = None,
                    style: StyleTemplate = TABLE_STYLE_TEMPLATE,
                    max_values: int = 20,
                    sort_by: Optional[str] = None,
@@ -80,26 +88,35 @@ class MatPlotLibAccessor:
                           sort_by=sort_by,
                           ascending=ascending)
 
-    def plot_line(self,
+    def plot_timeserie(self,
                   label: str,
                   x: str,
                   y: str,
-                  title: str = "Test",
-                  style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE) -> Axes:
+                  title: Optional[str] = None,
+                  style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
+                  max_values: int = 20,
+                  sort_by: Optional[str] = None,
+                  ascending: bool = False) -> Axes:
 
-        return plot_line(pd_df=self._obj,
+        return plot_timeserie(pd_df=self._obj,
                          label=label,
                          x=x,
                          y=y,
                          title=title,
-                         style=style)
+                         style=style,
+                         max_values=max_values,
+                          sort_by=sort_by,
+                          ascending=ascending)
 
     def plot_network(self,
                      source: str = "source",
                      target: str = "target",
                      weight: str = "weight",
-                     title: str = "Test",
-                     style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE) -> Axes:
+                     title: Optional[str] = None,
+                     style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
+                     max_values: int = 20,
+                     sort_by: Optional[str] = None,
+                     ascending: bool = False) -> Axes:
 
         graph = Graph.from_pandas_edgelist(df=self._obj,
                                            source=source,

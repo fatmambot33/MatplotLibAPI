@@ -6,8 +6,20 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
 from typing import Optional
-from .Utils import (BUBBLE_STYLE_TEMPLATE, DynamicFuncFormatter,
-                    StyleTemplate, generate_ticks, _validate_panda)
+from .Utils import (DynamicFuncFormatter,
+                    StyleTemplate, generate_ticks, _validate_panda, string_formatter, bmk_formatter, percent_formatter)
+
+
+BUBBLE_STYLE_TEMPLATE = StyleTemplate(
+    format_funcs={"label": string_formatter,
+                  "x": bmk_formatter,
+                  "y": percent_formatter,
+                  "label": string_formatter,
+                  "z": bmk_formatter},
+    yscale="log",
+    y_ticks=8,
+    x_ticks=8
+)
 
 
 def plot_bubble(

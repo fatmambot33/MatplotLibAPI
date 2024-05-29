@@ -13,8 +13,10 @@ from networkx import Graph
 from networkx.classes.graph import Graph
 
 
-from .Utils import (NETWORK_STYLE_TEMPLATE, StyleTemplate,
-                    string_formatter, _validate_panda)
+from .Utils import StyleTemplate, string_formatter, _validate_panda
+
+NETWORK_STYLE_TEMPLATE = StyleTemplate(
+)
 
 DEFAULT = {"MAX_EDGES": 100,
            "MAX_NODES": 30,

@@ -1,6 +1,6 @@
 # Hint for Visual Code Python Interactive window
 # %%
-from MatplotLibAPI import plot_line, plot_network, plot_table, plot_pivotbar, MatPlotLibAccessor
+from MatplotLibAPI import plot_timeserie, plot_network, plot_table, plot_pivotbar, MatPlotLibAccessor
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -9,7 +9,8 @@ bb_df = pd.read_csv('ts.csv')
 fig = bb_df.mpl.plot_bubble_composite(label="dimension",
                                       x="index",
                                       y="overlap",
-                                      z="users")
+                                      z="users",
+                                      sort_by="index")
 fig.show()
 
 

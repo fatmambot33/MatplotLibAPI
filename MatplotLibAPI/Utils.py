@@ -14,11 +14,11 @@ from matplotlib.ticker import FuncFormatter
 
 def _validate_panda(pd_df: pd.DataFrame,
                     cols: List[str],
-                    sort_by:Optional[str]=None):
-    _columns=cols.copy()
-    if sort_by and sort_by not in  _columns:
-         _columns.append(sort_by)
-    for col in  _columns:
+                    sort_by: Optional[str] = None):
+    _columns = cols.copy()
+    if sort_by and sort_by not in _columns:
+        _columns.append(sort_by)
+    for col in _columns:
         if col not in pd_df.columns:
             raise AttributeError(f"{col} is not a DataFrame's column")
 
@@ -36,8 +36,6 @@ BACKGROUND_COLOR = 'black'
 TEXT_COLOR = 'white'
 PALETTE = "Greys_r"
 FONT_SIZE = 14
-FONT_SIZE_MAPPING = {0: FONT_SIZE-4, 1: FONT_SIZE -
-                     2, 2: FONT_SIZE, 3: FONT_SIZE+2, 4: FONT_SIZE+4}
 
 
 @dataclass
@@ -92,58 +90,21 @@ def bmk_formatter(val, pos: Optional[int] = None):
 
 
 def integer_formatter(value, pos: Optional[int] = None):
-    # Example formatting function: here we simply return the value as a string with some prefix
     return f"{int(value)}"
 
 
 def string_formatter(value, pos: Optional[int] = None):
-    # Example formatting function: here we simply return the value as a string with some prefix
     return str(value).replace("-", " ").replace("_", " ").title()
 
 
-def year_month_formatter(x, pos: Optional[int] = None):
+def yy_mm__formatter(x, pos: Optional[int] = None):
     return num2date(x).strftime('%Y-%m')
 
+def yy_mm_dd__formatter(x, pos: Optional[int] = None):
+    return num2date(x).strftime('%Y-%m-%D')
 
 def percent_formatter(x,  pos: Optional[int] = None):
     return f"{x * 100:.0f}%"
-
-
-BUBBLE_STYLE_TEMPLATE = StyleTemplate(
-    format_funcs={"label": string_formatter,
-                  "x": bmk_formatter,
-                  "y": percent_formatter,
-                  "label": string_formatter,
-                  "z": bmk_formatter, },
-    y_ticks=5
-)
-TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
-    palette='rocket',
-    format_funcs={"y": bmk_formatter, "label": string_formatter}
-)
-PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
-    background_color='white',
-    fig_border='lightgrey',
-    palette='viridis',
-    format_funcs={"y": percent_formatter, "label": string_formatter}
-)
-PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
-    background_color='black',
-    fig_border='darkgrey',
-    font_color='white',
-    palette='magma',
-    format_funcs={"y": percent_formatter, "label": string_formatter}
-)
-
-TABLE_STYLE_TEMPLATE = StyleTemplate(
-    background_color='black',
-    fig_border='darkgrey',
-    font_color='white',
-    palette='magma'
-)
-
-NETWORK_STYLE_TEMPLATE = StyleTemplate(
-)
 
 
 def generate_ticks(min_val, max_val, num_ticks="10"):

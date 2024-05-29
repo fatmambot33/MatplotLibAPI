@@ -9,9 +9,24 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, MonthLocator
 
-from .Utils import (PIVOTBARS_STYLE_TEMPLATE, PIVOTLINES_STYLE_TEMPLATE,
-                    DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda)
 
+
+from .Utils import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda, percent_formatter
+
+PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
+    background_color='black',
+    fig_border='darkgrey',
+    font_color='white',
+    palette='magma',
+    format_funcs={"y": percent_formatter, 
+                  "label": string_formatter}
+)
+PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
+    background_color='white',
+    fig_border='lightgrey',
+    palette='viridis',
+    format_funcs={"y": percent_formatter, "label": string_formatter}
+)
 
 def plot_pivotbar(pd_df: pd.DataFrame,
                   label: str,

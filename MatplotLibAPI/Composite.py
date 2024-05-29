@@ -17,7 +17,7 @@ def plot_bubble_composite(
         z: str,
         title: Optional[str] = "Test",
         style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
-        max_values: int = BUBBLE_STYLE_TEMPLATE,
+        max_values: int = 50,
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
         ascending: bool = False,
@@ -55,7 +55,7 @@ def plot_bubble_composite(
     ax2 = fig.add_subplot(grid[1, 0])
     ax2 = plot_table(
         pd_df=pd_df,
-        cols=[label, z, x, y],
+        cols=[label, z, y, x],
         title=f"Top {table_rows}",
         ax=ax2,
         sort_by=sort_by,
@@ -66,7 +66,7 @@ def plot_bubble_composite(
     ax3 = fig.add_subplot(grid[1, 1])
     ax3 = plot_table(
         pd_df=pd_df,
-        cols=[label, z, x, y],
+        cols=[label, z, y, x],
         title=f"Worst {table_rows}",
         ax=ax3,
         sort_by=sort_by,

@@ -2,7 +2,14 @@ from typing import List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
-from .Utils import (TABLE_STYLE_TEMPLATE, StyleTemplate, _validate_panda)
+from .Utils import (StyleTemplate, _validate_panda, string_formatter)
+
+TABLE_STYLE_TEMPLATE = StyleTemplate(
+    background_color='black',
+    fig_border='darkgrey',
+    font_color='white',
+    palette='magma'
+)
 
 
 def plot_table(pd_df: pd.DataFrame,
@@ -14,7 +21,7 @@ def plot_table(pd_df: pd.DataFrame,
                ascending: bool = False,
                ax: Optional[Axes] = None
                ) -> Axes:
-    _validate_panda(pd_df, cols=cols,sort_by=sort_by)
+    _validate_panda(pd_df, cols=cols, sort_by=sort_by)
 
     if not sort_by:
         sort_by = cols[0]
@@ -44,7 +51,7 @@ def plot_table(pd_df: pd.DataFrame,
 
     table_plot = ax.table(
         cellText=plot_df.values,
-        colLabels=col_labels,
+        colLabels=[string_formatter(colLabel) for colLabel in col_labels],
         cellLoc='center',
         colWidths=style.col_widths,
         bbox=[0, -0.3, 1, 1.3])
