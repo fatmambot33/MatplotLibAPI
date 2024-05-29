@@ -1,3 +1,11 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+[project]
+name = "natplolib_package"
+version="v3.0.3"
+readme = "README.md"
+requires-python=">=3.7"
+dependencies = ["pandas","matplotlib","networkx","seaborn","scikit-learn",]
+
+
