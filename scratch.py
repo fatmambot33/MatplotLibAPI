@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-# bb_df = pd.read_csv('ts.csv')
-# fig = bb_df.mpl.plot_bubble_composite(label="dimension",
-#                                       x="index",
-#                                       y="overlap",
-#                                       z="users",
-#                                       sort_by="index")
-# fig.show()
+bb_df = pd.read_csv('ts.csv')
+fig = bb_df.mpl.plot_bubble_composite(label="dimension",
+                                      x="index",
+                                      y="overlap",
+                                      z="users",
+                                      sort_by="index")
+fig.show()
 
 
 nw_df = pd.read_csv('nw.csv')
