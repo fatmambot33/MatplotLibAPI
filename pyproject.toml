@@ -6,6 +6,6 @@ name = "MatplotLibAPI"
 version="v3.0.5"
 readme = "README.md"
 requires-python=">=3.7"
-dependencies = ["pandas","matplotlib","networkx","seaborn","scikit-learn",]
+dependencies = ["pandas","matplotlib","networkx","plotly","seaborn","scikit-learn",]
 
 

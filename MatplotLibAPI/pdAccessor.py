@@ -1,17 +1,20 @@
 
 import logging
 import warnings
+
 from typing import Optional, List
+import pandas as pd
+
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-import pandas as pd
+import plotly.graph_objects as go
 from .Style import StyleTemplate
 from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Composite import plot_composite_bubble
 from .Timeserie import plot_timeserie, TIMESERIE_STYLE_TEMPLATE
 from .Table import plot_table, TABLE_STYLE_TEMPLATE
-from .Network import (Graph)
-
+from .Network import Graph
+from .Treemap import plot_treemap, TREEMAP_STYLE_TEMPLATE
 
 warnings.filterwarnings('ignore')
 logging.getLogger().setLevel(logging.WARNING)
@@ -28,7 +31,7 @@ class MatPlotLibAccessor:
                     x: str,
                     y: str,
                     z: str,
-                    title: str = "Test",
+                    title: Optional[str] = None,
                     style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
                     max_values: int = 50,
                     center_to_mean: bool = False,
@@ -54,7 +57,7 @@ class MatPlotLibAccessor:
                               z: str,
                               title: Optional[str] = None,
                               style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
-                              max_values: int = 50,
+                              max_values: int = 100,
                               center_to_mean: bool = False,
                               sort_by: Optional[str] = None,
                               ascending: bool = False) -> Figure:
@@ -93,7 +96,7 @@ class MatPlotLibAccessor:
                        y: str,
                        title: Optional[str] = None,
                        style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
-                       max_values: int = 20,
+                       max_values: int = 100,
                        sort_by: Optional[str] = None,
                        ascending: bool = False) -> Axes:
 
@@ -123,3 +126,22 @@ class MatPlotLibAccessor:
                                            weight=weight)
 
         return graph.plotX(title, style)
+    
+    def plot_treemap(self,
+                 path: str,
+                 values: str,
+                 style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+                 title: Optional[str] = None,
+                 color: Optional[str] = None, 
+                 max_values: int = 100,
+                 sort_by: Optional[str] = None,
+                 ascending: bool = False) ->go.Figure:
+        return plot_treemap(pd_df=self._obj,
+                              path=path,
+                              values=values,
+                              title=title,
+                              style=style,
+                              color=color,
+                              max_values=max_values,
+                              sort_by=sort_by,
+                              ascending=ascending)
