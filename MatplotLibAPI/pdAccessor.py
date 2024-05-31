@@ -4,7 +4,7 @@ import warnings
 
 from typing import Optional, List
 import pandas as pd
-
+from pandas.api.extensions import register_dataframe_accessor
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import plotly.graph_objects as go
@@ -20,7 +20,7 @@ warnings.filterwarnings('ignore')
 logging.getLogger().setLevel(logging.WARNING)
 
 
-@pd.api.extensions.register_dataframe_accessor("mpl")
+@register_dataframe_accessor("mpl")
 class MatPlotLibAccessor:
 
     def __init__(self, pd_df: pd.DataFrame):
