@@ -26,7 +26,7 @@ def plot_treemap(pd_df: pd.DataFrame,
     cols = [path, values]
     if color:
         cols.append(color)
-    _validate_panda(df, cols=cols, sort_by=sort_by)
+    _validate_panda(pd_df, cols=cols, sort_by=sort_by)
     if not sort_by:
         sort_by = values
     df = pd_df.sort_values(by=sort_by, ascending=ascending)[
