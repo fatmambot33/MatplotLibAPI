@@ -1,7 +1,7 @@
-from typing import List, Optional
+from typing import Optional
 import pandas as pd
 import plotly.graph_objects as go
-from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, _validate_panda, percent_formatter, format_func
+from .Style import StyleTemplate, string_formatter, _validate_panda, percent_formatter
 
 TREEMAP_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',

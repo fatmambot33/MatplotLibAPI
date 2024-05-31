@@ -11,4 +11,4 @@ from .pdAccessor import MatPlotLibAccessor
 from .Style import StyleTemplate
 
 __all__ = ["plot_bubble", "plot_timeserie", "plot_table", "plot_network",
-           "plot_pivotbar", "plot_treemap","plot_composite_bubble", "StyleTemplate", "MatPlotLibAccessor"]
+           "plot_pivotbar", "plot_treemap", "plot_composite_bubble", "StyleTemplate", "MatPlotLibAccessor"]
