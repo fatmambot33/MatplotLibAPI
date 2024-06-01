@@ -1,12 +1,14 @@
 # Hint for Visual Code Python Interactive window
 # %%
+from typing import Optional
 import pandas as pd
-
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
-from .Style import DynamicFuncFormatter, StyleTemplate, string_formatter, _validate_panda, bmk_formatter, format_func
-from typing import Optional
+
+from .Style import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func
+from . import validate_dataframe
+
 
 TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
     palette='rocket',
@@ -26,7 +28,7 @@ def plot_timeserie(pd_df: pd.DataFrame,
                    ascending: bool = False,
                    ax: Optional[Axes] = None) -> Axes:
 
-    _validate_panda(pd_df, cols=[label, x, y], sort_by=sort_by)
+    validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
     style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
 
     df = pd_df[[label, x, y]].sort_values(by=[label, x])

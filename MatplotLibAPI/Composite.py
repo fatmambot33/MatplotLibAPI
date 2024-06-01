@@ -1,12 +1,17 @@
 # Hint for Visual Code Python Interactive window
 # %%
+from typing import Optional, Tuple
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-import pandas as pd
+
+from .Network import plot_network,plot_network_components,DEFAULT
 from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import plot_table
-from typing import Optional, Tuple
-from .Style import StyleTemplate, _validate_panda, format_func
+from .Style import StyleTemplate, format_func
+from . import validate_dataframe
+
+
 
 
 def plot_composite_bubble(
@@ -19,13 +24,13 @@ def plot_composite_bubble(
         style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
         max_values: int = 50,
         center_to_mean: bool = False,
-        filter_by:Optional[str] = None,
+        filter_by: Optional[str] = None,
         sort_by: Optional[str] = None,
         ascending: bool = False,
         table_rows: int = 10,
         figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
 
-    _validate_panda(pd_df, cols=[label, x, y, z], sort_by=sort_by)
+    validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
 
     if not sort_by:
         sort_by = z

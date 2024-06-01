@@ -21,7 +21,7 @@ logging.getLogger().setLevel(logging.WARNING)
 
 
 @register_dataframe_accessor("mpl")
-class MatPlotLibAccessor:
+class DataFrameAccessor:
 
     def __init__(self, pd_df: pd.DataFrame):
         self._obj = pd_df

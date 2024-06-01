@@ -1,13 +1,13 @@
 # Hint for Visual Code Python Interactive window
 # %%
-
+from typing import Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
-from typing import Optional
-from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, _validate_panda, string_formatter, bmk_formatter, percent_formatter, format_func
 
+from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func
+from . import validate_dataframe
 
 BUBBLE_STYLE_TEMPLATE = StyleTemplate(
     format_funcs={"label": string_formatter,
@@ -33,7 +33,7 @@ def plot_bubble(
         ascending: bool = False,
         ax: Optional[Axes] = None):
 
-    _validate_panda(pd_df, cols=[label, x, y, z], sort_by=sort_by)
+    validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
     style.format_funcs = format_func(
         style.format_funcs, label=label, x=x, y=y, z=z)
     if not sort_by:

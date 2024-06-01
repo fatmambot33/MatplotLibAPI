@@ -13,7 +13,8 @@ from networkx import Graph
 from networkx.classes.graph import Graph
 
 
-from .Style import StyleTemplate, string_formatter, _validate_panda,format_func
+from .Style import StyleTemplate, string_formatter, format_func
+from . import validate_dataframe
 
 NETWORK_STYLE_TEMPLATE = StyleTemplate(
 )
@@ -165,23 +166,22 @@ class Graph(nx.Graph):
 
         return node_size, edges_width, fonts_size
 
-    def subgraphX(self, node_list=None, max_edges: int = DEFAULT["MAX_EDGES"]):
+    def subgraph(self, node_list=None, max_edges: int = DEFAULT["MAX_EDGES"]) -> Graph:
         if node_list is None:
             node_list = self.nodes.sort("weight")[:DEFAULT["MAX_NODES"]]
         connected_subgraph_nodes = list(self.find_connected_subgraph())
         node_list = [
             node for node in node_list if node in connected_subgraph_nodes]
 
-        subgraph = nx.subgraph(
-            self, nbunch=node_list)
+        subgraph = nx.subgraph(self, nbunch=node_list)
         edges = subgraph.top_k_edges(attribute="weight", k=5).keys()
         subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
-        return subgraph
+        return Graph(subgraph)
 
-    def plotX(self,
-              title: str = "Test",
-              style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-              ax: Optional[Axes] = None) -> Axes:
+    def plot_network(self,
+                   title: str = "Test",
+                   style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                   ax: Optional[Axes] = None) -> Axes:
         """
         Plots the degree distribution of the graph, including a degree rank plot and a degree histogram.
         """
@@ -227,7 +227,7 @@ class Graph(nx.Graph):
 
         return ax
 
-    def analysis(self, node_list: Optional[List] = None,
+    def plot_network_components(self, node_list: Optional[List] = None,
                  scale: int = DEFAULT["GRAPH_SCALE"],
                  node_scale: int = DEFAULT["MAX_NODE_SIZE"],
                  edge_scale: float = DEFAULT["MAX_EDGE_WIDTH"],
@@ -235,13 +235,16 @@ class Graph(nx.Graph):
                  max_edges: int = DEFAULT["MAX_EDGES"],
                  plt_title: Optional[str] = "Top keywords"):
         # node_list=self.nodes_circuits(node_list)
-        g = self.subgraphX(max_edges=max_edges, node_list=node_list)
+        g = self.subgraph(max_edges=max_edges, node_list=node_list)
         connected_components = nx.connected_components(g)
+        axes=[]
         for connected_component in connected_components:
             if len(connected_component) > 5:
-                connected_component_graph = self.subgraphX(max_edges=max_edges,
-                                                           node_list=connected_component)
-                connected_component_graph.plotX()
+                connected_component_graph = self.subgraph(max_edges=max_edges,
+                                                          node_list=connected_component)
+                ax=connected_component_graph.plot_network()
+                axes.append(ax)
+        return axes
 
     def find_connected_subgraph(self):
         logging.info(f'find_connected_subgraph')
@@ -295,7 +298,7 @@ class Graph(nx.Graph):
     def from_pandas_edgelist(df: pd.DataFrame,
                              source: str = "source",
                              target: str = "target",
-                             weight: str = "weight"):
+                             weight: str = "weight") -> Graph:
         """
         Initialize netX instance with a simple dataframe
 
@@ -305,7 +308,6 @@ class Graph(nx.Graph):
         :param weight: Name of edges weight column in df_source.
 
         """
-        G = Graph()
         G = nx.from_pandas_edgelist(
             df, source=source, target=target, edge_attr=weight, create_using=G)
         G = G.find_connected_subgraph()
@@ -323,7 +325,7 @@ class Graph(nx.Graph):
         nx.set_node_attributes(G, node_aggregates, name=weight)
 
         G = G.edge_subgraph(edges=G.top_k_edges(attribute=weight))
-        return G
+        return Graph(G)
 
 
 def plot_network(pd_df: pd.DataFrame,
@@ -333,15 +335,49 @@ def plot_network(pd_df: pd.DataFrame,
                  title: str = "Test",
                  style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
                  sort_by: Optional[str] = None,
-                 ascending: bool = False,
+                 ascending: bool = False, 
+                 node_list: Optional[List] = None,
                  ax: Optional[Axes] = None) -> Axes:
+    if node_list:
+        df = pd_df[(pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))]
+    else:
+        df = pd_df
+    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
 
-    _validate_panda(pd_df, cols=[source, target, weight], sort_by=sort_by)
-    
-    graph = Graph.from_pandas_edgelist(pd_df,
+    graph = Graph.from_pandas_edgelist(df,
                                        source=source,
                                        target=target,
                                        weight=weight)
-    return graph.plotX(title=title,
+    return graph.plot_network(title=title,
                        style=style,
                        ax=ax)
+
+def plot_network_components(pd_df: pd.DataFrame,
+                 source: str = "source",
+                 target: str = "target",
+                 weight: str = "weight",
+                 title: str = "Test",
+                 style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                 sort_by: Optional[str] = None,
+                 node_list: Optional[List] = None,
+                 ascending: bool = False,
+                 ax: Optional[List[Axes]] = None) -> List[Axes]:
+    if node_list:
+        df = pd_df[(pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))]
+    else:
+        df = pd_df
+    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
+
+    graph = Graph.from_pandas_edgelist(df,
+                                       source=source,
+                                       target=target,
+                                       weight=weight)
+    connected_components = nx.connected_components(graph)
+    axes=[]
+    for connected_component in connected_components:
+        if len(connected_component) > 5:
+            connected_component_graph = graph.subgraph(node_list=connected_component)
+            ax=connected_component_graph.plot_network()
+            axes.append(ax)
+    return axes
+    

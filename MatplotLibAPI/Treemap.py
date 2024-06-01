@@ -1,7 +1,12 @@
+# Hint for Visual Code Python Interactive window
+# %%
 from typing import Optional
 import pandas as pd
 import plotly.graph_objects as go
-from .Style import StyleTemplate, string_formatter, _validate_panda, percent_formatter
+
+from .Style import StyleTemplate, string_formatter, percent_formatter
+from . import validate_dataframe
+
 
 TREEMAP_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',
@@ -26,7 +31,7 @@ def plot_treemap(pd_df: pd.DataFrame,
     cols = [path, values]
     if color:
         cols.append(color)
-    _validate_panda(pd_df, cols=cols, sort_by=sort_by)
+    validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
     if not sort_by:
         sort_by = values
     df = pd_df.sort_values(by=sort_by, ascending=ascending)[
@@ -35,21 +40,39 @@ def plot_treemap(pd_df: pd.DataFrame,
             "parents": [""] * len(df),
             "values": df[values],
             "textinfo": "label",
-            "name": title}
+            "name": title,
+            "textfont":
+                {"family": style.font_name,
+                 "size": style.font_size,
+                 "color": style.font_color}
+            }
 
-    if color:
-        df['color'] = df[color]
+    if color and color in pd_df.columns:
+        color_data = pd_df[color]
+        if pd.api.types.is_categorical_dtype(color_data) or pd.api.types.is_object_dtype(color_data):
+            color_data = color_data.astype('category').cat.codes
+        elif pd.api.types.is_bool_dtype(color_data):
+            color_data = color_data.astype(int)
+        data['marker'] = dict(colorscale="Viridis",
+                              colors=color_data.to_list())
+
+    g = go.Treemap(data)
 
     if not fig:
-        fig = go.Figure(data=data)
+        fig = go.Figure(g)
     else:
-        fig.add_trace(go.Treemap(data))
-    
+        fig.add_trace(g)
+
     fig.update_layout(
-        paper_bgcolor=style.background_color,
+        title=title,
         plot_bgcolor=style.background_color,
-        font=dict(color=style.font_color),
-        margin=dict(t=50, l=25, r=25, b=25))
+        paper_bgcolor=style.background_color,
+        font=dict(
+            family=style.font_name,
+            size=style.font_size,
+            color=style.font_color
+        ),
+        showlegend=style.legend if style else True)
 
     # Apply color scale
     fig.update_traces(
