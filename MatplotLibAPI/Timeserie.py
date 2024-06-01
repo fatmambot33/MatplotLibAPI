@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
 
-from .Style import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func
-from . import validate_dataframe
+from . import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func
+from .. import validate_dataframe
 
 
 TIMESERIE_STYLE_TEMPLATE = StyleTemplate(

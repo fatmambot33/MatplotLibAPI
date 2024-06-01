@@ -4,8 +4,8 @@ from typing import Optional
 import pandas as pd
 import plotly.graph_objects as go
 
-from .Style import StyleTemplate, string_formatter, percent_formatter
-from . import validate_dataframe
+from . import StyleTemplate, string_formatter, percent_formatter
+from .. import validate_dataframe
 
 
 TREEMAP_STYLE_TEMPLATE = StyleTemplate(

@@ -10,16 +10,15 @@ from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, MonthLocator
 
 
-
-from .Style import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter,  percent_formatter,format_func
-from . import validate_dataframe
+from . import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter,  percent_formatter, format_func
+from .. import validate_dataframe
 
 PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',
     fig_border='darkgrey',
     font_color='white',
     palette='magma',
-    format_funcs={"y": percent_formatter, 
+    format_funcs={"y": percent_formatter,
                   "label": string_formatter}
 )
 PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
@@ -28,6 +27,7 @@ PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
     palette='viridis',
     format_funcs={"y": percent_formatter, "label": string_formatter}
 )
+
 
 def plot_pivotbar(pd_df: pd.DataFrame,
                   label: str,
@@ -41,7 +41,7 @@ def plot_pivotbar(pd_df: pd.DataFrame,
                   ax: Optional[Axes] = None):
 
     validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
-    style.format_funcs=format_func(style.format_funcs,label=label,x=x,y=y)
+    style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
     pivot_df = pd.pivot_table(pd_df, values=y, index=[
                               x], columns=[label], aggfunc=agg)
     # Reset index to make x a column again
