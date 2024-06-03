@@ -2,10 +2,11 @@
 # %%
 from typing import Optional
 import pandas as pd
+from pandas import CategoricalDtype,BooleanDtype
 import plotly.graph_objects as go
 
-from . import StyleTemplate, string_formatter, percent_formatter
-from .. import validate_dataframe
+from . import StyleTemplate, string_formatter, percent_formatter,validate_dataframe
+
 
 
 TREEMAP_STYLE_TEMPLATE = StyleTemplate(
@@ -49,9 +50,9 @@ def plot_treemap(pd_df: pd.DataFrame,
 
     if color and color in pd_df.columns:
         color_data = pd_df[color]
-        if pd.api.types.is_categorical_dtype(color_data) or pd.api.types.is_object_dtype(color_data):
+        if isinstance(color_data, CategoricalDtype) or pd.api.types.is_object_dtype(color_data):
             color_data = color_data.astype('category').cat.codes
-        elif pd.api.types.is_bool_dtype(color_data):
+        elif isinstance(color_data, BooleanDtype):
             color_data = color_data.astype(int)
         data['marker'] = dict(colorscale="Viridis",
                               colors=color_data.to_list())

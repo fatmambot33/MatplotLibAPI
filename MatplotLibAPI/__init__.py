@@ -1,4 +1,10 @@
 
+from .Treemap import plot_treemap, TREEMAP_STYLE_TEMPLATE
+from .Network import Graph
+from .Table import plot_table, TABLE_STYLE_TEMPLATE
+from .Timeserie import plot_timeserie, TIMESERIE_STYLE_TEMPLATE
+from .Composite import plot_composite_bubble
+from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
 from typing import List, Optional, Dict, Callable, Union
 from dataclasses import dataclass
 import pandas as pd
@@ -11,15 +17,18 @@ from matplotlib.dates import num2date
 from matplotlib.ticker import FuncFormatter
 import plotly.graph_objects as go
 
-from . import StyleTemplate
-from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
-from .Composite import plot_composite_bubble
-from .Timeserie import plot_timeserie, TIMESERIE_STYLE_TEMPLATE
-from .Table import plot_table, TABLE_STYLE_TEMPLATE
-from .Network import Graph
-from .Treemap import plot_treemap, TREEMAP_STYLE_TEMPLATE
 
 # region Utils
+
+def validate_dataframe(pd_df: pd.DataFrame,
+                       cols: List[str],
+                       sort_by: Optional[str] = None):
+    _columns = cols.copy()
+    if sort_by and sort_by not in _columns:
+        _columns.append(sort_by)
+    for col in _columns:
+        if col not in pd_df.columns:
+            raise AttributeError(f"{col} is not a DataFrame's column")
 
 
 def format_func(

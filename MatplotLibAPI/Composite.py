@@ -8,8 +8,7 @@ from matplotlib.figure import Figure
 from .Network import plot_network, plot_network_components, DEFAULT
 from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import plot_table
-from . import StyleTemplate, format_func
-from .. import validate_dataframe
+from . import StyleTemplate, format_func, validate_dataframe
 
 
 def plot_composite_bubble(

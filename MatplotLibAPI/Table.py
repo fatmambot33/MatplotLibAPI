@@ -3,8 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-from . import StyleTemplate,  string_formatter
-from .. import validate_dataframe
+from . import StyleTemplate,  string_formatter,validate_dataframe
 
 TABLE_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',
