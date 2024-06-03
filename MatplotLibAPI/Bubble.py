@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
 
-from . import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func,validate_dataframe
+from .StyleTemplate import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func,validate_dataframe
 
 BUBBLE_STYLE_TEMPLATE = StyleTemplate(
     format_funcs={"label": string_formatter,

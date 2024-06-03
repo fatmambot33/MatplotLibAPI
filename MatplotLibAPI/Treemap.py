@@ -5,7 +5,7 @@ import pandas as pd
 from pandas import CategoricalDtype,BooleanDtype
 import plotly.graph_objects as go
 
-from . import StyleTemplate, string_formatter, percent_formatter,validate_dataframe
+from .StyleTemplate import StyleTemplate, string_formatter, percent_formatter,validate_dataframe
 
 
 
