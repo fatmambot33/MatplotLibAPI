@@ -1,12 +1,12 @@
 
 from .StyleTemplate import StyleTemplate
-from .Bubble import plot_bubble, BUBBLE_STYLE_TEMPLATE
+from .Bubble import plot_bubble_ax, plot_bubble_fig, BUBBLE_STYLE_TEMPLATE
 from .Composite import plot_composite_bubble
-from .Timeserie import plot_timeserie, TIMESERIE_STYLE_TEMPLATE
-from .Table import plot_table, TABLE_STYLE_TEMPLATE
+from .Timeserie import plot_timeserie_ax, plot_timeserie_fig, TIMESERIE_STYLE_TEMPLATE
+from .Table import plot_table_ax, plot_table_fig, TABLE_STYLE_TEMPLATE
 from .Network import plot_network, plot_network_components, NETWORK_STYLE_TEMPLATE
 from .Treemap import plot_treemap, TREEMAP_STYLE_TEMPLATE
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import pandas as pd
 from pandas.api.extensions import register_dataframe_accessor
 
@@ -21,31 +21,65 @@ class DataFrameAccessor:
     def __init__(self, pd_df: pd.DataFrame):
         self._obj = pd_df
 
-    def plot_bubble(self,
-                    label: str,
-                    x: str,
-                    y: str,
-                    z: str,
-                    title: Optional[str] = None,
-                    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
-                    max_values: int = 50,
-                    center_to_mean: bool = False,
-                    sort_by: Optional[str] = None,
-                    ascending: bool = False,
-                    ax: Optional[Axes] = None) -> Axes:
+    def plot_bubble_ax(self,
+                       label: str,
+                       x: str,
+                       y: str,
+                       z: str,
+                       title: Optional[str] = None,
+                       style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+                       max_values: int = 50,
+                       center_to_mean: bool = False,
+                       sort_by: Optional[str] = None,
+                       ascending: bool = False,
+                       hline: bool = False,
+                       vline: bool = False,
+                       ax: Optional[Axes] = None) -> Axes:
 
-        return plot_bubble(pd_df=self._obj,
-                           label=label,
-                           x=x,
-                           y=y,
-                           z=z,
-                           title=title,
-                           style=style,
-                           max_values=max_values,
-                           center_to_mean=center_to_mean,
-                           sort_by=sort_by,
-                           ascending=ascending,
-                           ax=ax)
+        return plot_bubble_ax(pd_df=self._obj,
+                              label=label,
+                              x=x,
+                              y=y,
+                              z=z,
+                              title=title,
+                              style=style,
+                              max_values=max_values,
+                              center_to_mean=center_to_mean,
+                              sort_by=sort_by,
+                              ascending=ascending,
+                              hline=hline,
+                              vline=vline,
+                              ax=ax)
+
+    def plot_bubble_fig(self,
+                        label: str,
+                        x: str,
+                        y: str,
+                        z: str,
+                        title: Optional[str] = None,
+                        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+                        max_values: int = 50,
+                        center_to_mean: bool = False,
+                        sort_by: Optional[str] = None,
+                        ascending: bool = False,
+                        hline: bool = False,
+                        vline: bool = False,
+                        figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+
+        return plot_bubble_fig(pd_df=self._obj,
+                               label=label,
+                               x=x,
+                               y=y,
+                               z=z,
+                               title=title,
+                               style=style,
+                               max_values=max_values,
+                               center_to_mean=center_to_mean,
+                               sort_by=sort_by,
+                               ascending=ascending,
+                               hline=hline,
+                               vline=vline,
+                               figsize=figsize)
 
     def plot_composite_bubble(self,
                               label: str,
@@ -73,45 +107,89 @@ class DataFrameAccessor:
                                      ascending=ascending,
                                      ax=ax)
 
-    def plot_table(self,
-                   cols: List[str],
-                   title: Optional[str] = None,
-                   style: StyleTemplate = TABLE_STYLE_TEMPLATE,
-                   max_values: int = 20,
-                   sort_by: Optional[str] = None,
-                   ascending: bool = False,
-                   ax: Optional[Axes] = None) -> Axes:
+    def plot_table_ax(self,
+                      cols: List[str],
+                      title: Optional[str] = None,
+                      style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+                      max_values: int = 20,
+                      sort_by: Optional[str] = None,
+                      ascending: bool = False,
+                      ax: Optional[Axes] = None) -> Axes:
 
-        return plot_table(pd_df=self._obj,
-                          cols=cols,
-                          title=title,
-                          style=style,
-                          max_values=max_values,
-                          sort_by=sort_by,
-                          ascending=ascending,
-                          ax=ax)
+        return plot_table_ax(pd_df=self._obj,
+                             cols=cols,
+                             title=title,
+                             style=style,
+                             max_values=max_values,
+                             sort_by=sort_by,
+                             ascending=ascending,
+                             ax=ax)
 
-    def plot_timeserie(self,
-                       label: str,
-                       x: str,
-                       y: str,
+    def plot_table_fig(self,
+                       cols: List[str],
                        title: Optional[str] = None,
-                       style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
-                       max_values: int = 100,
+                       style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+                       max_values: int = 20,
                        sort_by: Optional[str] = None,
                        ascending: bool = False,
-                       ax: Optional[Axes] = None) -> Axes:
+                       figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
 
-        return plot_timeserie(pd_df=self._obj,
-                              label=label,
-                              x=x,
-                              y=y,
+        return plot_table_fig(pd_df=self._obj,
+                              cols=cols,
                               title=title,
                               style=style,
                               max_values=max_values,
                               sort_by=sort_by,
                               ascending=ascending,
-                              ax=ax)
+                              figsize=figsize)
+
+    def plot_timeserie_ax(self,
+                          label: str,
+                          x: str,
+                          y: str,
+                          title: Optional[str] = None,
+                          style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
+                          max_values: int = 100,
+                          sort_by: Optional[str] = None,
+                          ascending: bool = False,
+                          std: bool = False,
+                          ax: Optional[Axes] = None) -> Axes:
+
+        return plot_timeserie_ax(pd_df=self._obj,
+                                 label=label,
+                                 x=x,
+                                 y=y,
+                                 title=title,
+                                 style=style,
+                                 max_values=max_values,
+                                 sort_by=sort_by,
+                                 ascending=ascending,
+                                 std=std,
+                                 ax=ax)
+
+    def plot_timeserie_fig(self,
+                           label: str,
+                           x: str,
+                           y: str,
+                           title: Optional[str] = None,
+                           style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
+                           max_values: int = 100,
+                           sort_by: Optional[str] = None,
+                           ascending: bool = False,
+                           std: bool = False,
+                           figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
+
+        return plot_timeserie_fig(pd_df=self._obj,
+                                  label=label,
+                                  x=x,
+                                  y=y,
+                                  title=title,
+                                  style=style,
+                                  max_values=max_values,
+                                  sort_by=sort_by,
+                                  ascending=ascending,
+                                  std=std,
+                                  figsize=figsize)
 
     def plot_network(self,
                      source: str = "source",
@@ -177,5 +255,5 @@ class DataFrameAccessor:
                             ascending=ascending)
 
 
-__all__ = ["validate_dataframe", "plot_bubble", "plot_timeserie", "plot_table", "plot_network", "plot_network_components",
+__all__ = ["validate_dataframe", "plot_bubble_ax", "plot_timeserie_ax", "plot_table_ax", "plot_network", "plot_network_components",
            "plot_pivotbar", "plot_treemap", "plot_composite_bubble", "StyleTemplate", "DataFrameAccessor"]

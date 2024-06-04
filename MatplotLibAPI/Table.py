@@ -1,9 +1,10 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
-from .StyleTemplate import StyleTemplate,  string_formatter,validate_dataframe
+from .StyleTemplate import StyleTemplate,  string_formatter, validate_dataframe
 
 TABLE_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',
@@ -13,7 +14,7 @@ TABLE_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
-def plot_table(pd_df: pd.DataFrame,
+def plot_table_ax(pd_df: pd.DataFrame,
                cols: List[str],
                title: Optional[str] = None,
                style: StyleTemplate = TABLE_STYLE_TEMPLATE,
@@ -23,7 +24,7 @@ def plot_table(pd_df: pd.DataFrame,
                ax: Optional[Axes] = None
                ) -> Axes:
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
-    
+
     if not sort_by:
         sort_by = cols[0]
 
@@ -64,3 +65,27 @@ def plot_table(pd_df: pd.DataFrame,
         ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
         ax.title.set_position([0.5, 1.05])
     return ax
+
+
+def plot_table_fig(pd_df: pd.DataFrame,
+               cols: List[str],
+               title: Optional[str] = None,
+               style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+               max_values: int = 20,
+               sort_by: Optional[str] = None,
+               ascending: bool = False,
+               figsize: Tuple[float, float] = (19.2, 10.8)
+               ) -> Figure:
+    fig = plt.figure(figsize=figsize)
+    fig.patch.set_facecolor(style.background_color)
+    ax = fig.add_subplot()
+    ax = plot_table_ax(pd_df,
+                    cols,
+                    title,
+                    style,
+                    max_values,
+                    sort_by,
+                    ascending,
+                    ax
+                    )
+    return fig

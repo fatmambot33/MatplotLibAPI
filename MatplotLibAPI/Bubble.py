@@ -1,12 +1,13 @@
 # Hint for Visual Code Python Interactive window
 # %%
-from typing import Optional
+from typing import Optional, Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 import seaborn as sns
 
-from .StyleTemplate import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func,validate_dataframe
+from .StyleTemplate import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func, validate_dataframe
 
 BUBBLE_STYLE_TEMPLATE = StyleTemplate(
     format_funcs={"label": string_formatter,
@@ -18,7 +19,7 @@ BUBBLE_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
-def plot_bubble(
+def plot_bubble_ax(
         pd_df: pd.DataFrame,
         label: str,
         x: str,
@@ -30,6 +31,8 @@ def plot_bubble(
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
         ascending: bool = False,
+        hline=False,
+        vline=False,
         ax: Optional[Axes] = None):
 
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
@@ -92,17 +95,18 @@ def plot_bubble(
                    which='major',
                    colors=style.font_color,
                    labelsize=style.font_size)
-
-    ax.vlines(x=x_mean,
-              ymin=y_min,
-              ymax=y_max,
-              linestyle='--',
-              colors=style.font_color)
-    ax.hlines(y=y_mean,
-              xmin=x_min,
-              xmax=x_max,
-              linestyle='--',
-              colors=style.font_color)
+    if vline:
+        ax.vlines(x=x_mean,
+                ymin=y_min,
+                ymax=y_max,
+                linestyle='--',
+                colors=style.font_color)
+    if hline:
+        ax.hlines(y=y_mean,
+                xmin=x_min,
+                xmax=x_max,
+                linestyle='--',
+                colors=style.font_color)
 
     for index, row in plot_df.iterrows():
         x_value = row[x]
@@ -119,6 +123,43 @@ def plot_bubble(
     if title:
         ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
     return ax
+
+
+def plot_bubble_fig(
+        pd_df: pd.DataFrame,
+        label: str,
+        x: str,
+        y: str,
+        z: str,
+        title: Optional[str] = "Test",
+        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        max_values: int = BUBBLE_STYLE_TEMPLATE,
+        center_to_mean: bool = False,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        hline=False,
+        vline=False,
+        figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+
+    fig = plt.figure(figsize=figsize)
+    fig.patch.set_facecolor(style.background_color)
+    ax = fig.add_subplot()
+    ax = plot_bubble_ax(pd_df=pd_df,
+                        label=label,
+                        x=x,
+                        y=y,
+                        z=z,
+                        title=title,
+                        style=style,
+                        max_values=max_values,
+                        center_to_mean=center_to_mean,
+                        sort_by=sort_by,
+                        ascending=ascending,
+                        hline=hline,
+                        vline=vline,
+                        ax=ax)
+    return fig
+
 
 
 # endregion
