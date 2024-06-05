@@ -18,7 +18,7 @@ TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
 # region Line
 
 
-def plot_timeserie_ax(pd_df: pd.DataFrame,
+def aplot_timeserie(pd_df: pd.DataFrame,
                       label: str,
                       x: str,
                       y: str,
@@ -99,7 +99,7 @@ def plot_timeserie_ax(pd_df: pd.DataFrame,
     return ax
 
 
-def plot_timeserie_fig(pd_df: pd.DataFrame,
+def fplot_timeserie(pd_df: pd.DataFrame,
                        label: str,
                        x: str,
                        y: str,
@@ -113,7 +113,7 @@ def plot_timeserie_fig(pd_df: pd.DataFrame,
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
-    ax = plot_timeserie_ax(pd_df=pd_df,
+    ax = aplot_timeserie(pd_df=pd_df,
                            label=label,
                            x=x,
                            y=y,

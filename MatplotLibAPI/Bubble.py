@@ -19,7 +19,7 @@ BUBBLE_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
-def plot_bubble_ax(
+def aplot_bubble(
         pd_df: pd.DataFrame,
         label: str,
         x: str,
@@ -125,7 +125,7 @@ def plot_bubble_ax(
     return ax
 
 
-def plot_bubble_fig(
+def fplot_bubble(
         pd_df: pd.DataFrame,
         label: str,
         x: str,
@@ -144,7 +144,7 @@ def plot_bubble_fig(
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
-    ax = plot_bubble_ax(pd_df=pd_df,
+    ax = aplot_bubble(pd_df=pd_df,
                         label=label,
                         x=x,
                         y=y,

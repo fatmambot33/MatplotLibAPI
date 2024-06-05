@@ -14,7 +14,7 @@ TABLE_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
-def plot_table_ax(pd_df: pd.DataFrame,
+def aplot_table(pd_df: pd.DataFrame,
                cols: List[str],
                title: Optional[str] = None,
                style: StyleTemplate = TABLE_STYLE_TEMPLATE,
@@ -67,7 +67,7 @@ def plot_table_ax(pd_df: pd.DataFrame,
     return ax
 
 
-def plot_table_fig(pd_df: pd.DataFrame,
+def fplot_table(pd_df: pd.DataFrame,
                cols: List[str],
                title: Optional[str] = None,
                style: StyleTemplate = TABLE_STYLE_TEMPLATE,
@@ -79,7 +79,7 @@ def plot_table_fig(pd_df: pd.DataFrame,
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
-    ax = plot_table_ax(pd_df,
+    ax = aplot_table(pd_df,
                     cols,
                     title,
                     style,

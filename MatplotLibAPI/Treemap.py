@@ -19,7 +19,7 @@ TREEMAP_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
-def plot_treemap(pd_df: pd.DataFrame,
+def fplot_treemap(pd_df: pd.DataFrame,
                  path: str,
                  values: str,
                  style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,

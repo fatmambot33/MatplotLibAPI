@@ -5,8 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from .Bubble import plot_bubble_ax, BUBBLE_STYLE_TEMPLATE
-from .Table import plot_table_ax
+from .Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
+from .Table import aplot_table
 from .StyleTemplate import StyleTemplate, format_func, validate_dataframe
 
 
@@ -41,7 +41,7 @@ def plot_composite_bubble(
     fig.patch.set_facecolor(style.background_color)
     grid = plt.GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
-    ax = plot_bubble_ax(pd_df=plot_df,
+    ax = aplot_bubble(pd_df=plot_df,
                      label=label,
                      x=x,
                      y=y,
@@ -64,7 +64,7 @@ def plot_composite_bubble(
         style.format_funcs[z] = style.format_funcs["z"]
 
     ax2 = fig.add_subplot(grid[1, 0])
-    ax2 = plot_table_ax(
+    ax2 = aplot_table(
         pd_df=plot_df,
         cols=[label, z, y, x],
         title=f"Top {table_rows}",
@@ -75,7 +75,7 @@ def plot_composite_bubble(
         style=style
     )
     ax3 = fig.add_subplot(grid[1, 1])
-    ax3 = plot_table_ax(
+    ax3 = aplot_table(
         pd_df=plot_df,
         cols=[label, z, y, x],
         title=f"Worst {table_rows}",

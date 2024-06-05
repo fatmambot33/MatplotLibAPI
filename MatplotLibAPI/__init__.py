@@ -1,11 +1,11 @@
 
 from .StyleTemplate import StyleTemplate
-from .Bubble import plot_bubble_ax, plot_bubble_fig, BUBBLE_STYLE_TEMPLATE
+from .Bubble import aplot_bubble, fplot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Composite import plot_composite_bubble
-from .Timeserie import plot_timeserie_ax, plot_timeserie_fig, TIMESERIE_STYLE_TEMPLATE
-from .Table import plot_table_ax, plot_table_fig, TABLE_STYLE_TEMPLATE
-from .Network import plot_network, plot_network_components, NETWORK_STYLE_TEMPLATE
-from .Treemap import plot_treemap, TREEMAP_STYLE_TEMPLATE
+from .Timeserie import aplot_timeserie, fplot_timeserie, TIMESERIE_STYLE_TEMPLATE
+from .Table import aplot_table, fplot_table, TABLE_STYLE_TEMPLATE
+from .Network import aplot_network, aplot_network_components, NETWORK_STYLE_TEMPLATE
+from .Treemap import fplot_treemap, TREEMAP_STYLE_TEMPLATE
 from typing import List, Optional, Tuple
 import pandas as pd
 from pandas.api.extensions import register_dataframe_accessor
@@ -21,7 +21,7 @@ class DataFrameAccessor:
     def __init__(self, pd_df: pd.DataFrame):
         self._obj = pd_df
 
-    def plot_bubble_ax(self,
+    def aplot_bubble(self,
                        label: str,
                        x: str,
                        y: str,
@@ -36,7 +36,7 @@ class DataFrameAccessor:
                        vline: bool = False,
                        ax: Optional[Axes] = None) -> Axes:
 
-        return plot_bubble_ax(pd_df=self._obj,
+        return aplot_bubble(pd_df=self._obj,
                               label=label,
                               x=x,
                               y=y,
@@ -51,7 +51,7 @@ class DataFrameAccessor:
                               vline=vline,
                               ax=ax)
 
-    def plot_bubble_fig(self,
+    def fplot_bubble(self,
                         label: str,
                         x: str,
                         y: str,
@@ -66,7 +66,7 @@ class DataFrameAccessor:
                         vline: bool = False,
                         figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
 
-        return plot_bubble_fig(pd_df=self._obj,
+        return fplot_bubble(pd_df=self._obj,
                                label=label,
                                x=x,
                                y=y,
@@ -81,7 +81,7 @@ class DataFrameAccessor:
                                vline=vline,
                                figsize=figsize)
 
-    def plot_composite_bubble(self,
+    def fplot_composite_bubble(self,
                               label: str,
                               x: str,
                               y: str,
@@ -107,7 +107,7 @@ class DataFrameAccessor:
                                      ascending=ascending,
                                      ax=ax)
 
-    def plot_table_ax(self,
+    def aplot_table_ax(self,
                       cols: List[str],
                       title: Optional[str] = None,
                       style: StyleTemplate = TABLE_STYLE_TEMPLATE,
@@ -116,7 +116,7 @@ class DataFrameAccessor:
                       ascending: bool = False,
                       ax: Optional[Axes] = None) -> Axes:
 
-        return plot_table_ax(pd_df=self._obj,
+        return aplot_table(pd_df=self._obj,
                              cols=cols,
                              title=title,
                              style=style,
@@ -125,7 +125,7 @@ class DataFrameAccessor:
                              ascending=ascending,
                              ax=ax)
 
-    def plot_table_fig(self,
+    def fplot_table(self,
                        cols: List[str],
                        title: Optional[str] = None,
                        style: StyleTemplate = TABLE_STYLE_TEMPLATE,
@@ -134,7 +134,7 @@ class DataFrameAccessor:
                        ascending: bool = False,
                        figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
 
-        return plot_table_fig(pd_df=self._obj,
+        return fplot_table(pd_df=self._obj,
                               cols=cols,
                               title=title,
                               style=style,
@@ -143,7 +143,7 @@ class DataFrameAccessor:
                               ascending=ascending,
                               figsize=figsize)
 
-    def plot_timeserie_ax(self,
+    def aplot_timeserie(self,
                           label: str,
                           x: str,
                           y: str,
@@ -155,7 +155,7 @@ class DataFrameAccessor:
                           std: bool = False,
                           ax: Optional[Axes] = None) -> Axes:
 
-        return plot_timeserie_ax(pd_df=self._obj,
+        return aplot_timeserie(pd_df=self._obj,
                                  label=label,
                                  x=x,
                                  y=y,
@@ -167,7 +167,7 @@ class DataFrameAccessor:
                                  std=std,
                                  ax=ax)
 
-    def plot_timeserie_fig(self,
+    def fplot_timeserie(self,
                            label: str,
                            x: str,
                            y: str,
@@ -179,7 +179,7 @@ class DataFrameAccessor:
                            std: bool = False,
                            figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
 
-        return plot_timeserie_fig(pd_df=self._obj,
+        return fplot_timeserie(pd_df=self._obj,
                                   label=label,
                                   x=x,
                                   y=y,
@@ -191,7 +191,7 @@ class DataFrameAccessor:
                                   std=std,
                                   figsize=figsize)
 
-    def plot_network(self,
+    def aplot_network(self,
                      source: str = "source",
                      target: str = "target",
                      weight: str = "weight",
@@ -202,7 +202,7 @@ class DataFrameAccessor:
                      node_list: Optional[List] = None,
                      ax: Optional[Axes] = None) -> Axes:
 
-        return plot_network(df=self._obj,
+        return aplot_network(df=self._obj,
                             source=source,
                             target=target,
                             weight=weight,
@@ -213,7 +213,7 @@ class DataFrameAccessor:
                             node_list=node_list,
                             ax=ax)
 
-    def plot_network_components(self,
+    def aplot_network_components(self,
                                 source: str = "source",
                                 target: str = "target",
                                 weight: str = "weight",
@@ -224,7 +224,7 @@ class DataFrameAccessor:
                                 node_list: Optional[List] = None,
                                 ax: Optional[Axes] = None) -> Axes:
 
-        return plot_network_components(df=self._obj,
+        return aplot_network_components(df=self._obj,
                                        source=source,
                                        target=target,
                                        weight=weight,
@@ -235,7 +235,7 @@ class DataFrameAccessor:
                                        node_list=node_list,
                                        ax=ax)
 
-    def plot_treemap(self,
+    def fplot_treemap(self,
                      path: str,
                      values: str,
                      style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
@@ -244,7 +244,7 @@ class DataFrameAccessor:
                      max_values: int = 100,
                      sort_by: Optional[str] = None,
                      ascending: bool = False) -> go.Figure:
-        return plot_treemap(pd_df=self._obj,
+        return fplot_treemap(pd_df=self._obj,
                             path=path,
                             values=values,
                             title=title,
@@ -255,5 +255,5 @@ class DataFrameAccessor:
                             ascending=ascending)
 
 
-__all__ = ["validate_dataframe", "plot_bubble_ax", "plot_timeserie_ax", "plot_table_ax", "plot_network", "plot_network_components",
-           "plot_pivotbar", "plot_treemap", "plot_composite_bubble", "StyleTemplate", "DataFrameAccessor"]
+__all__ = ["validate_dataframe", "aplot_bubble", "aplot_timeserie", "aplot_table", "aplot_network", "aplot_network_components",
+           "plot_pivotbar", "fplot_treemap", "plot_composite_bubble", "StyleTemplate", "DataFrameAccessor"]

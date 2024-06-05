@@ -327,7 +327,7 @@ class Graph(nx.Graph):
         return Graph(G)
 
 
-def plot_network(pd_df: pd.DataFrame,
+def aplot_network(pd_df: pd.DataFrame,
                  source: str = "source",
                  target: str = "target",
                  weight: str = "weight",
@@ -351,7 +351,7 @@ def plot_network(pd_df: pd.DataFrame,
                        style=style,
                        ax=ax)
 
-def plot_network_components(pd_df: pd.DataFrame,
+def aplot_network_components(pd_df: pd.DataFrame,
                  source: str = "source",
                  target: str = "target",
                  weight: str = "weight",
