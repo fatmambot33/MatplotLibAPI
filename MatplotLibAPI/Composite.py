@@ -1,9 +1,11 @@
 # Hint for Visual Code Python Interactive window
 # %%
-from typing import Optional, Tuple
+from typing import Optional, Tuple,List,Union, Dict
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import GridSpec
 from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 
 from .Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import aplot_table
@@ -78,7 +80,7 @@ def plot_composite_bubble(
     ax3 = aplot_table(
         pd_df=plot_df,
         cols=[label, z, y, x],
-        title=f"Worst {table_rows}",
+        title=f"Last {table_rows}",
         ax=ax3,
         sort_by=sort_by,
         ascending=True,
@@ -87,3 +89,4 @@ def plot_composite_bubble(
     )
     fig.tight_layout()
     return fig
+
