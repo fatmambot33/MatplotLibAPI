@@ -105,7 +105,7 @@ class DataFrameAccessor:
                                      sort_by=sort_by,
                                      ascending=ascending)
 
-    def aplot_table_ax(self,
+    def aplot_table(self,
                        cols: List[str],
                        title: Optional[str] = None,
                        style: StyleTemplate = TABLE_STYLE_TEMPLATE,
