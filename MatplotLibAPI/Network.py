@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 import seaborn as sns
 import networkx as nx
 import numpy as np
@@ -13,7 +14,7 @@ from networkx import Graph
 from networkx.classes.graph import Graph
 
 
-from .StyleTemplate import StyleTemplate, string_formatter, format_func,validate_dataframe
+from .StyleTemplate import StyleTemplate, string_formatter, format_func, validate_dataframe
 
 NETWORK_STYLE_TEMPLATE = StyleTemplate(
 )
@@ -89,13 +90,14 @@ class EdgeView(nx.classes.reportviews.EdgeView):
         return [(edge[0], edge[1]) for edge in filtered_edges]
 
 
-class Graph(nx.Graph):
+class networkGraph():
     """
     Custom graph class based on NetworkX's Graph class.
     """
+    _nx_graph: nx.Graph
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, nx_graph: nx.Graph):
+        self._nx_graph = nx_graph
         self._scale = 1.0
 
     @property
@@ -108,7 +110,7 @@ class Graph(nx.Graph):
 
     @property
     def nodes(self):
-        return NodeView(self)
+        return NodeView(self._nx_graph)
 
     @nodes.setter
     def scale(self, value: NodeView):
@@ -116,21 +118,22 @@ class Graph(nx.Graph):
 
     @property
     def edges(self):
-        return EdgeView(self)
+        return EdgeView(self._nx_graph)
 
     @property
     def adjacency(self):
-        return AdjacencyView(list(self))
+        return AdjacencyView(list(self._nx_graph))
 
-    def edge_subgraph(self, edges: Iterable) -> Graph:
-        return nx.edge_subgraph(self, edges)
+    def edge_subgraph(self, edges: Iterable) -> 'networkGraph':
+        return nx.edge_subgraph(self._nx_graph, edges)
 
     def layout(self,
                max_node_size: int = DEFAULT["MAX_NODES"],
                min_node_size: int = DEFAULT["MAX_NODES"],
                max_edge_width: int = DEFAULT["MAX_EDGE_WIDTH"],
                max_font_size: int = DEFAULT["MAX_FONT_SIZE"],
-               min_font_size: int = DEFAULT["MIN_FONT_SIZE"]):
+               min_font_size: int = DEFAULT["MIN_FONT_SIZE"],
+               weight: str = "weight"):
         """
         Calculates the sizes for nodes, edges, and fonts based on node weights and edge weights.
 
@@ -144,13 +147,13 @@ class Graph(nx.Graph):
           and font sizes for node labels.
         """
         # Normalize and scale nodes' weights within the desired range of edge widths
-        node_weights = [data.get('weight', 1)
+        node_weights = [data.get(weight, 1)
                         for node, data in self.nodes(data=True)]
         node_size = scale_weights(
             weights=node_weights, scale_max=max_node_size, scale_min=min_node_size)
 
         # Normalize and scale edges' weights within the desired range of edge widths
-        edge_weights = [data.get('weight', 0)
+        edge_weights = [data.get(weight, 1)
                         for _, _, data in self.edges(data=True)]
         edges_width = scale_weights(
             weights=edge_weights, scale_max=max_edge_width)
@@ -165,7 +168,9 @@ class Graph(nx.Graph):
 
         return node_size, edges_width, fonts_size
 
-    def subgraph(self, node_list=None, max_edges: int = DEFAULT["MAX_EDGES"]) -> Graph:
+    def subgraph(self,
+                 node_list: Optional[List[str]] = None,
+                 max_edges: int = DEFAULT["MAX_EDGES"]) -> 'networkGraph':
         if node_list is None:
             node_list = self.nodes.sort("weight")[:DEFAULT["MAX_NODES"]]
         connected_subgraph_nodes = list(self.find_connected_subgraph())
@@ -175,16 +180,18 @@ class Graph(nx.Graph):
         subgraph = nx.subgraph(self, nbunch=node_list)
         edges = subgraph.top_k_edges(attribute="weight", k=5).keys()
         subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
-        return Graph(subgraph)
+        return networkGraph(subgraph)
 
     def plot_network(self,
-                   title: str = "Test",
-                   style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                   ax: Optional[Axes] = None) -> Axes:
+                     title: Optional[str] = None,
+                     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                     weight: str = "weight",
+                     ax: Optional[Axes] = None) -> Axes:
         """
         Plots the degree distribution of the graph, including a degree rank plot and a degree histogram.
         """
-        degree_sequence = sorted([d for n, d in self.degree()], reverse=True)
+        degree_sequence = sorted(
+            [d for n, d in self._nx_graph.degree()], reverse=True)
         dmax = max(degree_sequence)
         sns.set_palette(style.palette)
         if ax is None:
@@ -195,21 +202,22 @@ class Graph(nx.Graph):
             max_node_size=DEFAULT["MAX_NODE_SIZE"],
             max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
             min_font_size=style.font_mapping.get(0),
-            max_font_size=style.font_mapping.get(4))
-        pos = nx.spring_layout(self, k=1)
+            max_font_size=style.font_mapping.get(4),
+            weight=weight)
+        pos = nx.spring_layout(self._nx_graph, k=1)
         # nodes
-        nx.draw_networkx_nodes(self,
+        nx.draw_networkx_nodes(self._nx_graph,
                                pos,
                                ax=ax,
                                node_size=list(node_sizes),
                                node_color=node_sizes,
-                               cmap=plt.cm.get_cmap(style.palette))
+                               cmap=plt.get_cmap(style.palette))
         # edges
-        nx.draw_networkx_edges(self,
+        nx.draw_networkx_edges(self._nx_graph,
                                pos,
                                ax=ax,
                                edge_color=style.font_color,
-                               edge_cmap=plt.cm.get_cmap(style.palette),
+                               edge_cmap=plt.get_cmap(style.palette),
                                width=edge_widths)
         # labels
         for font_size, nodes in font_sizes.items():
@@ -221,34 +229,37 @@ class Graph(nx.Graph):
                 font_color=style.font_color,
                 labels={n: string_formatter(n) for n in nodes})
         ax.set_facecolor(style.background_color)
-        ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
+        if title:
+            ax.set_title(title, color=style.font_color,
+                         fontsize=style.font_size*2)
         ax.set_axis_off()
 
         return ax
 
-    def plot_network_components(self, node_list: Optional[List] = None,
-                 scale: int = DEFAULT["GRAPH_SCALE"],
-                 node_scale: int = DEFAULT["MAX_NODE_SIZE"],
-                 edge_scale: float = DEFAULT["MAX_EDGE_WIDTH"],
-                 max_nodes: int = DEFAULT["MAX_NODES"],
-                 max_edges: int = DEFAULT["MAX_EDGES"],
-                 plt_title: Optional[str] = "Top keywords"):
+    def plot_network_components(self,
+                                node_list: Optional[List] = None,
+                                scale: int = DEFAULT["GRAPH_SCALE"],
+                                node_scale: int = DEFAULT["MAX_NODE_SIZE"],
+                                edge_scale: float = DEFAULT["MAX_EDGE_WIDTH"],
+                                max_nodes: int = DEFAULT["MAX_NODES"],
+                                max_edges: int = DEFAULT["MAX_EDGES"],
+                                plt_title: Optional[str] = "Top keywords"):
         # node_list=self.nodes_circuits(node_list)
         g = self.subgraph(max_edges=max_edges, node_list=node_list)
         connected_components = nx.connected_components(g)
-        axes=[]
+        axes = []
         for connected_component in connected_components:
             if len(connected_component) > 5:
                 connected_component_graph = self.subgraph(max_edges=max_edges,
                                                           node_list=connected_component)
-                ax=connected_component_graph.plot_network()
+                ax = connected_component_graph.plot_network()
                 axes.append(ax)
         return axes
 
-    def find_connected_subgraph(self):
+    def find_connected_subgraph(self) -> 'networkGraph':
         logging.info(f'find_connected_subgraph')
         # Copy the original graph to avoid modifying it
-        H = self.copy()
+        H = self._nx_graph.copy()
 
         # Flag to keep track of whether any node with degree < 2 was removed
         removed_node = True
@@ -265,7 +276,7 @@ class Graph(nx.Graph):
                     removed_node = True
                     break
 
-        return H
+        return networkGraph(H)
 
     def top_k_edges(self, attribute: str, reverse: bool = True, k: int = 5) -> Dict[Any, List[Tuple[Any, Dict]]]:
         """
@@ -297,7 +308,7 @@ class Graph(nx.Graph):
     def from_pandas_edgelist(df: pd.DataFrame,
                              source: str = "source",
                              target: str = "target",
-                             weight: str = "weight") -> Graph:
+                             weight: str = "weight") -> 'networkGraph':
         """
         Initialize netX instance with a simple dataframe
 
@@ -307,11 +318,12 @@ class Graph(nx.Graph):
         :param weight: Name of edges weight column in df_source.
 
         """
-        G = nx.from_pandas_edgelist(
-            df, source=source, target=target, edge_attr=weight, create_using=G)
-        G = G.find_connected_subgraph()
+        network_G = nx.from_pandas_edgelist(
+            df, source=source, target=target, edge_attr=weight)
+        network_G = networkGraph(network_G)
+        network_G = network_G.find_connected_subgraph()
 
-        edge_aggregates = G.top_k_edges(attribute=weight, k=10)
+        edge_aggregates = network_G.top_k_edges(attribute=weight, k=10)
         node_aggregates = {}
         for (u, v), weight_value in edge_aggregates.items():
             if u not in node_aggregates:
@@ -321,62 +333,136 @@ class Graph(nx.Graph):
             node_aggregates[u] += weight_value
             node_aggregates[v] += weight_value
 
-        nx.set_node_attributes(G, node_aggregates, name=weight)
+        nx.set_node_attributes(network_G, node_aggregates, name=weight)
 
-        G = G.edge_subgraph(edges=G.top_k_edges(attribute=weight))
-        return Graph(G)
+        network_G = network_G.edge_subgraph(
+            edges=network_G.top_k_edges(attribute=weight))
+        return networkGraph(network_G)
 
 
 def aplot_network(pd_df: pd.DataFrame,
-                 source: str = "source",
-                 target: str = "target",
-                 weight: str = "weight",
-                 title: str = "Test",
-                 style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                 sort_by: Optional[str] = None,
-                 ascending: bool = False, 
-                 node_list: Optional[List] = None,
-                 ax: Optional[Axes] = None) -> Axes:
+                  source: str = "source",
+                  target: str = "target",
+                  weight: str = "weight",
+                  title: Optional[str] = None,
+                  style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                  sort_by: Optional[str] = None,
+                  ascending: bool = False,
+                  node_list: Optional[List] = None,
+                  ax: Optional[Axes] = None) -> Axes:
     if node_list:
-        df = pd_df[(pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))]
+        df = pd_df[(pd_df["source"].isin(node_list)) |
+                   (pd_df["target"].isin(node_list))]
     else:
         df = pd_df
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
 
-    graph = Graph.from_pandas_edgelist(df,
-                                       source=source,
-                                       target=target,
-                                       weight=weight)
+    graph = networkGraph.from_pandas_edgelist(df,
+                                              source=source,
+                                              target=target,
+                                              weight=weight)
     return graph.plot_network(title=title,
-                       style=style,
-                       ax=ax)
+                              style=style,
+                              weight=weight,
+                              ax=ax)
+
 
 def aplot_network_components(pd_df: pd.DataFrame,
-                 source: str = "source",
-                 target: str = "target",
-                 weight: str = "weight",
-                 title: str = "Test",
-                 style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                 sort_by: Optional[str] = None,
-                 node_list: Optional[List] = None,
-                 ascending: bool = False,
-                 ax: Optional[List[Axes]] = None) -> List[Axes]:
+                             source: str = "source",
+                             target: str = "target",
+                             weight: str = "weight",
+                             title: Optional[str] = None,
+                             style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                             sort_by: Optional[str] = None,
+                             node_list: Optional[List] = None,
+                             ascending: bool = False,
+                             ax: Optional[List[Axes]] = None) -> List[Axes]:
     if node_list:
-        df = pd_df[(pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))]
+        df = pd_df[(pd_df["source"].isin(node_list)) |
+                   (pd_df["target"].isin(node_list))]
     else:
         df = pd_df
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
 
-    graph = Graph.from_pandas_edgelist(df,
-                                       source=source,
-                                       target=target,
-                                       weight=weight)
+    graph = networkGraph.from_pandas_edgelist(df,
+                                              source=source,
+                                              target=target,
+                                              weight=weight)
     connected_components = nx.connected_components(graph)
-    axes=[]
+    axes = []
+    i = 0
     for connected_component in connected_components:
         if len(connected_component) > 5:
-            connected_component_graph = graph.subgraph(node_list=connected_component)
-            ax=connected_component_graph.plot_network()
+            connected_component_graph = graph.subgraph(
+                node_list=connected_component)
+            ax = connected_component_graph.plot_network(title=f"{title}::{i}",
+                                                        style=style,
+                                                        weight=weight,
+                                                        ax=ax)
             axes.append(ax)
+            i += 1
     return axes
-    
+
+
+def fplot_network(pd_df: pd.DataFrame,
+                  source: str = "source",
+                  target: str = "target",
+                  weight: str = "weight",
+                  title: Optional[str] = None,
+                  style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                  sort_by: Optional[str] = None,
+                  ascending: bool = False,
+                  node_list: Optional[List] = None,
+                  figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+    fig = plt.figure(figsize=figsize)
+    fig.patch.set_facecolor(style.background_color)
+    ax = fig.add_subplot()
+    ax = aplot_network(pd_df,
+                       source=source,
+                       target=target,
+                       weight=weight,
+                       title=title,
+                       style=style,
+                       sort_by=sort_by,
+                       ascending=ascending,
+                       node_list=node_list,
+                       ax=ax
+                       )
+    return fig
+
+
+def fplot_network_components(pd_df: pd.DataFrame,
+                             source: str = "source",
+                             target: str = "target",
+                             weight: str = "weight",
+                             title: Optional[str] = None,
+                             style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+                             sort_by: Optional[str] = None,
+                             ascending: bool = False,
+                             node_list: Optional[List] = None,
+                             figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+    axes = aplot_network_components(pd_df,
+                                    source=source,
+                                    target=target,
+                                    weight=weight,
+                                    title=title,
+                                    style=style,
+                                    sort_by=sort_by,
+                                    ascending=ascending,
+                                    node_list=node_list
+                                    )
+    fig = plt.figure(figsize=figsize)
+    fig.patch.set_facecolor(style.background_color)
+    ax = fig.add_subplot()
+    ax = aplot_network(pd_df,
+                       source=source,
+                       target=target,
+                       weight=weight,
+                       title=title,
+                       style=style,
+                       sort_by=sort_by,
+                       ascending=ascending,
+                       node_list=node_list,
+                       ax=ax
+                       )
+    return fig
