@@ -106,13 +106,13 @@ class DataFrameAccessor:
                                      ascending=ascending)
 
     def aplot_table(self,
-                       cols: List[str],
-                       title: Optional[str] = None,
-                       style: StyleTemplate = TABLE_STYLE_TEMPLATE,
-                       max_values: int = 20,
-                       sort_by: Optional[str] = None,
-                       ascending: bool = False,
-                       ax: Optional[Axes] = None) -> Axes:
+                    cols: List[str],
+                    title: Optional[str] = None,
+                    style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+                    max_values: int = 20,
+                    sort_by: Optional[str] = None,
+                    ascending: bool = False,
+                    ax: Optional[Axes] = None) -> Axes:
 
         return aplot_table(pd_df=self._obj,
                            cols=cols,
@@ -259,18 +259,20 @@ class DataFrameAccessor:
                       style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
                       title: Optional[str] = None,
                       color: Optional[str] = None,
-                      max_values: int = 100,
                       sort_by: Optional[str] = None,
-                      ascending: bool = False) -> go.Figure:
+                      max_values: int = 100,
+                      ascending: bool = False,
+                      fig: Optional[go.Figure] = None) -> go.Figure:
         return fplot_treemap(pd_df=self._obj,
                              path=path,
                              values=values,
                              title=title,
                              style=style,
                              color=color,
-                             max_values=max_values,
                              sort_by=sort_by,
-                             ascending=ascending)
+                             ascending=ascending,
+                             max_values=max_values,
+                             fig=fig)
 
 
 __all__ = ["validate_dataframe", "aplot_bubble", "aplot_timeserie", "aplot_table", "aplot_network", "aplot_network_components", "fplot_network",

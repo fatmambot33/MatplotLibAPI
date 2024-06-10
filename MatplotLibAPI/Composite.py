@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import GridSpec
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
-
+import plotly.graph_objects as go
 from .Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import aplot_table
+from .Treemap import fplot_treemap,TREEMAP_STYLE_TEMPLATE
 from .StyleTemplate import StyleTemplate, format_func, validate_dataframe
 
 
@@ -90,3 +91,17 @@ def plot_composite_bubble(
     fig.tight_layout()
     return fig
 
+def fplot_treemaps(pd_dfs: List[pd.DataFrame],
+                 path: str,
+                 values: str,
+                 style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+                 title: Optional[str] = None,
+                 color: Optional[str] = None,
+                 sort_by: Optional[str] = None,
+                 ascending: bool = False,
+                 max_values: int = 100) -> go.Figure:
+    
+    trms=[]
+    for pd_df in pd_dfs:
+        trm=fplot_treemap(pd_df=pd_df,
+                          )
