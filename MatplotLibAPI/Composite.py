@@ -1,15 +1,14 @@
 # Hint for Visual Code Python Interactive window
 # %%
-from typing import Optional, Tuple, List, Union, Dict
+from typing import Optional, Tuple, List
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import GridSpec
 from matplotlib.figure import Figure
-from matplotlib.axes import Axes
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from .Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import aplot_table
-from .Treemap import fplot_treemap, TREEMAP_STYLE_TEMPLATE
+from .Treemap import aplot_treemap, TREEMAP_STYLE_TEMPLATE
 from .StyleTemplate import StyleTemplate, format_func, validate_dataframe
 
 
@@ -91,7 +90,7 @@ def plot_composite_bubble(
     return fig
 
 
-def fplot_treemaps(pd_dfs: List[pd.DataFrame],
+def plot_composite_treemap(pd_dfs: List[pd.DataFrame],
                    path: str,
                    values: str,
                    style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
@@ -101,7 +100,6 @@ def fplot_treemaps(pd_dfs: List[pd.DataFrame],
                    ascending: bool = False,
                    max_values: int = 100) -> go.Figure:
 
-    trms = []
     num_dimensions = len(pd_dfs)
     if num_dimensions > 0:
         fig = make_subplots(
@@ -110,9 +108,9 @@ def fplot_treemaps(pd_dfs: List[pd.DataFrame],
             specs=[[{'type': 'domain'}] for _ in range(num_dimensions)],
             vertical_spacing=0.02
         )
-        current_row = 0
+        current_row = 1
         for pd_df in pd_dfs:
-            trm = fplot_treemap(pd_df=pd_df,
+            trm = aplot_treemap(pd_df=pd_df,
                                 path=path,
                                 values=values,
                                 title=title,
@@ -120,7 +118,7 @@ def fplot_treemaps(pd_dfs: List[pd.DataFrame],
                                 color=color,
                                 sort_by=sort_by,
                                 ascending=ascending,
-                                max_values=max_values,
-                                fig=fig)
-            trms.append(trm)
+                                max_values=max_values)
+            fig.add_trace(trm,row=current_row, col=1)
             current_row += 1
+        return fig

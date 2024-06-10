@@ -5,7 +5,7 @@ from .Composite import plot_composite_bubble
 from .Timeserie import aplot_timeserie, fplot_timeserie, TIMESERIE_STYLE_TEMPLATE
 from .Table import aplot_table, fplot_table, TABLE_STYLE_TEMPLATE
 from .Network import aplot_network, aplot_network_components, fplot_network, NETWORK_STYLE_TEMPLATE
-from .Treemap import fplot_treemap, TREEMAP_STYLE_TEMPLATE
+from .Treemap import fplot_treemap, aplot_treemap, TREEMAP_STYLE_TEMPLATE
 from typing import List, Optional, Tuple
 import pandas as pd
 from pandas.api.extensions import register_dataframe_accessor
@@ -274,6 +274,26 @@ class DataFrameAccessor:
                              max_values=max_values,
                              fig=fig)
 
+    def aplot_treemap(self,
+                      path: str,
+                      values: str,
+                      style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+                      title: Optional[str] = None,
+                      color: Optional[str] = None,
+                      sort_by: Optional[str] = None,
+                      max_values: int = 100,
+                      ascending: bool = False,
+                      fig: Optional[go.Figure] = None) -> go.Figure:
+        return aplot_treemap(pd_df=self._obj,
+                             path=path,
+                             values=values,
+                             title=title,
+                             style=style,
+                             color=color,
+                             sort_by=sort_by,
+                             ascending=ascending,
+                             max_values=max_values)
+
 
 __all__ = ["validate_dataframe", "aplot_bubble", "aplot_timeserie", "aplot_table", "aplot_network", "aplot_network_components", "fplot_network",
-           "plot_pivotbar", "fplot_treemap", "plot_composite_bubble", "StyleTemplate", "DataFrameAccessor"]
+           "plot_pivotbar", "fplot_treemap", "aplot_treemap", "plot_composite_bubble", "StyleTemplate", "DataFrameAccessor"]

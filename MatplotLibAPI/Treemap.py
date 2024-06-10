@@ -2,11 +2,10 @@
 # %%
 from typing import Optional
 import pandas as pd
-from pandas import CategoricalDtype,BooleanDtype
+from pandas import CategoricalDtype, BooleanDtype
 import plotly.graph_objects as go
 
-from .StyleTemplate import StyleTemplate, string_formatter, percent_formatter,validate_dataframe
-
+from .StyleTemplate import StyleTemplate, string_formatter, percent_formatter, validate_dataframe
 
 
 TREEMAP_STYLE_TEMPLATE = StyleTemplate(
@@ -19,16 +18,15 @@ TREEMAP_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
-def fplot_treemap(pd_df: pd.DataFrame,
-                 path: str,
-                 values: str,
-                 style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
-                 title: Optional[str] = None,
-                 color: Optional[str] = None,
-                 sort_by: Optional[str] = None,
-                 ascending: bool = False,
-                 max_values: int = 100,
-                 fig: Optional[go.Figure] = None) -> go.Figure:
+def aplot_treemap(pd_df: pd.DataFrame,
+                  path: str,
+                  values: str,
+                  style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+                  title: Optional[str] = None,
+                  color: Optional[str] = None,
+                  sort_by: Optional[str] = None,
+                  ascending: bool = False,
+                  max_values: int = 100) -> go.Trace:
     cols = [path, values]
     if color:
         cols.append(color)
@@ -57,7 +55,33 @@ def fplot_treemap(pd_df: pd.DataFrame,
         data['marker'] = dict(colorscale="Viridis",
                               colors=color_data.to_list())
 
-    g = go.Treemap(data)
+    g = go.Treemap(data,
+                   root_color=style.background_color
+                   )
+
+    return g
+
+
+def fplot_treemap(pd_df: pd.DataFrame,
+                  path: str,
+                  values: str,
+                  style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+                  title: Optional[str] = None,
+                  color: Optional[str] = None,
+                  sort_by: Optional[str] = None,
+                  ascending: bool = False,
+                  max_values: int = 100,
+                  fig: Optional[go.Figure] = None) -> go.Figure:
+
+    g = aplot_treemap(pd_df=pd_df,
+                      path=path,
+                      values=values,
+                      title=title,
+                      style=style,
+                      color=color,
+                      sort_by=sort_by,
+                      ascending=ascending,
+                      max_values=max_values)
 
     if not fig:
         fig = go.Figure(g)
