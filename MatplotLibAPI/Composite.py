@@ -1,6 +1,6 @@
 # Hint for Visual Code Python Interactive window
 # %%
-from typing import Optional, Tuple,List,Union, Dict
+from typing import Optional, Tuple, List, Union, Dict
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import GridSpec
@@ -9,9 +9,8 @@ from matplotlib.axes import Axes
 import plotly.graph_objects as go
 from .Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
 from .Table import aplot_table
-from .Treemap import fplot_treemap,TREEMAP_STYLE_TEMPLATE
+from .Treemap import fplot_treemap, TREEMAP_STYLE_TEMPLATE
 from .StyleTemplate import StyleTemplate, format_func, validate_dataframe
-
 
 
 def plot_composite_bubble(
@@ -45,17 +44,17 @@ def plot_composite_bubble(
     grid = plt.GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
     ax = aplot_bubble(pd_df=plot_df,
-                     label=label,
-                     x=x,
-                     y=y,
-                     z=z,
-                     title=title,
-                     style=style,
-                     max_values=max_values,
-                     center_to_mean=center_to_mean,
-                     sort_by=sort_by,
-                     ascending=ascending,
-                     ax=ax)
+                      label=label,
+                      x=x,
+                      y=y,
+                      z=z,
+                      title=title,
+                      style=style,
+                      max_values=max_values,
+                      center_to_mean=center_to_mean,
+                      sort_by=sort_by,
+                      ascending=ascending,
+                      ax=ax)
 
     if "label" in style.format_funcs:
         style.format_funcs[label] = style.format_funcs["label"]
@@ -91,17 +90,37 @@ def plot_composite_bubble(
     fig.tight_layout()
     return fig
 
+
 def fplot_treemaps(pd_dfs: List[pd.DataFrame],
-                 path: str,
-                 values: str,
-                 style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
-                 title: Optional[str] = None,
-                 color: Optional[str] = None,
-                 sort_by: Optional[str] = None,
-                 ascending: bool = False,
-                 max_values: int = 100) -> go.Figure:
-    
-    trms=[]
-    for pd_df in pd_dfs:
-        trm=fplot_treemap(pd_df=pd_df,
-                          )
+                   path: str,
+                   values: str,
+                   style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+                   title: Optional[str] = None,
+                   color: Optional[str] = None,
+                   sort_by: Optional[str] = None,
+                   ascending: bool = False,
+                   max_values: int = 100) -> go.Figure:
+
+    trms = []
+    num_dimensions = len(pd_dfs)
+    if num_dimensions > 0:
+        fig = make_subplots(
+            rows=num_dimensions,
+            cols=1,
+            specs=[[{'type': 'domain'}] for _ in range(num_dimensions)],
+            vertical_spacing=0.02
+        )
+        current_row = 0
+        for pd_df in pd_dfs:
+            trm = fplot_treemap(pd_df=pd_df,
+                                path=path,
+                                values=values,
+                                title=title,
+                                style=style,
+                                color=color,
+                                sort_by=sort_by,
+                                ascending=ascending,
+                                max_values=max_values,
+                                fig=fig)
+            trms.append(trm)
+            current_row += 1
