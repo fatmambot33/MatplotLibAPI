@@ -1,7 +1,7 @@
 
 from .StyleTemplate import StyleTemplate
 from .Bubble import aplot_bubble, fplot_bubble, BUBBLE_STYLE_TEMPLATE
-from .Composite import plot_composite_bubble
+from .Composite import plot_composite_bubble,plot_composite_treemap
 from .Timeserie import aplot_timeserie, fplot_timeserie, TIMESERIE_STYLE_TEMPLATE
 from .Table import aplot_table, fplot_table, TABLE_STYLE_TEMPLATE
 from .Network import aplot_network, aplot_network_components, fplot_network, NETWORK_STYLE_TEMPLATE
@@ -294,6 +294,31 @@ class DataFrameAccessor:
                              ascending=ascending,
                              max_values=max_values)
 
+    def fplot_composite_treemap(self,
+                      path_column: str,
+                      values: str,
+                      style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+                      title: Optional[str] = None,
+                      color: Optional[str] = None,
+                      sort_by: Optional[str] = None,
+                      max_values: int = 100,
+                      ascending: bool = False,
+                      fig: Optional[go.Figure] = None) -> go.Figure:
+        pd_dfs={}
+        pathes=self._obj[path_column].unique()
+        for path in pathes:
+            pd_dfs[path]=self._obj[self._obj[path_column]==path]
+
+
+        return plot_composite_treemap(pd_dfs=pd_dfs,
+                             values=values,
+                             title=title,
+                             style=style,
+                             color=color,
+                             sort_by=sort_by,
+                             ascending=ascending,
+                             max_values=max_values)
+
 
 __all__ = ["validate_dataframe", "aplot_bubble", "aplot_timeserie", "aplot_table", "aplot_network", "aplot_network_components", "fplot_network",
-           "plot_pivotbar", "fplot_treemap", "aplot_treemap", "plot_composite_bubble", "StyleTemplate", "DataFrameAccessor"]
+           "plot_pivotbar", "fplot_treemap", "aplot_treemap", "plot_composite_bubble","plot_composite_treemap", "StyleTemplate", "DataFrameAccessor"]
