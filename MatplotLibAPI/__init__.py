@@ -6,7 +6,7 @@ from .Timeserie import aplot_timeserie, fplot_timeserie, TIMESERIE_STYLE_TEMPLAT
 from .Table import aplot_table, fplot_table, TABLE_STYLE_TEMPLATE
 from .Network import aplot_network, aplot_network_components, fplot_network, NETWORK_STYLE_TEMPLATE
 from .Treemap import fplot_treemap, aplot_treemap, TREEMAP_STYLE_TEMPLATE
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple,Dict
 import pandas as pd
 from pandas.api.extensions import register_dataframe_accessor
 
@@ -295,7 +295,7 @@ class DataFrameAccessor:
                              max_values=max_values)
 
     def fplot_composite_treemap(self,
-                      path_column: str,
+                      pathes: List[str],
                       values: str,
                       style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
                       title: Optional[str] = None,
@@ -304,10 +304,9 @@ class DataFrameAccessor:
                       max_values: int = 100,
                       ascending: bool = False,
                       fig: Optional[go.Figure] = None) -> go.Figure:
-        pd_dfs={}
-        pathes=self._obj[path_column].unique()
+        pd_dfs:Dict[str,pd.DataFrame]={}
         for path in pathes:
-            pd_dfs[path]=self._obj[self._obj[path_column]==path]
+            pd_dfs[path]=self._obj
 
 
         return plot_composite_treemap(pd_dfs=pd_dfs,
