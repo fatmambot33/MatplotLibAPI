@@ -1,6 +1,6 @@
 # Hint for Visual Code Python Interactive window
 # %%
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List,Dict
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -90,30 +90,29 @@ def plot_composite_bubble(
     return fig
 
 
-def plot_composite_treemap(pd_dfs: List[pd.DataFrame],
-                   path: str,
+def plot_composite_treemap(pd_dfs: Dict[str,pd.DataFrame],
                    values: str,
                    style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
                    title: Optional[str] = None,
                    color: Optional[str] = None,
                    sort_by: Optional[str] = None,
                    ascending: bool = False,
-                   max_values: int = 100) -> go.Figure:
+                   max_values: int = 100) -> Optional[go.Figure]:
 
     num_dimensions = len(pd_dfs)
     if num_dimensions > 0:
         fig = make_subplots(
             rows=num_dimensions,
             cols=1,
+            subplot_titles=[f"{title}::{dim.title()}" for dim in pd_dfs.keys()],
             specs=[[{'type': 'domain'}] for _ in range(num_dimensions)],
             vertical_spacing=0.02
         )
         current_row = 1
-        for pd_df in pd_dfs:
-            trm = aplot_treemap(pd_df=pd_df,
+        for path, df in pd_dfs.items():
+            trm = aplot_treemap(pd_df=df,
                                 path=path,
                                 values=values,
-                                title=title,
                                 style=style,
                                 color=color,
                                 sort_by=sort_by,
