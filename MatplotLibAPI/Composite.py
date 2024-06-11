@@ -181,16 +181,16 @@ def plot_composite_treemap(pd_dfs: Dict[str, pd.DataFrame],
             vertical_spacing=0.2
         )
 
-    current_row = 1
-    for path, df in pd_dfs.items():
-        trm = aplot_treemap(pd_df=df,
-                            path=path,
-                            values=values,
-                            style=style,
-                            color=color,
-                            sort_by=sort_by,
-                            ascending=ascending,
-                            max_values=max_values)
-        fig.add_trace(trm, row=current_row, col=1)
-        current_row += 1
-    return fig
+        current_row = 1
+        for path, df in pd_dfs.items():
+            trm = aplot_treemap(pd_df=df,
+                                path=path,
+                                values=values,
+                                style=style,
+                                color=color,
+                                sort_by=sort_by,
+                                ascending=ascending,
+                                max_values=max_values)
+            fig.add_trace(trm, row=current_row, col=1)
+            current_row += 1
+        return fig
