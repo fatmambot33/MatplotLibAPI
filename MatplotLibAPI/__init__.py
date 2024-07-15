@@ -91,7 +91,8 @@ class DataFrameAccessor:
                                max_values: int = 100,
                                center_to_mean: bool = False,
                                sort_by: Optional[str] = None,
-                               ascending: bool = False) -> Figure:
+                               ascending: bool = False,
+                               table_rows:int=10) -> Figure:
 
         return plot_composite_bubble(pd_df=self._obj,
                                      label=label,
@@ -103,7 +104,8 @@ class DataFrameAccessor:
                                      max_values=max_values,
                                      center_to_mean=center_to_mean,
                                      sort_by=sort_by,
-                                     ascending=ascending)
+                                     ascending=ascending,
+                                     table_rows=table_rows)
 
     def aplot_table(self,
                     cols: List[str],
