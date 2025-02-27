@@ -7,7 +7,9 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import seaborn as sns
 
-from .StyleTemplate import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func, validate_dataframe
+from MatplotLibAPI.StyleTemplate import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func, validate_dataframe
+
+MAX_RESULTS = 50
 
 BUBBLE_STYLE_TEMPLATE = StyleTemplate(
     format_funcs={"label": string_formatter,
@@ -25,9 +27,9 @@ def aplot_bubble(
         x: str,
         y: str,
         z: str,
-        title: Optional[str] = "Test",
+        title: Optional[str] = None,
         style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
-        max_values: int = BUBBLE_STYLE_TEMPLATE,
+        max_values: int = MAX_RESULTS,
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
         ascending: bool = False,

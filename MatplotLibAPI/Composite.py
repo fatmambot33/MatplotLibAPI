@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from .Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
-from .Table import aplot_table
-from .Treemap import aplot_treemap, TREEMAP_STYLE_TEMPLATE
-from .StyleTemplate import StyleTemplate, format_func, validate_dataframe
+from MatplotLibAPI.Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
+from MatplotLibAPI.Table import aplot_table
+from MatplotLibAPI.Treemap import aplot_treemap, TREEMAP_STYLE_TEMPLATE
+from MatplotLibAPI.StyleTemplate import StyleTemplate, format_func, validate_dataframe
 
 
 def plot_composite_bubble(

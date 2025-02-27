@@ -4,14 +4,12 @@ from typing import List, Optional, Union
 
 import pandas as pd
 
-import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, MonthLocator
 
+from MatplotLibAPI.StyleTemplate import StyleTemplate, DynamicFuncFormatter, validate_dataframe,  generate_ticks, string_formatter,  percent_formatter, format_func
 
-from . import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter,  percent_formatter, format_func
-from .. import validate_dataframe
 
 PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',

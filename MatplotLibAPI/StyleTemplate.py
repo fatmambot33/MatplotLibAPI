@@ -99,10 +99,7 @@ def format_func(
 # region Style
 
 
-MAX_RESULTS = 50
-X_COL = "index"
-Y_COL = "overlap"
-Z_COL = "users"
+
 FIG_SIZE = (19.2, 10.8)
 BACKGROUND_COLOR = 'black'
 TEXT_COLOR = 'white'

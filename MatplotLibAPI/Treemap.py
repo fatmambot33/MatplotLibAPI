@@ -5,7 +5,7 @@ import pandas as pd
 from pandas import CategoricalDtype, BooleanDtype
 import plotly.graph_objects as go
 
-from .StyleTemplate import StyleTemplate, string_formatter, percent_formatter, validate_dataframe
+from MatplotLibAPI.StyleTemplate import StyleTemplate, string_formatter, percent_formatter, validate_dataframe
 
 
 TREEMAP_STYLE_TEMPLATE = StyleTemplate(

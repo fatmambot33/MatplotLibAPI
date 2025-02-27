@@ -14,7 +14,7 @@ from networkx import Graph
 from networkx.classes.graph import Graph
 
 
-from .StyleTemplate import StyleTemplate, string_formatter, format_func, validate_dataframe
+from MatplotLibAPI.StyleTemplate import StyleTemplate, string_formatter, format_func, validate_dataframe
 
 NETWORK_STYLE_TEMPLATE = StyleTemplate(
 )

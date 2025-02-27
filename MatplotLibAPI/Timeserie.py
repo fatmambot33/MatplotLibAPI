@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 import seaborn as sns
 
-from .StyleTemplate import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func, validate_dataframe
+from MatplotLibAPI.StyleTemplate import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func, validate_dataframe
 
 
 TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
