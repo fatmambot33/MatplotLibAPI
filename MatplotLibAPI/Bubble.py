@@ -88,6 +88,7 @@ def aplot_bubble(
     y_max = pd_df[y].max()
     y_mean = pd_df[y].mean()
     ax.set_yticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
+    ax.minorticks_off()
     ax.yaxis.grid(True, "major", linewidth=.5, color=style.font_color)
     if style.format_funcs.get("y"):
         ax.yaxis.set_major_formatter(
