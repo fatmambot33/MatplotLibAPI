@@ -6,4 +6,4 @@ data
 config.py
 .DS_Store
 pycache
-scratch.py
+scratch*
