@@ -3,9 +3,11 @@
 from typing import Optional, Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import NullLocator
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import seaborn as sns
+    
 
 from MatplotLibAPI.StyleTemplate import DynamicFuncFormatter, StyleTemplate, generate_ticks, string_formatter, bmk_formatter, percent_formatter, format_func, validate_dataframe
 
@@ -88,7 +90,13 @@ def aplot_bubble(
     y_max = pd_df[y].max()
     y_mean = pd_df[y].mean()
     ax.set_yticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
-    ax.minorticks_off()
+
+
+    if style.yscale == 'log':
+        ax.yaxis.set_minor_locator(NullLocator())  # Disable minor ticks for log scale
+    else:
+        ax.minorticks_off()  # Disable minor ticks for linear scale
+
     ax.yaxis.grid(True, "major", linewidth=.5, color=style.font_color)
     if style.format_funcs.get("y"):
         ax.yaxis.set_major_formatter(
