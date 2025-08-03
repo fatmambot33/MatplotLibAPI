@@ -41,41 +41,24 @@ def aplot_bubble(
         ax: Optional[Axes] = None):
     """Plot a bubble chart on the provided axes.
 
-    Parameters
-    ----------
-    pd_df : pandas.DataFrame
-        DataFrame containing the data to plot.
-    label : str
-        Column name for bubble labels.
-    x : str
-        Column name for the x-axis values.
-    y : str
-        Column name for the y-axis values.
-    z : str
-        Column name for bubble sizes.
-    title : Optional[str], default None
-        Title of the plot.
-    style : StyleTemplate, default BUBBLE_STYLE_TEMPLATE
-        Style configuration for the plot.
-    max_values : int, default MAX_RESULTS
-        Maximum number of rows to plot.
-    center_to_mean : bool, default False
-        Whether to center the x values around their mean.
-    sort_by : Optional[str], default None
-        Column used to sort the data before plotting.
-    ascending : bool, default False
-        Sort order for the data.
-    hline : bool, default False
-        Draw a horizontal line at ``y=0`` if ``True``.
-    vline : bool, default False
-        Draw a vertical line at ``x=0`` if ``True``.
-    ax : Optional[Axes]
-        Existing matplotlib axes to plot on.
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to plot.
+        label (str): Column name for bubble labels.
+        x (str): Column name for the x-axis values.
+        y (str): Column name for the y-axis values.
+        z (str): Column name for bubble sizes.
+        title (Optional[str], optional): Title of the plot. Defaults to ``None``.
+        style (StyleTemplate, optional): Style configuration for the plot. Defaults to ``BUBBLE_STYLE_TEMPLATE``.
+        max_values (int, optional): Maximum number of rows to plot. Defaults to ``MAX_RESULTS``.
+        center_to_mean (bool, optional): Whether to center the x values around their mean. Defaults to ``False``.
+        sort_by (Optional[str], optional): Column used to sort the data before plotting. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        hline (bool, optional): Draw a horizontal line at ``y=0`` if ``True``. Defaults to ``False``.
+        vline (bool, optional): Draw a vertical line at ``x=0`` if ``True``. Defaults to ``False``.
+        ax (Optional[Axes], optional): Existing matplotlib axes to plot on. Defaults to ``None``.
 
-    Returns
-    -------
-    Axes
-        The axes containing the bubble chart.
+    Returns:
+        Axes: The axes containing the bubble chart.
     """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
     style.format_funcs = format_func(
@@ -189,7 +172,27 @@ def fplot_bubble(
         hline=False,
         vline=False,
         figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
-    """Return a new figure with a bubble chart."""
+    """Return a new figure with a bubble chart.
+
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to plot.
+        label (str): Column name for bubble labels.
+        x (str): Column name for the x-axis values.
+        y (str): Column name for the y-axis values.
+        z (str): Column name for bubble sizes.
+        title (Optional[str], optional): Title of the plot. Defaults to ``"Test"``.
+        style (StyleTemplate, optional): Style configuration for the plot. Defaults to ``BUBBLE_STYLE_TEMPLATE``.
+        max_values (int, optional): Maximum number of rows to plot. Defaults to ``MAX_RESULTS``.
+        center_to_mean (bool, optional): Whether to center the x values around their mean. Defaults to ``False``.
+        sort_by (Optional[str], optional): Column used to sort the data before plotting. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        hline (bool, optional): Draw a horizontal line at ``y=0`` if ``True``. Defaults to ``False``.
+        vline (bool, optional): Draw a vertical line at ``x=0`` if ``True``. Defaults to ``False``.
+        figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
+
+    Returns:
+        Figure: Matplotlib figure containing the bubble chart.
+    """
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()

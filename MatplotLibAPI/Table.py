@@ -25,7 +25,21 @@ def aplot_table(pd_df: pd.DataFrame,
                ascending: bool = False,
                ax: Optional[Axes] = None
                ) -> Axes:
-    """Render a table into the provided axes."""
+    """Render a table into the provided axes.
+
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to display.
+        cols (List[str]): Columns to include in the table.
+        title (Optional[str], optional): Table title. Defaults to ``None``.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``TABLE_STYLE_TEMPLATE``.
+        max_values (int, optional): Maximum number of rows to display. Defaults to ``20``.
+        sort_by (Optional[str], optional): Column used for sorting. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        ax (Optional[Axes], optional): Axes to draw on. Defaults to ``None``.
+
+    Returns:
+        Axes: Matplotlib axes containing the rendered table.
+    """
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
 
     if not sort_by:
@@ -79,7 +93,21 @@ def fplot_table(pd_df: pd.DataFrame,
                ascending: bool = False,
                figsize: Tuple[float, float] = (19.2, 10.8)
                ) -> Figure:
-    """Return a new figure containing a formatted table."""
+    """Return a new figure containing a formatted table.
+
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to display.
+        cols (List[str]): Columns to include in the table.
+        title (Optional[str], optional): Table title. Defaults to ``None``.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``TABLE_STYLE_TEMPLATE``.
+        max_values (int, optional): Maximum number of rows to display. Defaults to ``20``.
+        sort_by (Optional[str], optional): Column used for sorting. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
+
+    Returns:
+        Figure: Matplotlib figure containing the table.
+    """
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()

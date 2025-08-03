@@ -29,52 +29,26 @@ def plot_composite_bubble(
         ascending: bool = False,
         table_rows: int = 10,
         figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
-    """
-    Plot a composite bubble chart with additional tables for top and bottom values.
+    """Plot a composite bubble chart with summary tables.
 
-    Parameters:
-    pd_df (pd.DataFrame): 
-        The pandas DataFrame containing the data to be plotted.
-    label (str): 
-        The column name for the bubble labels.
-    x (str): 
-        The column name for the x-axis values.
-    y (str): 
-        The column name for the y-axis values.
-    z (str): 
-        The column name for the bubble sizes.
-    title (Optional[str]): 
-        The title of the plot. Default is "Test".
-    style (StyleTemplate): 
-        A StyleTemplate object to define the visual style of the plot. Default is BUBBLE_STYLE_TEMPLATE.
-    max_values (int): 
-        The maximum number of values to display in the bubble chart. Default is 50.
-    center_to_mean (bool): 
-        A flag indicating whether to center the bubbles to the mean. Default is False.
-    filter_by (Optional[str]): 
-        The column name to filter the data by. Default is None.
-    sort_by (Optional[str]): 
-        The column name to sort the data by. Default is None.
-    ascending (bool): 
-        A flag indicating whether to sort in ascending order. Default is False.
-    table_rows (int): 
-        The number of rows to display in the tables. Default is 10.
-    figsize (Tuple[float, float]): 
-        The size of the figure. Default is (19.2, 10.8).
+    Args:
+        pd_df (pd.DataFrame): Data to be plotted.
+        label (str): Column name for bubble labels.
+        x (str): Column name for the x-axis values.
+        y (str): Column name for the y-axis values.
+        z (str): Column name for bubble sizes.
+        title (Optional[str], optional): Title of the plot. Defaults to ``"Test"``.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``BUBBLE_STYLE_TEMPLATE``.
+        max_values (int, optional): Maximum number of rows to display in the chart. Defaults to ``50``.
+        center_to_mean (bool, optional): Whether to center the bubbles on the mean. Defaults to ``False``.
+        filter_by (Optional[str], optional): Column used to filter the data. Defaults to ``None``.
+        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        table_rows (int, optional): Number of rows to display in the tables. Defaults to ``10``.
+        figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
 
     Returns:
-    Figure: 
-        The matplotlib figure object containing the composite bubble chart and tables.
-
-    Example:
-    >>> df = pd.DataFrame({
-    ...     "Label": ["A", "B", "C"],
-    ...     "X": [1, 2, 3],
-    ...     "Y": [4, 5, 6],
-    ...     "Z": [7, 8, 9]
-    ... })
-    >>> fig = plot_composite_bubble(df, label="Label", x="X", y="Y", z="Z")
-    >>> fig.show()
+        Figure: Matplotlib figure containing the composite bubble chart and tables.
     """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
 
@@ -146,30 +120,20 @@ def plot_composite_treemap(pd_dfs: Dict[str, pd.DataFrame],
                            sort_by: Optional[str] = None,
                            ascending: bool = False,
                            max_values: int = 100) -> Optional[go.Figure]:
-    """
-    Plot a composite treemap from multiple DataFrames.
+    """Plot a composite treemap from multiple DataFrames.
 
-    Parameters:
-    pd_dfs (Dict[str, pd.DataFrame]): 
-        A dictionary where keys are dimension names and values are pandas DataFrames to be plotted.
-    values (str): 
-        The column name in each DataFrame that contains the values to be visualized in the treemap.
-    style (StyleTemplate): 
-        A StyleTemplate object to define the visual style of the treemap. Default is TREEMAP_STYLE_TEMPLATE.
-    title (Optional[str]): 
-        An optional title for the composite treemap plot. Default is None.
-    color (Optional[str]): 
-        An optional column name for coloring the treemap. Default is None.
-    sort_by (Optional[str]): 
-        An optional column name for sorting the treemap values. Default is None.
-    ascending (bool): 
-        A flag indicating whether to sort in ascending order. Default is False.
-    max_values (int): 
-        The maximum number of values to display in each treemap. Default is 100.
+    Args:
+        pd_dfs (Dict[str, pd.DataFrame]): Mapping of dimension names to DataFrames to plot.
+        values (str): Column containing the values to visualize in each treemap.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``TREEMAP_STYLE_TEMPLATE``.
+        title (Optional[str], optional): Title of the composite plot. Defaults to ``None``.
+        color (Optional[str], optional): Column name used for coloring. Defaults to ``None``.
+        sort_by (Optional[str], optional): Column name used to sort values. Defaults to ``None``.
+        ascending (bool, optional): Sort order for values. Defaults to ``False``.
+        max_values (int, optional): Maximum number of values per treemap. Defaults to ``100``.
 
     Returns:
-    Optional[go.Figure]: 
-        The composite treemap figure object or None if no DataFrames are provided.
+        Optional[go.Figure]: Composite treemap figure, or ``None`` if no data frames are provided.
     """
     num_dimensions = len(pd_dfs)
     if num_dimensions > 0:

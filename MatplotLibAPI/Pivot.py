@@ -39,7 +39,23 @@ def plot_pivotbar(pd_df: pd.DataFrame,
                   sort_by: Optional[str] = None,
                   ascending: bool = False,
                   ax: Optional[Axes] = None):
-    """Plot a bar chart from a pivot table on the given axes."""
+    """Plot a bar chart from a pivot table on the given axes.
+
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to plot.
+        label (str): Column to pivot into series.
+        x (str): Column used for the x-axis.
+        y (str): Column used for the y values.
+        agg (str, optional): Aggregation function for pivot. Defaults to ``"sum"``.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``PIVOTBARS_STYLE_TEMPLATE``.
+        title (Optional[str], optional): Plot title. Defaults to ``None``.
+        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        ax (Optional[Axes], optional): Existing axes to draw on. Defaults to ``None``.
+
+    Returns:
+        Axes: Matplotlib axes with the bar chart.
+    """
     validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
     style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
     pivot_df = pd.pivot_table(pd_df, values=y, index=[
@@ -85,7 +101,23 @@ def plot_lines(
     ascending: bool = False,
     ax: Optional[Axes] = None
 ) -> Axes:
-    """Plot line charts for the top elements in ``y`` grouped by ``label``."""
+    """Plot line charts for the top elements in ``y`` grouped by ``label``.
+
+    Args:
+        data (pd.DataFrame): Source data.
+        label (str): Column used to group lines.
+        x (str): Column for the x-axis values.
+        y (Union[str, List[str]]): Column(s) for the y-axis values.
+        title (Optional[str], optional): Plot title. Defaults to ``None``.
+        style (Optional[StyleTemplate], optional): Style configuration. Defaults to ``PIVOTBARS_STYLE_TEMPLATE``.
+        max_values (int, optional): Number of top elements to plot. Defaults to ``4``.
+        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        ax (Optional[Axes], optional): Axes to draw on. Defaults to ``None``.
+
+    Returns:
+        Axes: Matplotlib axes with the line chart.
+    """
     if title is not None:
         ax.set_title(title)
     ax.figure.set_facecolor(style.background_color)
@@ -147,7 +179,22 @@ def plot_bars(ax: Axes,
               z_col: str = "browser",
               n=5,
               agg_func: str = 'sum') -> Axes:
-    """Plot stacked bars for ``y_col`` grouped by ``z_col`` over ``x_col``."""
+    """Plot stacked bars for ``y_col`` grouped by ``z_col`` over ``x_col``.
+
+    Args:
+        ax (Axes): Axes to draw on.
+        data (pd.DataFrame): Source data.
+        x_col (str): Column for the x-axis.
+        y_col (Union[str, List[str]]): Column(s) for the y values.
+        style (Optional[StyleTemplate], optional): Style configuration. Defaults to ``None``.
+        fig_title (Optional[str], optional): Plot title. Defaults to ``None``.
+        z_col (str, optional): Column used for stacking groups. Defaults to ``"browser"``.
+        n (int, optional): Number of top groups to display. Defaults to ``5``.
+        agg_func (str, optional): Aggregation function. Defaults to ``'sum'``.
+
+    Returns:
+        Axes: Matplotlib axes with the stacked bars.
+    """
     # Validate inputs
 
     if not isinstance(y_col, list):

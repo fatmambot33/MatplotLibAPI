@@ -29,7 +29,22 @@ def aplot_treemap(pd_df: pd.DataFrame,
                   sort_by: Optional[str] = None,
                   ascending: bool = False,
                   max_values: int = 100) -> go.Trace:
-    """Create a treemap trace from the data frame."""
+    """Create a treemap trace from the data frame.
+
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to plot.
+        path (str): Column representing hierarchical path.
+        values (str): Column containing values for each treemap block.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``TREEMAP_STYLE_TEMPLATE``.
+        title (Optional[str], optional): Plot title. Defaults to ``None``.
+        color (Optional[str], optional): Column used for coloring. Defaults to ``None``.
+        sort_by (Optional[str], optional): Column used to sort data. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        max_values (int, optional): Maximum number of rows to plot. Defaults to ``100``.
+
+    Returns:
+        go.Trace: Plotly treemap trace.
+    """
     cols = [path, values]
     if color:
         cols.append(color)
@@ -75,7 +90,23 @@ def fplot_treemap(pd_df: pd.DataFrame,
                   ascending: bool = False,
                   max_values: int = 100,
                   fig: Optional[go.Figure] = None) -> go.Figure:
-    """Return a figure containing the treemap plot."""
+    """Return a figure containing the treemap plot.
+
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to plot.
+        path (str): Column representing hierarchical path.
+        values (str): Column containing values for each treemap block.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``TREEMAP_STYLE_TEMPLATE``.
+        title (Optional[str], optional): Plot title. Defaults to ``None``.
+        color (Optional[str], optional): Column used for coloring. Defaults to ``None``.
+        sort_by (Optional[str], optional): Column used to sort data. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        max_values (int, optional): Maximum number of rows to plot. Defaults to ``100``.
+        fig (Optional[go.Figure], optional): Existing figure to add the treemap to. Defaults to ``None``.
+
+    Returns:
+        go.Figure: Figure containing the treemap plot.
+    """
     g = aplot_treemap(pd_df=pd_df,
                       path=path,
                       values=values,
