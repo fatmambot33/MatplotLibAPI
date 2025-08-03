@@ -278,23 +278,27 @@ class NetworkGraph:
         self,
         node_list: Optional[List[str]] = None,
         max_edges: int = DEFAULT["MAX_EDGES"],
+        min_degree: int = 2,
+        top_k_edges_per_node: int = 5,
     ) -> 'NetworkGraph':
         """Return a trimmed subgraph limited by nodes and edges.
 
         Args:
             node_list (Optional[List[str]], optional): Nodes to include. Defaults to ``None``.
             max_edges (int, optional): Maximum edges to retain. Defaults to ``DEFAULT["MAX_EDGES"]``.
+            min_degree (int, optional): Minimum degree for nodes in the core subgraph. Defaults to 2.
+            top_k_edges_per_node (int, optional): Number of top edges to keep per node. Defaults to 5.
 
         Returns:
             NetworkGraph: Trimmed subgraph.
         """
         if node_list is None:
             node_list = self.nodes.sort("weight")[: DEFAULT["MAX_NODES"]]
-        connected_subgraph_nodes = list(self.find_connected_subgraph().nodes)
-        node_list = [node for node in node_list if node in connected_subgraph_nodes]
+        core_subgraph_nodes = list(self.get_core_subgraph(k=min_degree).nodes)
+        node_list = [node for node in node_list if node in core_subgraph_nodes]
 
         subgraph = NetworkGraph(nx.subgraph(self._nx_graph, nbunch=node_list))
-        edges = subgraph.top_k_edges(attribute="weight", k=5).keys()
+        edges = subgraph.top_k_edges(attribute="weight", k=top_k_edges_per_node).keys()
         subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
         return subgraph
 
@@ -332,8 +336,8 @@ class NetworkGraph:
             self._nx_graph,
             pos,
             ax=ax,
-            node_size=node_sizes_int, # type: ignore
-            node_color= node_sizes, # type: ignore
+            node_size=node_sizes_int,
+            node_color=cast(Any, node_sizes),
             cmap=plt.get_cmap(style.palette),
         )
         # edges
@@ -343,7 +347,7 @@ class NetworkGraph:
             ax=ax,
             edge_color=style.font_color,
             edge_cmap=plt.get_cmap(style.palette),
-            width=edge_widths, # type: ignore
+            width=cast(Any, edge_widths),
         )
         # labels
         for font_size, nodes in font_sizes.items():
@@ -363,65 +367,40 @@ class NetworkGraph:
         return ax
 
     def plot_network_components(self,
-                                node_list: Optional[List] = None,
-                                scale: int = DEFAULT["GRAPH_SCALE"],
-                                node_scale: int = DEFAULT["MAX_NODE_SIZE"],
-                                edge_scale: float = DEFAULT["MAX_EDGE_WIDTH"],
-                                max_nodes: int = DEFAULT["MAX_NODES"],
-                                max_edges: int = DEFAULT["MAX_EDGES"],
-                                plt_title: Optional[str] = "Top keywords"):
-        """Plot each connected component of the graph.
+                                *args, **kwargs):
+        """Plot network components (DEPRECATED).
+
+        .. deprecated:: 0.1.0
+            This method will be removed in a future version.
+            Please use `fplot_network_components` which provides a figure-level interface
+            for plotting components.
+        """
+        import warnings
+        warnings.warn(
+            "`plot_network_components` is deprecated and will be removed in a future version. "
+            "Please use `fplot_network_components`.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        # For backward compatibility, we can try to call the new function,
+        # but it's better to encourage users to switch.
+        # This is a bit tricky because the function signatures are different.
+        # For now, we'll just warn.
+        return []
+
+    def get_core_subgraph(self, k: int = 2) -> 'NetworkGraph':
+        """Return the k-core of the graph.
+
+        The k-core is a subgraph containing only nodes with degree >= k.
 
         Args:
-            node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
-            scale (int, optional): Figure scaling factor. Defaults to ``DEFAULT["GRAPH_SCALE"]``.
-            node_scale (int, optional): Scaling for node sizes. Defaults to ``DEFAULT["MAX_NODE_SIZE"]``.
-            edge_scale (float, optional): Scaling for edge widths. Defaults to ``DEFAULT["MAX_EDGE_WIDTH"]``.
-            max_nodes (int, optional): Maximum nodes per component. Defaults to ``DEFAULT["MAX_NODES"]``.
-            max_edges (int, optional): Maximum edges per component. Defaults to ``DEFAULT["MAX_EDGES"]``.
-            plt_title (Optional[str], optional): Base title for component plots. Defaults to ``"Top keywords"``.
+            k (int, optional): The minimum degree for nodes in the core. Defaults to 2.
 
         Returns:
-            List[Axes]: Axes for each plotted component.
+            NetworkGraph: The k-core subgraph.
         """
-        # node_list=self.nodes_circuits(node_list)
-        g = self.subgraph(max_edges=max_edges, node_list=node_list)
-        connected_components = nx.connected_components(g._nx_graph)
-        axes = []
-        for connected_component in connected_components:
-            if len(connected_component) > 5:
-                connected_component_graph = self.subgraph(max_edges=max_edges,
-                                                          node_list=connected_component)
-                ax = connected_component_graph.plot_network()
-                axes.append(ax)
-        return axes
-
-    def find_connected_subgraph(self) -> 'NetworkGraph':
-        """Return subgraph containing only nodes with degree >= 2.
-
-        Returns:
-            NetworkGraph: Connected subgraph.
-        """
-        logging.info('find_connected_subgraph')
-        # Copy the original graph to avoid modifying it
-        H = self._nx_graph.copy()
-
-        # Flag to keep track of whether any node with degree < 2 was removed
-        removed_node = True
-
-        while removed_node:
-            removed_node = False
-            # Iterate over the nodes
-            for node in list(H.nodes):
-                if H.degree(node) < 2: # type: ignore
-                    # Remove the node and its incident edges
-                    logging.info(
-                        f'Removing the {node} node and its incident edges')
-                    H.remove_node(node)
-                    removed_node = True
-                    break
-
-        return NetworkGraph(H)
+        core_graph = nx.k_core(self._nx_graph, k=k)
+        return NetworkGraph(core_graph)
 
     def top_k_edges(self, attribute: str, reverse: bool = True, k: int = 5) -> Dict[Any, List[Tuple[Any, Dict]]]:
         """Return the top ``k`` edges based on a given attribute.
@@ -445,6 +424,38 @@ class NetworkGraph:
                 top_list[edge_key] = data[attribute]
         return top_list
 
+    def calculate_node_weights_from_edges(self, weight: str = "weight", k: int = 10):
+        """Calculate node weights by summing weights of top k edges.
+
+        Args:
+            weight (str, optional): Edge attribute to use for weighting. Defaults to "weight".
+            k (int, optional): Number of top edges to consider for each node. Defaults to 10.
+        """
+        edge_aggregates = self.top_k_edges(attribute=weight, k=k)
+        node_aggregates = {}
+        for (u, v), weight_value in edge_aggregates.items():
+            if u not in node_aggregates:
+                node_aggregates[u] = 0
+            if v not in node_aggregates:
+                node_aggregates[v] = 0
+            node_aggregates[u] += weight_value
+            node_aggregates[v] += weight_value
+
+        nx.set_node_attributes(self._nx_graph, node_aggregates, name=weight)
+
+    def trim_edges(self, weight: str = "weight", top_k_per_node: int = 5) -> 'NetworkGraph':
+        """Trim the graph to keep only the top k edges per node.
+
+        Args:
+            weight (str, optional): Edge attribute to use for sorting. Defaults to "weight".
+            top_k_per_node (int, optional): Number of top edges to keep per node. Defaults to 5.
+
+        Returns:
+            NetworkGraph: A new graph containing only the top edges.
+        """
+        edges_to_keep = self.top_k_edges(attribute=weight, k=top_k_per_node)
+        return self.edge_subgraph(edges=edges_to_keep)
+
     @staticmethod
     def from_pandas_edgelist(
         df: pd.DataFrame,
@@ -466,25 +477,7 @@ class NetworkGraph:
         network_G = nx.from_pandas_edgelist(
             df, source=source, target=target, edge_attr=weight
         )
-        network_G = NetworkGraph(network_G)
-        network_G = network_G.find_connected_subgraph()
-
-        edge_aggregates = network_G.top_k_edges(attribute=weight, k=10)
-        node_aggregates = {}
-        for (u, v), weight_value in edge_aggregates.items():
-            if u not in node_aggregates:
-                node_aggregates[u] = 0
-            if v not in node_aggregates:
-                node_aggregates[v] = 0
-            node_aggregates[u] += weight_value
-            node_aggregates[v] += weight_value
-
-        nx.set_node_attributes(network_G._nx_graph, node_aggregates, name=weight)
-
-        network_G = network_G.edge_subgraph(
-            edges=network_G.top_k_edges(attribute=weight)
-        )
-        return network_G
+        return NetworkGraph(network_G)
 
 
 def aplot_network(pd_df: pd.DataFrame,
@@ -524,6 +517,10 @@ def aplot_network(pd_df: pd.DataFrame,
     graph = NetworkGraph.from_pandas_edgelist(
         df, source=source, target=target, weight=weight
     )
+    graph = graph.get_core_subgraph(k=2)
+    graph.calculate_node_weights_from_edges(weight=weight, k=10)
+    graph = graph.trim_edges(weight=weight, top_k_per_node=5)
+
     return graph.plot_network(title=title,
                               style=style,
                               weight=weight,
@@ -539,7 +536,7 @@ def aplot_network_components(pd_df: pd.DataFrame,
                              sort_by: Optional[str] = None,
                              node_list: Optional[List] = None,
                              ascending: bool = False,
-                             ax: Optional[Axes] = None) -> List[Axes]:
+                             axes: Optional[np.ndarray] = None) -> None:
     """Plot network components separately on multiple axes.
 
     Args:
@@ -552,10 +549,7 @@ def aplot_network_components(pd_df: pd.DataFrame,
         sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
         node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
         ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        ax (Optional[Axes], optional): Existing axes to draw on. Defaults to ``None``.
-
-    Returns:
-        List[Axes]: Axes for each component plotted.
+        axes (Optional[np.ndarray], optional): Existing axes to draw on. If None, new axes are created. Defaults to ``None``.
     """
     if node_list:
         df = pd_df.loc[(pd_df["source"].isin(node_list)) |
@@ -567,20 +561,48 @@ def aplot_network_components(pd_df: pd.DataFrame,
     graph = NetworkGraph.from_pandas_edgelist(
         df, source=source, target=target, weight=weight
     )
-    connected_components = nx.connected_components(graph._nx_graph)
-    axes = []
-    i = 0
-    for connected_component in connected_components:
-        if len(connected_component) > 5:
-            connected_component_graph = graph.subgraph(
-                node_list=connected_component)
-            comp_ax = connected_component_graph.plot_network(title=f"{title}::{i}",
-                                                             style=style,
-                                                             weight=weight,
-                                                             ax=ax)
-            axes.append(comp_ax)
-            i += 1
-    return axes
+    graph = graph.get_core_subgraph(k=2)
+    graph.calculate_node_weights_from_edges(weight=weight, k=10)
+    graph = graph.trim_edges(weight=weight, top_k_per_node=5)
+
+    connected_components = list(nx.connected_components(graph._nx_graph))
+
+    if not connected_components:
+        if axes is not None:
+            for ax in axes.flatten():
+                ax.set_axis_off()
+        return
+
+    if axes is None:
+        n_components = len(connected_components)
+        n_cols = int(np.ceil(np.sqrt(n_components)))
+        n_rows = int(np.ceil(n_components / n_cols))
+        fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=(19.2, 10.8))
+        fig.patch.set_facecolor(style.background_color)
+        if not isinstance(axes_grid, np.ndarray):
+            axes = np.array([axes_grid])
+        else:
+            axes = axes_grid.flatten()
+
+    i = -1
+    for i, component in enumerate(connected_components):
+        if i < len(axes):
+            if len(component) > 5:
+                component_graph = graph.subgraph(node_list=list(component))
+                component_graph.plot_network(
+                    title=f"{title}::{i}" if title else str(i),
+                    style=style,
+                    weight=weight,
+                    ax=axes[i]
+                )
+            axes[i].set_axis_on()
+        else:
+            break  # Stop if there are more components than axes
+
+    # Turn off any unused axes
+    if axes is not None:
+        for j in range(i + 1, len(axes)):
+            axes[j].set_axis_off()
 
 
 def fplot_network(pd_df: pd.DataFrame,
@@ -636,7 +658,8 @@ def fplot_network_components(pd_df: pd.DataFrame,
                              sort_by: Optional[str] = None,
                              ascending: bool = False,
                              node_list: Optional[List] = None,
-                             figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+                             figsize: Tuple[float, float] = (19.2, 10.8),
+                             n_cols: Optional[int] = None) -> Figure:
     """Return a figure showing individual network components.
 
     Args:
@@ -650,32 +673,50 @@ def fplot_network_components(pd_df: pd.DataFrame,
         ascending (bool, optional): Sort order for the data. Defaults to ``False``.
         node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
         figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
+        n_cols (Optional[int], optional): Number of columns for subplots. If None, it's inferred. Defaults to ``None``.
 
     Returns:
         Figure: Matplotlib figure displaying component plots.
     """
-    axes = aplot_network_components(pd_df,
-                                    source=source,
-                                    target=target,
-                                    weight=weight,
-                                    title=title,
-                                    style=style,
-                                    sort_by=sort_by,
-                                    ascending=ascending,
-                                    node_list=node_list
-                                    )
-    fig = plt.figure(figsize=figsize)
+    # First, get the graph and components to determine the layout
+    df = pd_df.copy()
+    if node_list:
+        df = df.loc[(df["source"].isin(node_list)) | (df["target"].isin(node_list))]
+
+    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
+    graph = NetworkGraph.from_pandas_edgelist(df, source=source, target=target, weight=weight)
+    graph = graph.get_core_subgraph(k=2)
+    connected_components = list(nx.connected_components(graph._nx_graph))
+
+    n_components = len(connected_components)
+    if n_cols is None:
+        n_cols = int(np.ceil(np.sqrt(n_components)))
+    n_rows = int(np.ceil(n_components / n_cols))
+
+    fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
-    ax = fig.add_subplot()
-    ax = aplot_network(pd_df,
-                       source=source,
-                       target=target,
-                       weight=weight,
-                       title=title,
-                       style=style,
-                       sort_by=sort_by,
-                       ascending=ascending,
-                       node_list=node_list,
-                       ax=ax
-                       )
+
+    if not isinstance(axes_grid, np.ndarray):
+        axes = np.array([axes_grid])
+    else:
+        axes = axes_grid.flatten()
+
+    aplot_network_components(
+        pd_df=pd_df,
+        source=source,
+        target=target,
+        weight=weight,
+        title=title,
+        style=style,
+        sort_by=sort_by,
+        ascending=ascending,
+        node_list=node_list,
+        axes=axes
+    )
+
+    if title:
+        fig.suptitle(title, color=style.font_color, fontsize=style.font_size * 2.5)
+
+    plt.tight_layout(rect=(0, 0.03, 1, 0.95))
+
     return fig
