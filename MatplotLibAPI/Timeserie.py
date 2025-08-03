@@ -1,3 +1,5 @@
+"""Timeserie plotting helpers."""
+
 # Hint for Visual Code Python Interactive window
 # %%
 from typing import Optional, Tuple
@@ -29,7 +31,24 @@ def aplot_timeserie(pd_df: pd.DataFrame,
                       ascending: bool = False,
                       std: bool = False,
                       ax: Optional[Axes] = None) -> Axes:
+    """Plot a time series on the provided axes.
 
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to plot.
+        label (str): Column used to group series.
+        x (str): Column for the x-axis values.
+        y (str): Column for the y-axis values.
+        title (Optional[str], optional): Plot title. Defaults to ``None``.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``TIMESERIE_STYLE_TEMPLATE``.
+        max_values (int, optional): Maximum number of rows to plot. Defaults to ``100``.
+        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        std (bool, optional): Whether to plot rolling standard deviation. Defaults to ``False``.
+        ax (Optional[Axes], optional): Axes to draw on. Defaults to ``None``.
+
+    Returns:
+        Axes: Matplotlib axes with the time series plot.
+    """
     validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
     style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
 
@@ -110,6 +129,24 @@ def fplot_timeserie(pd_df: pd.DataFrame,
                        ascending: bool = False,
                        std: bool = False,
                        figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+    """Return a figure plotting the time series.
+
+    Args:
+        pd_df (pd.DataFrame): DataFrame containing the data to plot.
+        label (str): Column used to group series.
+        x (str): Column for the x-axis values.
+        y (str): Column for the y-axis values.
+        title (Optional[str], optional): Plot title. Defaults to ``None``.
+        style (StyleTemplate, optional): Style configuration. Defaults to ``TIMESERIE_STYLE_TEMPLATE``.
+        max_values (int, optional): Maximum number of rows to plot. Defaults to ``100``.
+        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
+        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
+        std (bool, optional): Whether to plot rolling standard deviation. Defaults to ``False``.
+        figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
+
+    Returns:
+        Figure: Matplotlib figure containing the time series plot.
+    """
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()

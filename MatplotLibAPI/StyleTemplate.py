@@ -1,5 +1,7 @@
 
 
+"""Common style utilities and formatters for plotting."""
+
 from typing import List, Optional, Dict, Callable, Union
 from dataclasses import dataclass
 import pandas as pd
@@ -48,42 +50,7 @@ def format_func(
         x: Optional[str] = None,
         y: Optional[str] = None,
         z: Optional[str] = None):
-    """
-    Update the formatting functions for specified keys if they exist in the provided format functions dictionary.
-
-    Parameters:
-    format_funcs (Optional[Dict[str, Optional[Callable[[Union[int, float, str]], str]]]]): 
-        A dictionary mapping keys to formatting functions. The keys can be 'label', 'x', 'y', and 'z'.
-    label (Optional[str]): 
-        The key to update with the 'label' formatting function from the dictionary.
-    x (Optional[str]): 
-        The key to update with the 'x' formatting function from the dictionary.
-    y (Optional[str]): 
-        The key to update with the 'y' formatting function from the dictionary.
-    z (Optional[str]): 
-        The key to update with the 'z' formatting function from the dictionary.
-
-    Returns:
-    Optional[Dict[str, Optional[Callable[[Union[int, float, str]], str]]]]:
-        The updated dictionary with the specified keys pointing to their corresponding formatting functions.
-
-    Example:
-    >>> format_funcs = {
-    ...     "label": lambda x: f"Label: {x}",
-    ...     "x": lambda x: f"X-axis: {x}",
-    ...     "y": lambda y: f"Y-axis: {y}",
-    ... }
-    >>> updated_funcs = format_func(format_funcs, label="new_label", x="new_x")
-    >>> print(updated_funcs)
-    {
-        "label": lambda x: f"Label: {x}",
-        "x": lambda x: f"X-axis: {x}",
-        "y": lambda y: f"Y-axis: {y}",
-        "new_label": lambda x: f"Label: {x}",
-        "new_x": lambda x: f"X-axis: {x}",
-    }
-    """
-
+    """Update formatting functions for specified keys if present."""
     if label and "label" in format_funcs:
         format_funcs[label] = format_funcs["label"]
     if x and "x" in format_funcs:
@@ -109,6 +76,8 @@ FONT_SIZE = 14
 
 @dataclass
 class StyleTemplate:
+    """Configuration container for plot styling options."""
+
     background_color: str = BACKGROUND_COLOR
     fig_border: str = BACKGROUND_COLOR
     font_name: str = 'Arial'
@@ -165,6 +134,7 @@ class StyleTemplate:
     """
     @property
     def font_mapping(self):
+        """Map levels 0-4 to scaled font sizes."""
         return {0: self.font_size-3,
                 1: self.font_size-1,
                 2: self.font_size,
@@ -173,19 +143,10 @@ class StyleTemplate:
 
 
 class DynamicFuncFormatter(FuncFormatter):
-    """
-    A class to create a dynamic function formatter for matplotlib plots.
+    """Formatter that delegates tick formatting to a dynamic function."""
 
-    Inherits from:
-    FuncFormatter: A base class from matplotlib for formatting axis ticks.
-
-    Parameters:
-    func_name (Callable): The function to be used for formatting.
-
-    Example:
-    >>> formatter = DynamicFuncFormatter(percent_formatter)
-    """
     def __init__(self, func_name):
+        """Initialize the formatter with the provided function."""
         super().__init__(func_name)
 
 

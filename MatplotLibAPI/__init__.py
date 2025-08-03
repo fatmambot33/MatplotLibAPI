@@ -1,3 +1,4 @@
+"""Public API and pandas accessor for MatplotLibAPI."""
 
 from .StyleTemplate import StyleTemplate
 from .Bubble import aplot_bubble, fplot_bubble, BUBBLE_STYLE_TEMPLATE
@@ -17,8 +18,10 @@ import plotly.graph_objects as go
 
 @register_dataframe_accessor("mpl")
 class DataFrameAccessor:
+    """Expose MatplotLibAPI plotting helpers as a pandas accessor."""
 
     def __init__(self, pd_df: pd.DataFrame):
+        """Store the parent DataFrame."""
         self._obj = pd_df
 
     def aplot_bubble(self,
@@ -35,7 +38,7 @@ class DataFrameAccessor:
                      hline: bool = False,
                      vline: bool = False,
                      ax: Optional[Axes] = None) -> Axes:
-
+        """Plot a bubble chart using the underlying DataFrame."""
         return aplot_bubble(pd_df=self._obj,
                             label=label,
                             x=x,
@@ -65,7 +68,7 @@ class DataFrameAccessor:
                      hline: bool = False,
                      vline: bool = False,
                      figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
-
+        """Return a figure with a bubble chart."""
         return fplot_bubble(pd_df=self._obj,
                             label=label,
                             x=x,
@@ -93,7 +96,7 @@ class DataFrameAccessor:
                                sort_by: Optional[str] = None,
                                ascending: bool = False,
                                table_rows:int=10) -> Figure:
-
+        """Return a composite bubble chart with summary tables."""
         return plot_composite_bubble(pd_df=self._obj,
                                      label=label,
                                      x=x,
@@ -115,7 +118,7 @@ class DataFrameAccessor:
                     sort_by: Optional[str] = None,
                     ascending: bool = False,
                     ax: Optional[Axes] = None) -> Axes:
-
+        """Plot a table using the DataFrame's data."""
         return aplot_table(pd_df=self._obj,
                            cols=cols,
                            title=title,
@@ -133,7 +136,7 @@ class DataFrameAccessor:
                     sort_by: Optional[str] = None,
                     ascending: bool = False,
                     figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
-
+        """Return a figure containing the table plot."""
         return fplot_table(pd_df=self._obj,
                            cols=cols,
                            title=title,
@@ -154,7 +157,7 @@ class DataFrameAccessor:
                         ascending: bool = False,
                         std: bool = False,
                         ax: Optional[Axes] = None) -> Axes:
-
+        """Plot a time series using the stored DataFrame."""
         return aplot_timeserie(pd_df=self._obj,
                                label=label,
                                x=x,
@@ -178,7 +181,7 @@ class DataFrameAccessor:
                         ascending: bool = False,
                         std: bool = False,
                         figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
-
+        """Return a figure plotting the time series."""
         return fplot_timeserie(pd_df=self._obj,
                                label=label,
                                x=x,
@@ -201,7 +204,7 @@ class DataFrameAccessor:
                       ascending: bool = False,
                       node_list: Optional[List] = None,
                       ax: Optional[Axes] = None) -> Axes:
-
+        """Plot a network graph on the given axes."""
         return aplot_network(pd_df=self._obj,
                              source=source,
                              target=target,
@@ -223,7 +226,7 @@ class DataFrameAccessor:
                                  ascending: bool = False,
                                  node_list: Optional[List] = None,
                                  ax: Optional[Axes] = None) -> Axes:
-
+        """Plot connected components of the network graph."""
         return aplot_network_components(df=self._obj,
                                         source=source,
                                         target=target,
@@ -244,7 +247,7 @@ class DataFrameAccessor:
                       sort_by: Optional[str] = None,
                       ascending: bool = False,
                       node_list: Optional[List] = None) -> Axes:
-
+        """Return a network plot as a new figure."""
         return fplot_network(pd_df=self._obj,
                              source=source,
                              target=target,
@@ -265,6 +268,7 @@ class DataFrameAccessor:
                       max_values: int = 100,
                       ascending: bool = False,
                       fig: Optional[go.Figure] = None) -> go.Figure:
+        """Return a figure with a treemap plot."""
         return fplot_treemap(pd_df=self._obj,
                              path=path,
                              values=values,
@@ -286,6 +290,7 @@ class DataFrameAccessor:
                       max_values: int = 100,
                       ascending: bool = False,
                       fig: Optional[go.Figure] = None) -> go.Figure:
+        """Add a treemap trace to an existing figure or create a new one."""
         return aplot_treemap(pd_df=self._obj,
                              path=path,
                              values=values,
@@ -306,10 +311,10 @@ class DataFrameAccessor:
                       max_values: int = 100,
                       ascending: bool = False,
                       fig: Optional[go.Figure] = None) -> go.Figure:
-        pd_dfs:Dict[str,pd.DataFrame]={}
+        """Return a figure composed of multiple treemap plots."""
+        pd_dfs: Dict[str, pd.DataFrame] = {}
         for path in pathes:
-            pd_dfs[path]=self._obj
-
+            pd_dfs[path] = self._obj
 
         return plot_composite_treemap(pd_dfs=pd_dfs,
                              values=values,
