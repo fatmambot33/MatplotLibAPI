@@ -19,7 +19,6 @@ BUBBLE_STYLE_TEMPLATE = StyleTemplate(
     format_funcs={"label": string_formatter,
                   "x": bmk_formatter,
                   "y": percent_formatter,
-                  "label": string_formatter,
                   "z": bmk_formatter},
     yscale="log"
 )
@@ -184,7 +183,7 @@ def fplot_bubble(
         z: str,
         title: Optional[str] = "Test",
         style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
-        max_values: int = BUBBLE_STYLE_TEMPLATE,
+        max_values: int = MAX_RESULTS,
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
         ascending: bool = False,
