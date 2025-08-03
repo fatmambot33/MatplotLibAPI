@@ -332,8 +332,8 @@ class NetworkGraph:
             self._nx_graph,
             pos,
             ax=ax,
-            node_size=node_sizes_int,
-            node_color=cast(Iterable[float], node_sizes),
+            node_size=node_sizes_int, # type: ignore
+            node_color= node_sizes, # type: ignore
             cmap=plt.get_cmap(style.palette),
         )
         # edges
@@ -343,7 +343,7 @@ class NetworkGraph:
             ax=ax,
             edge_color=style.font_color,
             edge_cmap=plt.get_cmap(style.palette),
-            width=cast(Iterable[float], edge_widths),
+            width=edge_widths, # type: ignore
         )
         # labels
         for font_size, nodes in font_sizes.items():
@@ -413,7 +413,7 @@ class NetworkGraph:
             removed_node = False
             # Iterate over the nodes
             for node in list(H.nodes):
-                if H.degree(node) < 2:
+                if H.degree(node) < 2: # type: ignore
                     # Remove the node and its incident edges
                     logging.info(
                         f'Removing the {node} node and its incident edges')
