@@ -327,12 +327,13 @@ class NetworkGraph:
             weight=weight)
         pos = nx.spring_layout(self._nx_graph, k=1)
         # nodes
+        node_sizes_int = [int(size) for size in node_sizes]
         nx.draw_networkx_nodes(
             self._nx_graph,
             pos,
             ax=ax,
-            node_size=node_sizes,
-            node_color=cast(Any, node_sizes),
+            node_size=node_sizes_int,
+            node_color=cast(Iterable[float], node_sizes),
             cmap=plt.get_cmap(style.palette),
         )
         # edges
@@ -342,7 +343,7 @@ class NetworkGraph:
             ax=ax,
             edge_color=style.font_color,
             edge_cmap=plt.get_cmap(style.palette),
-            width=cast(Any, edge_widths),
+            width=cast(Iterable[float], edge_widths),
         )
         # labels
         for font_size, nodes in font_sizes.items():
@@ -412,7 +413,7 @@ class NetworkGraph:
             removed_node = False
             # Iterate over the nodes
             for node in list(H.nodes):
-                if H.degree[node] < 2:
+                if H.degree(node) < 2:
                     # Remove the node and its incident edges
                     logging.info(
                         f'Removing the {node} node and its incident edges')
