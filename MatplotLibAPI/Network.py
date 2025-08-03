@@ -3,7 +3,7 @@
 import logging
 from collections import defaultdict
 from collections.abc import Iterable
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -230,18 +230,20 @@ class NetworkGraph:
         """
         return NetworkGraph(nx.edge_subgraph(self._nx_graph, edges))
 
-    def layout(self,
-               max_node_size: int = DEFAULT["MAX_NODES"],
-               min_node_size: int = DEFAULT["MAX_NODES"],
-               max_edge_width: int = DEFAULT["MAX_EDGE_WIDTH"],
-               max_font_size: int = DEFAULT["MAX_FONT_SIZE"],
-               min_font_size: int = DEFAULT["MIN_FONT_SIZE"],
-               weight: str = "weight"):
+    def layout(
+        self,
+        max_node_size: int = DEFAULT["MAX_NODE_SIZE"],
+        min_node_size: int = DEFAULT["MIN_NODE_SIZE"],
+        max_edge_width: int = DEFAULT["MAX_EDGE_WIDTH"],
+        max_font_size: int = DEFAULT["MAX_FONT_SIZE"],
+        min_font_size: int = DEFAULT["MIN_FONT_SIZE"],
+        weight: str = "weight",
+    ) -> Tuple[List[float], List[float], Dict[int, List[str]]]:
         """Calculate node, edge and font sizes based on weights.
 
         Args:
-            max_node_size (int, optional): Upper bound for node size. Defaults to ``DEFAULT["MAX_NODES"]``.
-            min_node_size (int, optional): Lower bound for node size. Defaults to ``DEFAULT["MAX_NODES"]``.
+            max_node_size (int, optional): Upper bound for node size. Defaults to ``DEFAULT["MAX_NODE_SIZE"]``.
+            min_node_size (int, optional): Lower bound for node size. Defaults to ``DEFAULT["MIN_NODE_SIZE"]``.
             max_edge_width (int, optional): Upper bound for edge width. Defaults to ``DEFAULT["MAX_EDGE_WIDTH"]``.
             max_font_size (int, optional): Upper bound for font size. Defaults to ``DEFAULT["MAX_FONT_SIZE"]``.
             min_font_size (int, optional): Lower bound for font size. Defaults to ``DEFAULT["MIN_FONT_SIZE"]``.
@@ -288,7 +290,7 @@ class NetworkGraph:
         """
         if node_list is None:
             node_list = self.nodes.sort("weight")[: DEFAULT["MAX_NODES"]]
-        connected_subgraph_nodes = list(self.find_connected_subgraph())
+        connected_subgraph_nodes = list(self.find_connected_subgraph().nodes)
         node_list = [node for node in node_list if node in connected_subgraph_nodes]
 
         subgraph = NetworkGraph(nx.subgraph(self._nx_graph, nbunch=node_list))
@@ -312,35 +314,36 @@ class NetworkGraph:
         Returns:
             Axes: Matplotlib axes with the plotted network.
         """
-        degree_sequence = sorted(
-            [d for n, d in self._nx_graph.degree()], reverse=True)
-        dmax = max(degree_sequence)
         sns.set_palette(style.palette)
         if ax is None:
             ax = plt.gca()
 
         node_sizes, edge_widths, font_sizes = self.layout(
-            min_node_size=DEFAULT["MIN_NODE_SIZE"]/5,
+            min_node_size=DEFAULT["MIN_NODE_SIZE"] // 5,
             max_node_size=DEFAULT["MAX_NODE_SIZE"],
             max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
-            min_font_size=style.font_mapping.get(0),
-            max_font_size=style.font_mapping.get(4),
+            min_font_size=style.font_mapping.get(0, DEFAULT["MIN_FONT_SIZE"]),
+            max_font_size=style.font_mapping.get(4, DEFAULT["MAX_FONT_SIZE"]),
             weight=weight)
         pos = nx.spring_layout(self._nx_graph, k=1)
         # nodes
-        nx.draw_networkx_nodes(self._nx_graph,
-                               pos,
-                               ax=ax,
-                               node_size=list(node_sizes),
-                               node_color=node_sizes,
-                               cmap=plt.get_cmap(style.palette))
+        nx.draw_networkx_nodes(
+            self._nx_graph,
+            pos,
+            ax=ax,
+            node_size=node_sizes,
+            node_color=cast(Any, node_sizes),
+            cmap=plt.get_cmap(style.palette),
+        )
         # edges
-        nx.draw_networkx_edges(self._nx_graph,
-                               pos,
-                               ax=ax,
-                               edge_color=style.font_color,
-                               edge_cmap=plt.get_cmap(style.palette),
-                               width=edge_widths)
+        nx.draw_networkx_edges(
+            self._nx_graph,
+            pos,
+            ax=ax,
+            edge_color=style.font_color,
+            edge_cmap=plt.get_cmap(style.palette),
+            width=cast(Any, edge_widths),
+        )
         # labels
         for font_size, nodes in font_sizes.items():
             nx.draw_networkx_labels(
@@ -409,7 +412,7 @@ class NetworkGraph:
             removed_node = False
             # Iterate over the nodes
             for node in list(H.nodes):
-                if H.degree(node) < 2:
+                if H.degree[node] < 2:
                     # Remove the node and its incident edges
                     logging.info(
                         f'Removing the {node} node and its incident edges')
@@ -475,7 +478,7 @@ class NetworkGraph:
             node_aggregates[u] += weight_value
             node_aggregates[v] += weight_value
 
-        nx.set_node_attributes(network_G, node_aggregates, name=weight)
+        nx.set_node_attributes(network_G._nx_graph, node_aggregates, name=weight)
 
         network_G = network_G.edge_subgraph(
             edges=network_G.top_k_edges(attribute=weight)
@@ -511,8 +514,8 @@ def aplot_network(pd_df: pd.DataFrame,
         Axes: Matplotlib axes with the plotted network.
     """
     if node_list:
-        df = pd_df[(pd_df["source"].isin(node_list)) |
-                   (pd_df["target"].isin(node_list))]
+        df = pd_df.loc[(pd_df["source"].isin(node_list)) |
+                       (pd_df["target"].isin(node_list))]
     else:
         df = pd_df
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
@@ -554,8 +557,8 @@ def aplot_network_components(pd_df: pd.DataFrame,
         List[Axes]: Axes for each component plotted.
     """
     if node_list:
-        df = pd_df[(pd_df["source"].isin(node_list)) |
-                   (pd_df["target"].isin(node_list))]
+        df = pd_df.loc[(pd_df["source"].isin(node_list)) |
+                       (pd_df["target"].isin(node_list))]
     else:
         df = pd_df
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
