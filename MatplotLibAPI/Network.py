@@ -66,19 +66,19 @@ class NodeView(nx.classes.reportviews.NodeView):
     """Extended node view with convenience helpers."""
 
     def sort(self,
-             attribute: Optional[str] = 'weight',
-             reverse: Optional[bool] = True):
+             attribute: str = "weight",
+             reverse: bool = True) -> List[Any]:
         """Return nodes sorted by the specified attribute.
 
         Args:
-            attribute (Optional[str], optional): Node attribute used for sorting. Defaults to ``'weight'``.
-            reverse (Optional[bool], optional): Sort order. Defaults to ``True``.
+            attribute (str, optional): Node attribute used for sorting. Defaults to ``"weight"``.
+            reverse (bool, optional): Sort order. Defaults to ``True``.
 
         Returns:
-            List: Sorted nodes.
+            List[Any]: Sorted nodes.
         """
         sorted_nodes = sorted(
-            self, key=lambda node: self[node][attribute], reverse=reverse
+            self, key=lambda node: self[node].get(attribute, 1), reverse=reverse
         )
         return sorted_nodes
 
@@ -95,7 +95,7 @@ class NodeView(nx.classes.reportviews.NodeView):
         filtered_nodes = [
             node
             for node in self
-            if attribute in self[node] and self[node][attribute] == value
+            if self[node].get(attribute) == value
         ]
         return filtered_nodes
 
@@ -104,19 +104,19 @@ class AdjacencyView(nx.classes.coreviews.AdjacencyView):
     """Adjacency view with sorting and filtering helpers."""
 
     def sort(self,
-             attribute: Optional[str] = 'weight',
-             reverse: Optional[bool] = True):
+             attribute: str = "weight",
+             reverse: bool = True) -> List[Any]:
         """Return adjacent nodes sorted by the given attribute.
 
         Args:
-            attribute (Optional[str], optional): Attribute used for sorting. Defaults to ``'weight'``.
-            reverse (Optional[bool], optional): Sort order. Defaults to ``True``.
+            attribute (str, optional): Attribute used for sorting. Defaults to ``"weight"``.
+            reverse (bool, optional): Sort order. Defaults to ``True``.
 
         Returns:
-            List: Sorted adjacent nodes.
+            List[Any]: Sorted adjacent nodes.
         """
         sorted_nodes = sorted(
-            self, key=lambda node: self[node][attribute], reverse=reverse
+            self, key=lambda node: self[node].get(attribute, 1), reverse=reverse
         )
         return sorted_nodes
 
@@ -133,7 +133,7 @@ class AdjacencyView(nx.classes.coreviews.AdjacencyView):
         filtered_nodes = [
             node
             for node in self
-            if attribute in self[node] and self[node][attribute] == value
+            if self[node].get(attribute) == value
         ]
         return filtered_nodes
 
@@ -142,21 +142,21 @@ class EdgeView(nx.classes.reportviews.EdgeView):
     """Edge view with sorting and filtering helpers."""
 
     def sort(self,
-             reverse: Optional[bool] = True,
-             attribute: Optional[str] = 'weight'):
+             attribute: str = "weight",
+             reverse: bool = True) -> Dict[Tuple[Any, Any], Dict[str, Any]]:
         """Return edges sorted by the given attribute.
 
         Args:
-            reverse (Optional[bool], optional): Sort order. Defaults to ``True``.
-            attribute (Optional[str], optional): Edge attribute used for sorting. Defaults to ``'weight'``.
+            attribute (str, optional): Edge attribute used for sorting. Defaults to ``"weight"``.
+            reverse (bool, optional): Sort order. Defaults to ``True``.
 
         Returns:
-            Dict[Tuple[Any, Any], Dict]: Mapping of edge tuples to their attributes.
+            Dict[Tuple[Any, Any], Dict[str, Any]]: Mapping of edge tuples to their attributes.
         """
         sorted_edges = sorted(
             self(data=True), key=lambda t: t[2].get(attribute, 1), reverse=reverse
         )
-        return {(u, v): _ for u, v, _ in sorted_edges}
+        return {(u, v): data for u, v, data in sorted_edges}
 
     def filter(self, attribute: str, value: str):
         """Return edges where ``attribute`` equals ``value``.
@@ -171,7 +171,7 @@ class EdgeView(nx.classes.reportviews.EdgeView):
         filtered_edges = [
             edge
             for edge in self
-            if attribute in self[edge] and self[edge][attribute] == value
+            if self[edge].get(attribute) == value
         ]
         return [(edge[0], edge[1]) for edge in filtered_edges]
 
@@ -344,7 +344,7 @@ class NetworkGraph:
         # labels
         for font_size, nodes in font_sizes.items():
             nx.draw_networkx_labels(
-                self,
+                self._nx_graph,
                 pos,
                 ax=ax,
                 font_size=font_size,
@@ -382,7 +382,7 @@ class NetworkGraph:
         """
         # node_list=self.nodes_circuits(node_list)
         g = self.subgraph(max_edges=max_edges, node_list=node_list)
-        connected_components = nx.connected_components(g)
+        connected_components = nx.connected_components(g._nx_graph)
         axes = []
         for connected_component in connected_components:
             if len(connected_component) > 5:
@@ -535,7 +535,7 @@ def aplot_network_components(pd_df: pd.DataFrame,
                              sort_by: Optional[str] = None,
                              node_list: Optional[List] = None,
                              ascending: bool = False,
-                             ax: Optional[List[Axes]] = None) -> List[Axes]:
+                             ax: Optional[Axes] = None) -> List[Axes]:
     """Plot network components separately on multiple axes.
 
     Args:
@@ -548,7 +548,7 @@ def aplot_network_components(pd_df: pd.DataFrame,
         sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
         node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
         ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        ax (Optional[List[Axes]], optional): Existing axes to draw on. Defaults to ``None``.
+        ax (Optional[Axes], optional): Existing axes to draw on. Defaults to ``None``.
 
     Returns:
         List[Axes]: Axes for each component plotted.
@@ -563,18 +563,18 @@ def aplot_network_components(pd_df: pd.DataFrame,
     graph = NetworkGraph.from_pandas_edgelist(
         df, source=source, target=target, weight=weight
     )
-    connected_components = nx.connected_components(graph)
+    connected_components = nx.connected_components(graph._nx_graph)
     axes = []
     i = 0
     for connected_component in connected_components:
         if len(connected_component) > 5:
             connected_component_graph = graph.subgraph(
                 node_list=connected_component)
-            ax = connected_component_graph.plot_network(title=f"{title}::{i}",
-                                                        style=style,
-                                                        weight=weight,
-                                                        ax=ax)
-            axes.append(ax)
+            comp_ax = connected_component_graph.plot_network(title=f"{title}::{i}",
+                                                             style=style,
+                                                             weight=weight,
+                                                             ax=ax)
+            axes.append(comp_ax)
             i += 1
     return axes
 
