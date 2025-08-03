@@ -1,3 +1,5 @@
+"""Timeserie plotting helpers."""
+
 # Hint for Visual Code Python Interactive window
 # %%
 from typing import Optional, Tuple
@@ -29,7 +31,7 @@ def aplot_timeserie(pd_df: pd.DataFrame,
                       ascending: bool = False,
                       std: bool = False,
                       ax: Optional[Axes] = None) -> Axes:
-
+    """Plot a time series on the provided axes."""
     validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
     style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
 
@@ -110,6 +112,7 @@ def fplot_timeserie(pd_df: pd.DataFrame,
                        ascending: bool = False,
                        std: bool = False,
                        figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+    """Return a figure plotting the time series."""
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()

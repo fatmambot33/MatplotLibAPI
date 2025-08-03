@@ -1,3 +1,5 @@
+"""Table plotting helpers."""
+
 from typing import List, Optional, Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -23,6 +25,7 @@ def aplot_table(pd_df: pd.DataFrame,
                ascending: bool = False,
                ax: Optional[Axes] = None
                ) -> Axes:
+    """Render a table into the provided axes."""
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
 
     if not sort_by:
@@ -76,6 +79,7 @@ def fplot_table(pd_df: pd.DataFrame,
                ascending: bool = False,
                figsize: Tuple[float, float] = (19.2, 10.8)
                ) -> Figure:
+    """Return a new figure containing a formatted table."""
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()

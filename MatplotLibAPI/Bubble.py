@@ -77,7 +77,6 @@ def aplot_bubble(
     Axes
         The axes containing the bubble chart.
     """
-
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
     style.format_funcs = format_func(
         style.format_funcs, label=label, x=x, y=y, z=z)
@@ -191,7 +190,6 @@ def fplot_bubble(
         vline=False,
         figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
     """Return a new figure with a bubble chart."""
-
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()

@@ -1,3 +1,5 @@
+"""Composite plotting routines combining multiple charts."""
+
 # Hint for Visual Code Python Interactive window
 # %%
 from typing import Optional, Tuple, List, Dict

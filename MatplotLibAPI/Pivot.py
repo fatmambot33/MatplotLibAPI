@@ -1,3 +1,5 @@
+"""Pivot chart helpers for bar and line plots."""
+
 # Hint for Visual Code Python Interactive window
 # %%
 from typing import List, Optional, Union
@@ -37,7 +39,7 @@ def plot_pivotbar(pd_df: pd.DataFrame,
                   sort_by: Optional[str] = None,
                   ascending: bool = False,
                   ax: Optional[Axes] = None):
-
+    """Plot a bar chart from a pivot table on the given axes."""
     validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
     style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
     pivot_df = pd.pivot_table(pd_df, values=y, index=[
@@ -83,7 +85,7 @@ def plot_lines(
     ascending: bool = False,
     ax: Optional[Axes] = None
 ) -> Axes:
-
+    """Plot line charts for the top elements in ``y`` grouped by ``label``."""
     if title is not None:
         ax.set_title(title)
     ax.figure.set_facecolor(style.background_color)
@@ -145,7 +147,7 @@ def plot_bars(ax: Axes,
               z_col: str = "browser",
               n=5,
               agg_func: str = 'sum') -> Axes:
-
+    """Plot stacked bars for ``y_col`` grouped by ``z_col`` over ``x_col``."""
     # Validate inputs
 
     if not isinstance(y_col, list):

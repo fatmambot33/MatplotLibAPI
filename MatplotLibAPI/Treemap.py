@@ -1,3 +1,5 @@
+"""Treemap plotting utilities."""
+
 # Hint for Visual Code Python Interactive window
 # %%
 from typing import Optional
@@ -27,6 +29,7 @@ def aplot_treemap(pd_df: pd.DataFrame,
                   sort_by: Optional[str] = None,
                   ascending: bool = False,
                   max_values: int = 100) -> go.Trace:
+    """Create a treemap trace from the data frame."""
     cols = [path, values]
     if color:
         cols.append(color)
@@ -72,7 +75,7 @@ def fplot_treemap(pd_df: pd.DataFrame,
                   ascending: bool = False,
                   max_values: int = 100,
                   fig: Optional[go.Figure] = None) -> go.Figure:
-
+    """Return a figure containing the treemap plot."""
     g = aplot_treemap(pd_df=pd_df,
                       path=path,
                       values=values,
