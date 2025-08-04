@@ -1,7 +1,5 @@
 """Pivot chart helpers for bar and line plots."""
 
-# Hint for Visual Code Python Interactive window
-# %%
 from typing import List, Optional, Union
 
 import pandas as pd
