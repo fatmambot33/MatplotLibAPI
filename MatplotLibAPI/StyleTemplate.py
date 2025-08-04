@@ -126,8 +126,10 @@ class DynamicFuncFormatter(FuncFormatter):
         super().__init__(func_name)
 
 
-def percent_formatter(val: float, pos: Optional[int] = None) -> str:
+def percent_formatter(val: Union[int, float, str], pos: Optional[int] = None) -> str:
     """Format a value as a percentage."""
+    if isinstance(val, str):
+        val = float(val)
     val *= 100
     if val <= 0.1:
         return f"{val:.2f}%"
@@ -152,7 +154,7 @@ def integer_formatter(val: float, pos: Optional[int] = None) -> str:
     return str(int(val))
 
 
-def string_formatter(val: Union[str, float], pos: Optional[int] = None) -> str:
+def string_formatter(val: Union[int, float, str], pos: Optional[int] = None) -> str:
     """Format a string to be title-case with spaces."""
     return str(val).replace("-", " ").replace("_", " ").title()
 
