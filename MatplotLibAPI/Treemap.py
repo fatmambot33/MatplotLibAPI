@@ -66,9 +66,9 @@ def aplot_treemap(pd_df: pd.DataFrame,
 
     if color and color in pd_df.columns:
         color_data = pd_df[color]
-        if isinstance(color_data, CategoricalDtype) or pd.api.types.is_object_dtype(color_data):
+        if isinstance(color_data.dtype, CategoricalDtype) or pd.api.types.is_object_dtype(color_data.dtype):
             color_data = color_data.astype('category').cat.codes
-        elif isinstance(color_data, BooleanDtype):
+        elif isinstance(color_data.dtype, BooleanDtype):
             color_data = color_data.astype(int)
         data['marker'] = dict(colorscale="Viridis",
                               colors=color_data.to_list())
@@ -77,7 +77,7 @@ def aplot_treemap(pd_df: pd.DataFrame,
                    root_color=style.background_color
                    )
 
-    return g
+    return g  # type: ignore
 
 
 def fplot_treemap(pd_df: pd.DataFrame,

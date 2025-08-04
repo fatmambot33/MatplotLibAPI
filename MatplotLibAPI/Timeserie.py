@@ -2,22 +2,93 @@
 
 # Hint for Visual Code Python Interactive window
 # %%
-from typing import Optional, Tuple
+from typing import Optional, Tuple, cast
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 import seaborn as sns
 
-from MatplotLibAPI.StyleTemplate import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func, validate_dataframe
+from MatplotLibAPI.StyleTemplate import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func, validate_dataframe, FormatterFunc
 
 
 TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
     palette='rocket',
-    format_funcs={"y": bmk_formatter, "label": string_formatter}
+    format_funcs=cast(dict[str, Optional[FormatterFunc]], {
+        "y": bmk_formatter, "label": string_formatter})
 )
 
 # region Line
+
+
+def _prepare_timeserie_data(pd_df: pd.DataFrame, label: str, x: str, y: str, sort_by: Optional[str]) -> pd.DataFrame:
+    """Prepare data for time series plotting."""
+    validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
+    df = pd_df[[label, x, y]].sort_values(by=[label, x])  # type: ignore
+    df[x] = pd.to_datetime(df[x])
+    df.set_index(x, inplace=True)
+    return df
+
+
+def _plot_timeserie_lines(ax: Axes, df: pd.DataFrame, label: str, x: str, y: str, std: bool, style: StyleTemplate, format_funcs: Optional[dict[str, Optional[FormatterFunc]]]) -> None:
+    """Plot the time series lines on the axes."""
+    sns.set_palette(style.palette)
+    # Get unique dimension_types
+    label_types = df[label].unique()
+    # Colors for each group
+    colors = sns.color_palette(n_colors=len(label_types))
+
+    for label_type, color in zip(label_types, colors):
+        temp_df = df[df[label] == label_type].sort_values(by=x)  # type: ignore
+
+        if format_funcs and (label_formatter := format_funcs.get("label")):
+            label_type = label_formatter(label_type, None)
+        if std:
+            ma = temp_df[y].rolling(window=7, min_periods=1).mean()
+            std_dev = temp_df[y].rolling(window=7, min_periods=1).std()
+            # Calculate the last moving average value to include in the legend
+            last_ma_value = cast(pd.Series, ma).iloc[-1]
+            # Dynamically creating the legend label
+            if format_funcs and (y_formatter := format_funcs.get(y)):
+                label_str = f"{string_formatter(label_type)} (avg 7d: {y_formatter(last_ma_value, None)})"
+            else:
+                label_str = f"{string_formatter(label_type)} (avg 7d: {last_ma_value})"
+            # Plot moving average and include the last MA value in the label for the legend
+            ax.plot(temp_df.index, ma, color=color,
+                    linestyle='--', label=label_str)
+
+            ax.fill_between(temp_df.index, ma - std_dev, ma +
+                            std_dev, color=color, alpha=0.2, label='_nolegend_')
+        else:
+            label_str = f"{string_formatter(label_type)}"
+            # Plot moving average and include the last MA value in the label for the legend
+            ax.plot(temp_df.index, temp_df[y], color=color, label=label_str)
+
+
+def _setup_timeserie_axes(ax: Axes, label: str, x: str, y: str, style: StyleTemplate, format_funcs: Optional[dict[str, Optional[FormatterFunc]]]) -> None:
+    """Configure the axes for the time series plot."""
+    ax.legend(
+        title=label,
+        fontsize=style.font_size-4,
+        title_fontsize=style.font_size,
+        labelcolor='linecolor',
+        facecolor=style.background_color)
+
+    ax.set_xlabel(string_formatter(x), color=style.font_color)
+    if format_funcs and (x_formatter := format_funcs.get("x")):
+        ax.xaxis.set_major_formatter(
+            DynamicFuncFormatter(x_formatter))
+    ax.tick_params(axis='x', colors=style.font_color,
+                   labelrotation=45, labelsize=style.font_size-4)
+
+    ax.set_ylabel(string_formatter(y), color=style.font_color)
+    if format_funcs and (y_formatter := format_funcs.get("y")):
+        ax.yaxis.set_major_formatter(
+            DynamicFuncFormatter(y_formatter))
+    ax.tick_params(axis='y', colors=style.font_color,
+                   labelsize=style.font_size-4)
+    ax.set_facecolor(style.background_color)
+    ax.grid(True)
 
 
 def aplot_timeserie(pd_df: pd.DataFrame,
@@ -49,70 +120,17 @@ def aplot_timeserie(pd_df: pd.DataFrame,
     Returns:
         Axes: Matplotlib axes with the time series plot.
     """
-    validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
-    style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
-
-    df = pd_df[[label, x, y]].sort_values(by=[label, x])
-    df[x] = pd.to_datetime(df[x])
-    df.set_index(x, inplace=True)
-
-    sns.set_palette(style.palette)
-    # Colors for each group
-    colors = sns.color_palette(n_colors=len(df.columns))
     if ax is None:
         ax = plt.gca()
 
-    # Get unique dimension_types
-    label_types = df[label].unique()
+    df = _prepare_timeserie_data(pd_df, label, x, y, sort_by)
 
-    # Colors for each group
-    colors = sns.color_palette(n_colors=len(label_types))
+    format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
 
-    for label_type, color in zip(label_types, colors):
-        temp_df = df[df[label] == label_type].sort_values(by=x)
+    _plot_timeserie_lines(ax, df, label, x, y, std, style, format_funcs)
 
-        if style.format_funcs.get("label"):
-            label_type = style.format_funcs.get("label")(label_type)
-        if std:
-            ma = temp_df[y].rolling(window=7, min_periods=1).mean()
-            std_dev = temp_df[y].rolling(window=7, min_periods=1).std()
-            # Calculate the last moving average value to include in the legend
-            last_ma_value = ma.iloc[-1]
-            # Dynamically creating the legend label
-            label_str = f"{string_formatter(label_type)} (avg 7d: {style.format_funcs[y](last_ma_value)})"
-            # Plot moving average and include the last MA value in the label for the legend
-            ax.plot(temp_df.index, ma, color=color,
-                    linestyle='--', label=label_str)
+    _setup_timeserie_axes(ax, label, x, y, style, format_funcs)
 
-            ax.fill_between(temp_df.index, ma - std_dev, ma +
-                            std_dev, color=color, alpha=0.2, label='_nolegend_')
-        else:
-            label_str = f"{string_formatter(label_type)}"
-            # Plot moving average and include the last MA value in the label for the legend
-            ax.plot(temp_df.index, temp_df[y], color=color, label=label_str)
-
-    ax.legend(
-        title=label,
-        fontsize=style.font_size-4,
-        title_fontsize=style.font_size,
-        labelcolor='linecolor',
-        facecolor=style.background_color)
-
-    ax.set_xlabel(string_formatter(x), color=style.font_color)
-    if style.format_funcs.get("x"):
-        ax.xaxis.set_major_formatter(
-            DynamicFuncFormatter(style.format_funcs.get("x")))
-    ax.tick_params(axis='x', colors=style.font_color,
-                   labelrotation=45, labelsize=style.font_size-4)
-
-    ax.set_ylabel(string_formatter(y), color=style.font_color)
-    if style.format_funcs.get("y"):
-        ax.yaxis.set_major_formatter(
-            DynamicFuncFormatter(style.format_funcs.get("y")))
-    ax.tick_params(axis='y', colors=style.font_color,
-                   labelsize=style.font_size-4)
-    ax.set_facecolor(style.background_color)
-    ax.grid(True)
     if title:
         ax.set_title(title, color=style.font_color, fontsize=style.font_size+4)
     return ax

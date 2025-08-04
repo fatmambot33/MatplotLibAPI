@@ -37,6 +37,97 @@ BUBBLE_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
+def _prepare_bubble_data(pd_df: pd.DataFrame, label: str, x: str, y: str, z: str, sort_by: Optional[str], ascending: bool, max_values: int, center_to_mean: bool, style: StyleTemplate) -> pd.DataFrame:
+    """Prepare data for bubble chart."""
+    validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
+    sort_col = sort_by or z
+
+    plot_df = (
+        pd_df[[label, x, y, z]]
+        .sort_values(by=[sort_col], ascending=ascending)  # type: ignore
+        .head(max_values)
+        .copy()
+    )
+
+    if center_to_mean:
+        plot_df[x] -= plot_df[x].mean()
+
+    plot_df["quintile"] = pd.qcut(plot_df[z], 5, labels=False, duplicates='drop')
+    plot_df["fontsize"] = plot_df["quintile"].map(style.font_mapping)  # type: ignore
+    return plot_df
+
+
+def _setup_bubble_axes(ax: Axes, style: StyleTemplate, pd_df: pd.DataFrame, x: str, y: str, format_funcs: Optional[dict[str, Optional[FormatterFunc]]]) -> None:
+    """Configure axes for the bubble chart."""
+    ax.set_facecolor(style.background_color)
+
+    if style.xscale:
+        ax.set(xscale=style.xscale)
+    if style.yscale:
+        ax.set(yscale=style.yscale)
+
+    # X-axis ticks and formatting
+    x_min, x_max = cast(float, pd_df[x].min()), cast(float, pd_df[x].max())
+    ax.set_xticks(generate_ticks(x_min, x_max, num_ticks=style.x_ticks))
+    ax.xaxis.grid(True, "major", linewidth=0.5, color=style.font_color)
+    if format_funcs and (fmt_x := format_funcs.get(x)):
+        ax.xaxis.set_major_formatter(DynamicFuncFormatter(fmt_x))
+
+    # Y-axis ticks and formatting
+    y_min, y_max = cast(float, pd_df[y].min()), cast(float, pd_df[y].max())
+    ax.set_yticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
+    if style.yscale == "log":
+        ax.yaxis.set_minor_locator(NullLocator())
+    else:
+        ax.minorticks_off()
+    ax.yaxis.grid(True, "major", linewidth=0.5, color=style.font_color)
+    if format_funcs and (fmt_y := format_funcs.get(y)):
+        ax.yaxis.set_major_formatter(DynamicFuncFormatter(fmt_y))
+
+    ax.tick_params(axis="both", which="major",
+                   colors=style.font_color, labelsize=style.font_size)
+
+
+def _draw_bubbles(ax: Axes, plot_df: pd.DataFrame, x: str, y: str, z: str, style: StyleTemplate) -> None:
+    """Draw bubbles on the axes."""
+    sns.scatterplot(
+        data=plot_df,
+        x=x,
+        y=y,
+        size=z,
+        hue="quintile",
+        sizes=(100, 2000),
+        legend=False,
+        palette=sns.color_palette(style.palette, as_cmap=True),
+        edgecolor=style.background_color,
+        ax=ax,
+    )
+
+
+def _draw_bubble_labels(ax: Axes, plot_df: pd.DataFrame, label: str, x: str, y: str, style: StyleTemplate, format_funcs: Optional[dict[str, Optional[FormatterFunc]]]) -> None:
+    """Draw labels for each bubble."""
+    for _, row in plot_df.iterrows():
+        x_val, y_val, label_val = row[x], row[y], str(row[label])
+        if format_funcs and (fmt_label := format_funcs.get(label)):
+            label_val = fmt_label(label_val, None)
+        ax.text(
+            cast(float, x_val),
+            cast(float, y_val),
+            label_val,
+            ha="center",
+            fontsize=row["fontsize"],
+            color=style.font_color,
+        )
+
+
+def _draw_mean_lines(ax: Axes, plot_df: pd.DataFrame, x: str, y: str, hline: bool, vline: bool, style: StyleTemplate) -> None:
+    """Draw horizontal and vertical mean lines."""
+    if vline:
+        ax.axvline(cast(float, plot_df[x].mean()), linestyle="--", color=style.font_color)
+    if hline:
+        ax.axhline(cast(float, plot_df[y].mean()), linestyle="--", color=style.font_color)
+
+
 def aplot_bubble(
     pd_df: pd.DataFrame,
     label: str,
@@ -74,85 +165,22 @@ def aplot_bubble(
     Returns:
         Axes: The matplotlib Axes object containing the bubble chart.
     """
-    validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
-    style.format_funcs = format_func(
-        style.format_funcs, label=label, x=x, y=y, z=z)
-    sort_col = sort_by or z
-
-    plot_df = (
-        pd_df[[label, x, y, z]]
-        .sort_values(by=sort_col, ascending=ascending)
-        .head(max_values)
-        .copy()
-    )
-
-    if center_to_mean:
-        plot_df[x] -= plot_df[x].mean()
-
-    plot_df["quintile"] = pd.qcut(plot_df[z], 5, labels=False)
-    plot_df["fontsize"] = plot_df["quintile"].map(style.font_mapping)
-
     if ax is None:
         ax = plt.gca()
 
-    sns.scatterplot(
-        data=plot_df,
-        x=x,
-        y=y,
-        size=z,
-        hue="quintile",
-        sizes=(100, 2000),
-        legend=False,
-        palette=sns.color_palette(style.palette, as_cmap=True),
-        edgecolor=style.background_color,
-        ax=ax,
-    )
+    plot_df = _prepare_bubble_data(
+        pd_df, label, x, y, z, sort_by, ascending, max_values, center_to_mean, style)
 
-    ax.set_facecolor(style.background_color)
+    format_funcs = format_func(
+        style.format_funcs, label=label, x=x, y=y, z=z)
 
-    if style.xscale:
-        ax.set(xscale=style.xscale)
-    if style.yscale:
-        ax.set(yscale=style.yscale)
+    _setup_bubble_axes(ax, style, pd_df, x, y, format_funcs)
 
-    # X-axis ticks and formatting
-    x_min, x_max = pd_df[x].min(), pd_df[x].max()
-    ax.set_xticks(generate_ticks(x_min, x_max, num_ticks=style.x_ticks))
-    ax.xaxis.grid(True, "major", linewidth=0.5, color=style.font_color)
-    if style.format_funcs and (fmt_x := style.format_funcs.get(x)):
-        ax.xaxis.set_major_formatter(DynamicFuncFormatter(fmt_x))
+    _draw_bubbles(ax, plot_df, x, y, z, style)
 
-    # Y-axis ticks and formatting
-    y_min, y_max = pd_df[y].min(), pd_df[y].max()
-    ax.set_yticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
-    if style.yscale == "log":
-        ax.yaxis.set_minor_locator(NullLocator())
-    else:
-        ax.minorticks_off()
-    ax.yaxis.grid(True, "major", linewidth=0.5, color=style.font_color)
-    if style.format_funcs and (fmt_y := style.format_funcs.get(y)):
-        ax.yaxis.set_major_formatter(DynamicFuncFormatter(fmt_y))
+    _draw_mean_lines(ax, plot_df, x, y, hline, vline, style)
 
-    ax.tick_params(axis="both", which="major",
-                   colors=style.font_color, labelsize=style.font_size)
-
-    if vline:
-        ax.axvline(plot_df[x].mean(), linestyle="--", color=style.font_color)
-    if hline:
-        ax.axhline(plot_df[y].mean(), linestyle="--", color=style.font_color)
-
-    for _, row in plot_df.iterrows():
-        x_val, y_val, label_val = row[x], row[y], str(row[label])
-        if style.format_funcs and (fmt_label := style.format_funcs.get(label)):
-            label_val = fmt_label(label_val, None)
-        ax.text(
-            x_val,
-            y_val,
-            label_val,
-            ha="center",
-            fontsize=row["fontsize"],
-            color=style.font_color,
-        )
+    _draw_bubble_labels(ax, plot_df, label, x, y, style, format_funcs)
 
     if title:
         ax.set_title(title, color=style.font_color,
@@ -175,8 +203,7 @@ def fplot_bubble(
     ascending: bool = False,
     hline: bool = False,
     vline: bool = False,
-    figsize: Tuple[float, float] = (19.2, 10.8),
-    save_path: Optional[str] = None,
+    figsize: Tuple[float, float] = (19.2, 10.8)
 ) -> Figure:
     """Create a new matplotlib Figure with a bubble chart.
 
@@ -195,7 +222,6 @@ def fplot_bubble(
         hline (bool, optional): Draw horizontal line at mean y. Defaults to False.
         vline (bool, optional): Draw vertical line at mean x. Defaults to False.
         figsize (Tuple[float, float], optional): Size of the figure. Defaults to (19.2, 10.8).
-        save_path (Optional[str], optional): If set, saves the figure to this path. Defaults to None.
 
     Returns:
         Figure: A matplotlib Figure object containing the bubble chart.
@@ -219,6 +245,4 @@ def fplot_bubble(
         vline=vline,
         ax=ax,
     )
-    if save_path:
-        fig.savefig(save_path, facecolor=style.background_color)
     return fig

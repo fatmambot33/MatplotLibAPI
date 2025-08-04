@@ -121,7 +121,7 @@ def plot_pivoted_bars(
         The matplotlib axes with the bar chart.
     """
     validate_dataframe(data, cols=[label, x, y], sort_by=sort_by)
-    style.format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
+    format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
 
     pivot_df = _pivot_and_sort_data(
         data, index=x, columns=label, values=y, aggfunc=agg, sort_by=sort_by, ascending=ascending
@@ -147,85 +147,85 @@ def plot_pivoted_bars(
     return ax
 
 
-def plot_pivoted_lines(
-    data: pd.DataFrame,
-    label: str,
-    x: str,
-    y: str,
-    style: StyleTemplate = PIVOTLINES_STYLE_TEMPLATE,
-    title: Optional[str] = None,
-    max_series: int = 4,
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    ax: Optional[Axes] = None,
-) -> Axes:
-    """
-    Plot line charts for the top elements in a series.
-
-    Parameters
-    ----------
-    data : pd.DataFrame
-        The source data.
-    label : str
-        The column to group lines by.
-    x : str
-        The column for the x-axis values.
-    y : str
-        The column for the y-axis values.
-    style : StyleTemplate, optional
-        The style configuration, by default PIVOTLINES_STYLE_TEMPLATE.
-    title : Optional[str], optional
-        The plot title, by default None.
-    max_series : int, optional
-        The number of top elements to plot, by default 4.
-    sort_by : Optional[str], optional
-        The column to sort by, by default None.
-    ascending : bool, optional
-        The sort order, by default False.
-    ax : Optional[Axes], optional
-        The axes to draw on, by default None.
-
-    Returns
-    -------
-    Axes
-        The matplotlib axes with the line chart.
-    """
-    validate_dataframe(data, cols=[label, x, y], sort_by=sort_by)
-    if not ax:
-        ax = plt.gca()
-
-    if title:
-        ax.set_title(title)
-
-    ax.figure.set_facecolor(style.background_color)
-    ax.figure.set_edgecolor(style.fig_border)
-
-    top_elements = data.groupby(label)[y].sum().nlargest(max_series).index
-    top_elements_df = data[data[label].isin(top_elements)]
-
-    for element in top_elements:
-        subset = top_elements_df[top_elements_df[label] == element]
-        ax.plot(subset[x], subset[y], label=element)
-
-    if pd.api.types.is_datetime64_any_dtype(data[x]):
-        ax.xaxis.set_major_locator(mdates.MonthLocator())
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
-    else:
-        if style.format_funcs:
-            x_formatter = style.format_funcs.get("x")
-            if x_formatter:
-                ax.xaxis.set_major_formatter(DynamicFuncFormatter(x_formatter))
-
-    plt.setp(ax.get_xticklabels(), rotation=45)
-    ax.set_xlabel(string_formatter(x))
-    ax.set_ylabel(string_formatter(y))
-
-    if style.format_funcs:
-        y_formatter = style.format_funcs.get("y")
-        if y_formatter:
-            ax.yaxis.set_major_formatter(DynamicFuncFormatter(y_formatter))
-
-    ax.legend()
-    ax.grid(True)
-
-    return ax
+# def plot_pivoted_lines(
+#     data: pd.DataFrame,
+#     label: str,
+#     x: str,
+#     y: str,
+#     style: StyleTemplate = PIVOTLINES_STYLE_TEMPLATE,
+#     title: Optional[str] = None,
+#     max_series: int = 4,
+#     sort_by: Optional[str] = None,
+#     ascending: bool = False,
+#     ax: Optional[Axes] = None,
+# ) -> Axes:
+#     """
+#     Plot line charts for the top elements in a series.
+#
+#     Parameters
+#     ----------
+#     data : pd.DataFrame
+#         The source data.
+#     label : str
+#         The column to group lines by.
+#     x : str
+#         The column for the x-axis values.
+#     y : str
+#         The column for the y-axis values.
+#     style : StyleTemplate, optional
+#         The style configuration, by default PIVOTLINES_STYLE_TEMPLATE.
+#     title : Optional[str], optional
+#         The plot title, by default None.
+#     max_series : int, optional
+#         The number of top elements to plot, by default 4.
+#     sort_by : Optional[str], optional
+#         The column to sort by, by default None.
+#     ascending : bool, optional
+#         The sort order, by default False.
+#     ax : Optional[Axes], optional
+#         The axes to draw on, by default None.
+#
+#     Returns
+#     -------
+#     Axes
+#         The matplotlib axes with the line chart.
+#     """
+#     validate_dataframe(data, cols=[label, x, y], sort_by=sort_by)  # type: ignore
+#     if not ax:
+#         ax = plt.gca()
+#
+#     if title:
+#         ax.set_title(title)
+#
+#     ax.figure.set_facecolor(style.background_color)
+#     ax.figure.set_edgecolor(style.fig_border)
+#
+#     top_elements = data.groupby(label)[y].sum().nlargest(max_series).index
+#     top_elements_df = data[data[label].isin(top_elements)]  # type: ignore
+#
+#     for element in top_elements:
+#         subset = top_elements_df[top_elements_df[label] == element]
+#         ax.plot(subset[x], subset[y], label=element)
+#
+#     if pd.api.types.is_datetime64_any_dtype(data[x]):
+#         ax.xaxis.set_major_locator(mdates.MonthLocator())
+#         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
+#     else:
+#         if style.format_funcs:
+#             x_formatter = style.format_funcs.get("x")
+#             if x_formatter:
+#                 ax.xaxis.set_major_formatter(DynamicFuncFormatter(x_formatter))
+#
+#     plt.setp(ax.get_xticklabels(), rotation=45)
+#     ax.set_xlabel(string_formatter(x))
+#     ax.set_ylabel(string_formatter(y))
+#
+#     if style.format_funcs:
+#         y_formatter = style.format_funcs.get("y")
+#         if y_formatter:
+#             ax.yaxis.set_major_formatter(DynamicFuncFormatter(y_formatter))
+#
+#     ax.legend()
+#     ax.grid(True)
+#
+#     return ax

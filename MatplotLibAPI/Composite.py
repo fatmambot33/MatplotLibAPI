@@ -1,9 +1,10 @@
 """Composite plotting routines combining multiple charts."""
 
-from typing import Optional, Tuple, List, Dict
+from typing import Optional, Tuple, List, Dict, cast
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+from matplotlib.gridspec import GridSpec
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from MatplotLibAPI.Bubble import aplot_bubble, BUBBLE_STYLE_TEMPLATE
@@ -56,13 +57,13 @@ def plot_composite_bubble(
         filter_by = z
     plot_df = pd_df.sort_values(by=filter_by,
                                 ascending=ascending)[[label, x, y, z]].head(max_values)
-    style.format_funcs = format_func(
+    format_funcs = format_func(
         style.format_funcs, label=label, x=x, y=y, z=z)
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
-    grid = plt.GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
+    grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
-    ax = aplot_bubble(pd_df=plot_df,
+    ax = aplot_bubble(pd_df=cast(pd.DataFrame, plot_df),
                       label=label,
                       x=x,
                       y=y,
@@ -75,18 +76,9 @@ def plot_composite_bubble(
                       ascending=ascending,
                       ax=ax)
 
-    if "label" in style.format_funcs:
-        style.format_funcs[label] = style.format_funcs["label"]
-    if "x" in style.format_funcs:
-        style.format_funcs[x] = style.format_funcs["x"]
-    if "y" in style.format_funcs:
-        style.format_funcs[y] = style.format_funcs["y"]
-    if "z" in style.format_funcs:
-        style.format_funcs[z] = style.format_funcs["z"]
-
     ax2 = fig.add_subplot(grid[1, 0])
     ax2 = aplot_table(
-        pd_df=plot_df,
+        pd_df=cast(pd.DataFrame, plot_df),
         cols=[label, z, y, x],
         title=f"Top {table_rows}",
         ax=ax2,
@@ -97,7 +89,7 @@ def plot_composite_bubble(
     )
     ax3 = fig.add_subplot(grid[1, 1])
     ax3 = aplot_table(
-        pd_df=plot_df,
+        pd_df=cast(pd.DataFrame, plot_df),
         cols=[label, z, y, x],
         title=f"Last {table_rows}",
         ax=ax3,
