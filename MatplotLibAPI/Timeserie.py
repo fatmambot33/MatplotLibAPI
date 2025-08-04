@@ -1,7 +1,5 @@
 """Timeserie plotting helpers."""
 
-# Hint for Visual Code Python Interactive window
-# %%
 from typing import Optional, Tuple, cast
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,7 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 import seaborn as sns
 
-from MatplotLibAPI.StyleTemplate import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func, validate_dataframe, FormatterFunc
+from .StyleTemplate import DynamicFuncFormatter, StyleTemplate, string_formatter, bmk_formatter, format_func, validate_dataframe, FormatterFunc
 
 
 TIMESERIE_STYLE_TEMPLATE = StyleTemplate(

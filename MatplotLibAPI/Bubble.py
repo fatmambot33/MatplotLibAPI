@@ -12,7 +12,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import seaborn as sns
 
-from MatplotLibAPI.StyleTemplate import (
+from .StyleTemplate import (
     DynamicFuncFormatter,
     StyleTemplate,
     FormatterFunc,

@@ -1,8 +1,0 @@
-pandas
-matplotlib
-networkx
-plotly
-seaborn
-scikit-learn
-kaleido
-nbformat

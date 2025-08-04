@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.axes import Axes
 
-from MatplotLibAPI.StyleTemplate import (
+from .StyleTemplate import (
     StyleTemplate,
     DynamicFuncFormatter,
     validate_dataframe,

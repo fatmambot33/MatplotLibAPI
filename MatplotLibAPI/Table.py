@@ -7,7 +7,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 
-from MatplotLibAPI.StyleTemplate import StyleTemplate,  string_formatter, validate_dataframe
+from .StyleTemplate import StyleTemplate,  string_formatter, validate_dataframe
 
 TABLE_STYLE_TEMPLATE = StyleTemplate(
     background_color='black',
