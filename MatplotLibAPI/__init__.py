@@ -9,6 +9,7 @@ from .Network import aplot_network, aplot_network_components, fplot_network, NET
 from .Treemap import fplot_treemap, aplot_treemap, TREEMAP_STYLE_TEMPLATE
 from typing import List, Optional, Tuple,Dict
 import pandas as pd
+import numpy as np
 from pandas.api.extensions import register_dataframe_accessor
 
 from matplotlib.axes import Axes
@@ -38,7 +39,26 @@ class DataFrameAccessor:
                      hline: bool = False,
                      vline: bool = False,
                      ax: Optional[Axes] = None) -> Axes:
-        """Plot a bubble chart using the underlying DataFrame."""
+        """Plot a bubble chart using the underlying DataFrame.
+
+        Args:
+            label (str): Column to use for bubble labels.
+            x (str): Column to use for the x-axis.
+            y (str): Column to use for the y-axis.
+            z (str): Column to use for the bubble size.
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to BUBBLE_STYLE_TEMPLATE.
+            max_values (int, optional): Maximum number of bubbles to plot. Defaults to 50.
+            center_to_mean (bool, optional): If True, center x-axis values around the mean. Defaults to False.
+            sort_by (Optional[str], optional): Column to sort by before plotting. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            hline (bool, optional): If True, draw a horizontal line at the mean of y-values. Defaults to False.
+            vline (bool, optional): If True, draw a vertical line at the mean of x-values. Defaults to False.
+            ax (Optional[Axes], optional): Matplotlib axes to plot on. If None, uses the current axes. Defaults to None.
+
+        Returns:
+            Axes: The Matplotlib axes object with the plot.
+        """
         return aplot_bubble(pd_df=self._obj,
                             label=label,
                             x=x,
@@ -68,7 +88,26 @@ class DataFrameAccessor:
                      hline: bool = False,
                      vline: bool = False,
                      figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
-        """Return a figure with a bubble chart."""
+        """Plot a bubble chart on a new figure.
+
+        Args:
+            label (str): Column to use for bubble labels.
+            x (str): Column to use for the x-axis.
+            y (str): Column to use for the y-axis.
+            z (str): Column to use for the bubble size.
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to BUBBLE_STYLE_TEMPLATE.
+            max_values (int, optional): Maximum number of bubbles to plot. Defaults to 50.
+            center_to_mean (bool, optional): If True, center x-axis values around the mean. Defaults to False.
+            sort_by (Optional[str], optional): Column to sort by before plotting. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            hline (bool, optional): If True, draw a horizontal line at the mean of y-values. Defaults to False.
+            vline (bool, optional): If True, draw a vertical line at the mean of x-values. Defaults to False.
+            figsize (Tuple[float, float], optional): Figure size. Defaults to (19.2, 10.8).
+
+        Returns:
+            Figure: The new Matplotlib figure with the plot.
+        """
         return fplot_bubble(pd_df=self._obj,
                             label=label,
                             x=x,
@@ -96,7 +135,27 @@ class DataFrameAccessor:
                                sort_by: Optional[str] = None,
                                ascending: bool = False,
                                table_rows:int=10) -> Figure:
-        """Return a composite bubble chart with summary tables."""
+        """Plot a composite bubble chart with summary tables.
+
+        This plot combines a bubble chart with tables summarizing the
+        top and bottom rows of the dataset.
+
+        Args:
+            label (str): Column to use for bubble labels.
+            x (str): Column to use for the x-axis.
+            y (str): Column to use for the y-axis.
+            z (str): Column to use for the bubble size.
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to BUBBLE_STYLE_TEMPLATE.
+            max_values (int, optional): Maximum number of bubbles to plot. Defaults to 100.
+            center_to_mean (bool, optional): If True, center x-axis values around the mean. Defaults to False.
+            sort_by (Optional[str], optional): Column to sort by before plotting. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            table_rows (int, optional): Number of rows for the summary tables. Defaults to 10.
+
+        Returns:
+            Figure: The new Matplotlib figure with the composite plot.
+        """
         return plot_composite_bubble(pd_df=self._obj,
                                      label=label,
                                      x=x,
@@ -118,7 +177,20 @@ class DataFrameAccessor:
                     sort_by: Optional[str] = None,
                     ascending: bool = False,
                     ax: Optional[Axes] = None) -> Axes:
-        """Plot a table using the DataFrame's data."""
+        """Plot a table of the DataFrame's data on a Matplotlib axes.
+
+        Args:
+            cols (List[str]): List of columns to include in the table.
+            title (Optional[str], optional): Table title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to TABLE_STYLE_TEMPLATE.
+            max_values (int, optional): Maximum number of rows to display. Defaults to 20.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            ax (Optional[Axes], optional): Matplotlib axes to plot on. If None, uses the current axes. Defaults to None.
+
+        Returns:
+            Axes: The Matplotlib axes object with the table.
+        """
         return aplot_table(pd_df=self._obj,
                            cols=cols,
                            title=title,
@@ -135,8 +207,21 @@ class DataFrameAccessor:
                     max_values: int = 20,
                     sort_by: Optional[str] = None,
                     ascending: bool = False,
-                    figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
-        """Return a figure containing the table plot."""
+                    figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+        """Plot a table of the DataFrame's data on a new figure.
+
+        Args:
+            cols (List[str]): List of columns to include in the table.
+            title (Optional[str], optional): Table title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to TABLE_STYLE_TEMPLATE.
+            max_values (int, optional): Maximum number of rows to display. Defaults to 20.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            figsize (Tuple[float, float], optional): Figure size. Defaults to (19.2, 10.8).
+
+        Returns:
+            Figure: The new Matplotlib figure with the table.
+        """
         return fplot_table(pd_df=self._obj,
                            cols=cols,
                            title=title,
@@ -157,7 +242,23 @@ class DataFrameAccessor:
                         ascending: bool = False,
                         std: bool = False,
                         ax: Optional[Axes] = None) -> Axes:
-        """Plot a time series using the stored DataFrame."""
+        """Plot a time series on a Matplotlib axes.
+
+        Args:
+            label (str): Column to use for the series label.
+            x (str): Column to use for the x-axis (time).
+            y (str): Column to use for the y-axis (values).
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to TIMESERIE_STYLE_TEMPLATE.
+            max_values (int, optional): Maximum number of data points to plot. Defaults to 100.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            std (bool, optional): If True, plot the standard deviation. Defaults to False.
+            ax (Optional[Axes], optional): Matplotlib axes to plot on. If None, uses the current axes. Defaults to None.
+
+        Returns:
+            Axes: The Matplotlib axes object with the plot.
+        """
         return aplot_timeserie(pd_df=self._obj,
                                label=label,
                                x=x,
@@ -180,8 +281,24 @@ class DataFrameAccessor:
                         sort_by: Optional[str] = None,
                         ascending: bool = False,
                         std: bool = False,
-                        figsize: Tuple[float, float] = (19.2, 10.8)) -> Axes:
-        """Return a figure plotting the time series."""
+                        figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+        """Plot a time series on a new figure.
+
+        Args:
+            label (str): Column to use for the series label.
+            x (str): Column to use for the x-axis (time).
+            y (str): Column to use for the y-axis (values).
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to TIMESERIE_STYLE_TEMPLATE.
+            max_values (int, optional): Maximum number of data points to plot. Defaults to 100.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            std (bool, optional): If True, plot the standard deviation. Defaults to False.
+            figsize (Tuple[float, float], optional): Figure size. Defaults to (19.2, 10.8).
+
+        Returns:
+            Figure: The new Matplotlib figure with the plot.
+        """
         return fplot_timeserie(pd_df=self._obj,
                                label=label,
                                x=x,
@@ -204,7 +321,22 @@ class DataFrameAccessor:
                       ascending: bool = False,
                       node_list: Optional[List] = None,
                       ax: Optional[Axes] = None) -> Axes:
-        """Plot a network graph on the given axes."""
+        """Plot a network graph on a Matplotlib axes.
+
+        Args:
+            source (str, optional): Column for source nodes. Defaults to "source".
+            target (str, optional): Column for target nodes. Defaults to "target".
+            weight (str, optional): Column for edge weights. Defaults to "weight".
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to NETWORK_STYLE_TEMPLATE.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            node_list (Optional[List], optional): List of nodes to include. If None, all nodes are used. Defaults to None.
+            ax (Optional[Axes], optional): Matplotlib axes to plot on. If None, uses the current axes. Defaults to None.
+
+        Returns:
+            Axes: The Matplotlib axes object with the plot.
+        """
         return aplot_network(pd_df=self._obj,
                              source=source,
                              target=target,
@@ -225,18 +357,30 @@ class DataFrameAccessor:
                                  sort_by: Optional[str] = None,
                                  ascending: bool = False,
                                  node_list: Optional[List] = None,
-                                 ax: Optional[Axes] = None) -> Axes:
-        """Plot connected components of the network graph."""
-        return aplot_network_components(df=self._obj,
-                                        source=source,
-                                        target=target,
-                                        weight=weight,
-                                        title=title,
-                                        style=style,
-                                        sort_by=sort_by,
-                                        ascending=ascending,
-                                        node_list=node_list,
-                                        ax=ax)
+                                 axes: Optional[np.ndarray] = None) -> None:
+        """Plot connected components of a network graph on multiple axes.
+
+        Args:
+            source (str, optional): Column for source nodes. Defaults to "source".
+            target (str, optional): Column for target nodes. Defaults to "target".
+            weight (str, optional): Column for edge weights. Defaults to "weight".
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to NETWORK_STYLE_TEMPLATE.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            node_list (Optional[List], optional): List of nodes to include. If None, all nodes are used. Defaults to None.
+            axes (Optional[np.ndarray], optional): Numpy array of Matplotlib axes to plot on. If None, new axes are created. Defaults to None.
+        """
+        aplot_network_components(pd_df=self._obj,
+                                 source=source,
+                                 target=target,
+                                 weight=weight,
+                                 title=title,
+                                 style=style,
+                                 sort_by=sort_by,
+                                 ascending=ascending,
+                                 node_list=node_list,
+                                 axes=axes)
 
     def fplot_network(self,
                       source: str = "source",
@@ -246,8 +390,24 @@ class DataFrameAccessor:
                       style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
                       sort_by: Optional[str] = None,
                       ascending: bool = False,
-                      node_list: Optional[List] = None) -> Axes:
-        """Return a network plot as a new figure."""
+                      node_list: Optional[List] = None,
+                      figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+        """Plot a network graph on a new figure.
+
+        Args:
+            source (str, optional): Column for source nodes. Defaults to "source".
+            target (str, optional): Column for target nodes. Defaults to "target".
+            weight (str, optional): Column for edge weights. Defaults to "weight".
+            title (Optional[str], optional): Chart title. Defaults to None.
+            style (StyleTemplate, optional): Styling template. Defaults to NETWORK_STYLE_TEMPLATE.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            ascending (bool, optional): Sort order. Defaults to False.
+            node_list (Optional[List], optional): List of nodes to include. If None, all nodes are used. Defaults to None.
+            figsize (Tuple[float, float], optional): Figure size. Defaults to (19.2, 10.8).
+
+        Returns:
+            Figure: The new Matplotlib figure with the plot.
+        """
         return fplot_network(pd_df=self._obj,
                              source=source,
                              target=target,
@@ -268,7 +428,22 @@ class DataFrameAccessor:
                       max_values: int = 100,
                       ascending: bool = False,
                       fig: Optional[go.Figure] = None) -> go.Figure:
-        """Return a figure with a treemap plot."""
+        """Plot a treemap on a new Plotly figure.
+
+        Args:
+            path (str): Column representing the hierarchy path.
+            values (str): Column with values for the treemap areas.
+            style (StyleTemplate, optional): Styling template. Defaults to TREEMAP_STYLE_TEMPLATE.
+            title (Optional[str], optional): Chart title. Defaults to None.
+            color (Optional[str], optional): Column to use for color coding. Defaults to None.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            max_values (int, optional): Maximum number of items to display. Defaults to 100.
+            ascending (bool, optional): Sort order. Defaults to False.
+            fig (Optional[go.Figure], optional): Existing Plotly figure to add to. If None, a new figure is created. Defaults to None.
+
+        Returns:
+            go.Figure: The Plotly figure with the treemap.
+        """
         return fplot_treemap(pd_df=self._obj,
                              path=path,
                              values=values,
@@ -280,27 +455,6 @@ class DataFrameAccessor:
                              max_values=max_values,
                              fig=fig)
 
-    def aplot_treemap(self,
-                      path: str,
-                      values: str,
-                      style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
-                      title: Optional[str] = None,
-                      color: Optional[str] = None,
-                      sort_by: Optional[str] = None,
-                      max_values: int = 100,
-                      ascending: bool = False,
-                      fig: Optional[go.Figure] = None) -> go.Figure:
-        """Add a treemap trace to an existing figure or create a new one."""
-        return aplot_treemap(pd_df=self._obj,
-                             path=path,
-                             values=values,
-                             title=title,
-                             style=style,
-                             color=color,
-                             sort_by=sort_by,
-                             ascending=ascending,
-                             max_values=max_values)
-
     def fplot_composite_treemap(self,
                       pathes: List[str],
                       values: str,
@@ -310,8 +464,23 @@ class DataFrameAccessor:
                       sort_by: Optional[str] = None,
                       max_values: int = 100,
                       ascending: bool = False,
-                      fig: Optional[go.Figure] = None) -> go.Figure:
-        """Return a figure composed of multiple treemap plots."""
+                      fig: Optional[go.Figure] = None) -> Optional[go.Figure]:
+        """Plot a composite treemap on a new Plotly figure.
+
+        Args:
+            pathes (List[str]): List of columns representing the hierarchy paths for each treemap.
+            values (str): Column with values for the treemap areas.
+            style (StyleTemplate, optional): Styling template. Defaults to TREEMAP_STYLE_TEMPLATE.
+            title (Optional[str], optional): Chart title. Defaults to None.
+            color (Optional[str], optional): Column to use for color coding. Defaults to None.
+            sort_by (Optional[str], optional): Column to sort by. Defaults to None.
+            max_values (int, optional): Maximum number of items to display. Defaults to 100.
+            ascending (bool, optional): Sort order. Defaults to False.
+            fig (Optional[go.Figure], optional): Existing Plotly figure to add to. If None, a new figure is created. Defaults to None.
+
+        Returns:
+            Optional[go.Figure]: The Plotly figure with the composite treemap, or None if the input data is empty.
+        """
         pd_dfs: Dict[str, pd.DataFrame] = {}
         for path in pathes:
             pd_dfs[path] = self._obj
@@ -326,5 +495,5 @@ class DataFrameAccessor:
                              max_values=max_values)
 
 
-__all__ = ["validate_dataframe", "aplot_bubble", "aplot_timeserie", "aplot_table", "aplot_network", "aplot_network_components", "fplot_network",
-           "plot_pivotbar", "fplot_treemap", "aplot_treemap", "plot_composite_bubble","plot_composite_treemap", "StyleTemplate", "DataFrameAccessor"]
+__all__ = ["aplot_bubble", "aplot_timeserie", "aplot_table", "aplot_network", "aplot_network_components", "fplot_network",
+           "fplot_treemap", "plot_composite_bubble","plot_composite_treemap", "StyleTemplate", "DataFrameAccessor"]

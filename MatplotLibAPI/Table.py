@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from matplotlib.transforms import Bbox
 
 from MatplotLibAPI.StyleTemplate import StyleTemplate,  string_formatter, validate_dataframe
 
@@ -14,6 +15,35 @@ TABLE_STYLE_TEMPLATE = StyleTemplate(
     font_color='white',
     palette='magma'
 )
+
+
+def _prepare_table_data(pd_df: pd.DataFrame, cols: List[str], sort_by: Optional[str], ascending: bool, max_values: int, style: StyleTemplate) -> pd.DataFrame:
+    """Prepare data for table plotting."""
+    validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
+
+    if not sort_by:
+        sort_by = cols[0]
+
+    plot_df = pd_df[cols].sort_values(
+        by=sort_by, ascending=ascending).head(max_values)  # type: ignore
+
+    if style.format_funcs:
+        for col, func in style.format_funcs.items():
+            if col in plot_df.columns and func is not None:
+                plot_df[col] = plot_df[col].apply(func)
+    return plot_df
+
+
+def _format_table(table, style: StyleTemplate):
+    """Format the table cells and font."""
+    table.auto_set_font_size(False)
+    table.set_fontsize(style.font_size)
+    table.scale(1.2, 1.2)
+
+    for key, cell in table.get_celld().items():
+        cell.set_fontsize(style.font_size)
+        cell.set_facecolor(style.background_color)
+        cell.get_text().set_color(style.font_color)
 
 
 def aplot_table(pd_df: pd.DataFrame,
@@ -40,47 +70,27 @@ def aplot_table(pd_df: pd.DataFrame,
     Returns:
         Axes: Matplotlib axes containing the rendered table.
     """
-    validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
-
-    if not sort_by:
-        sort_by = cols[0]
-
-    plot_df = pd_df[cols].sort_values(
-        by=sort_by, ascending=ascending).head(max_values)
-
-    col_labels = cols
-
-    if style.format_funcs:
-        for col, func in style.format_funcs.items():
-            if col in plot_df.columns:
-                plot_df[col] = plot_df[col].apply(func)
-
-    def format_table(table):
-        table.auto_set_font_size(False)
-        table.set_fontsize(style.font_size)
-        table.scale(1.2, 1.2)
-
-        for key, cell in table.get_celld().items():
-            cell.set_fontsize(style.font_size)
-            cell.set_facecolor(style.background_color)
-            cell.get_text().set_color(style.font_color)
-
     if ax is None:
         ax = plt.gca()
 
+    plot_df = _prepare_table_data(
+        pd_df, cols, sort_by, ascending, max_values, style)
+
     table_plot = ax.table(
-        cellText=plot_df.values,
-        colLabels=[string_formatter(colLabel) for colLabel in col_labels],
+        cellText=plot_df.values.tolist(),
+        colLabels=[string_formatter(colLabel) for colLabel in cols],
         cellLoc='center',
         colWidths=style.col_widths,
-        bbox=[0, -0.3, 1, 1.3])
-    format_table(table_plot)
+        bbox=Bbox.from_bounds(0, -0.3, 1, 1.3))
+
+    _format_table(table_plot, style)
+
     ax.set_facecolor(style.background_color)
     ax.set_axis_off()
     ax.grid(False)
     if title:
         ax.set_title(title, color=style.font_color, fontsize=style.font_size*2)
-        ax.title.set_position([0.5, 1.05])
+        ax.title.set_position((0.5, 1.05))
     return ax
 
 

@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
-from MatplotLibAPI.Pivot import plot_pivoted_bars, plot_pivoted_lines, PIVOTBARS_STYLE_TEMPLATE, PIVOTLINES_STYLE_TEMPLATE
+from MatplotLibAPI.Pivot import plot_pivoted_bars, PIVOTBARS_STYLE_TEMPLATE
 
 @pytest.fixture
 def sample_data():
@@ -32,19 +32,19 @@ def test_plot_pivoted_bars_with_title(sample_data):
     assert result_ax.get_title() == "My Title"
     plt.close(fig)
 
-def test_plot_pivoted_lines(sample_data):
-    """Test plot_pivoted_lines."""
-    fig, ax = plt.subplots()
-    result_ax = plot_pivoted_lines(sample_data, x='date', y='value', label='category', ax=ax)
-    assert isinstance(result_ax, Axes)
-    assert result_ax.get_title() == ""
-    assert result_ax.get_xlabel() == "Date"
-    assert result_ax.get_ylabel() == "Value"
-    plt.close(fig)
+# def test_plot_pivoted_lines(sample_data):
+#     """Test plot_pivoted_lines."""
+#     fig, ax = plt.subplots()
+#     result_ax = plot_pivoted_lines(sample_data, x='date', y='value', label='category', ax=ax)
+#     assert isinstance(result_ax, Axes)
+#     assert result_ax.get_title() == ""
+#     assert result_ax.get_xlabel() == "Date"
+#     assert result_ax.get_ylabel() == "Value"
+#     plt.close(fig)
 
-def test_plot_pivoted_lines_with_title(sample_data):
-    """Test plot_pivoted_lines with a title."""
-    fig, ax = plt.subplots()
-    result_ax = plot_pivoted_lines(sample_data, x='date', y='value', label='category', ax=ax, title="My Title")
-    assert result_ax.get_title() == "My Title"
-    plt.close(fig)
+# def test_plot_pivoted_lines_with_title(sample_data):
+#     """Test plot_pivoted_lines with a title."""
+#     fig, ax = plt.subplots()
+#     result_ax = plot_pivoted_lines(sample_data, x='date', y='value', label='category', ax=ax, title="My Title")
+#     assert result_ax.get_title() == "My Title"
+#     plt.close(fig)

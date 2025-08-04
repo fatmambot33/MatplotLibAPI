@@ -61,10 +61,12 @@ def format_func(
     if not format_funcs:
         return None
 
+    new_format_funcs = format_funcs.copy()
+
     for generic, specific in {"label": label, "x": x, "y": y, "z": z}.items():
-        if specific and generic in format_funcs:
-            format_funcs[specific] = format_funcs[generic]
-    return format_funcs
+        if specific and generic in new_format_funcs:
+            new_format_funcs[specific] = new_format_funcs[generic]
+    return new_format_funcs
 
 
 # region Style Constants
@@ -189,18 +191,24 @@ def generate_ticks(
     min_val_f: float = 0.0
     max_val_f: float = 0.0
 
-    try:
-        min_val_f = float(min_val)
-        max_val_f = float(max_val)
-        is_date = False
-    except (ValueError, TypeError):
+    if isinstance(min_val, (int, float, str)) and isinstance(max_val, (int, float, str)):
+        try:
+            min_val_f = float(min_val)
+            max_val_f = float(max_val)
+            is_date = False
+        except (ValueError, TypeError):
+            is_date = True
+    else:
         is_date = True
 
     if is_date:
         min_ts = pd.Timestamp(min_val)
         max_ts = pd.Timestamp(max_val)
-        step = ((max_ts - min_ts) / (num_ticks - 1)).days
-        return pd.date_range(start=min_ts, periods=num_ticks, freq=f"{step}D")
+        if pd.isna(min_ts) or pd.isna(max_ts):  # type: ignore
+            return pd.to_datetime([])
+        if min_ts == max_ts:
+            return pd.to_datetime([min_ts])
+        return pd.date_range(start=min_ts, end=max_ts, periods=num_ticks)
 
     data_range = max_val_f - min_val_f
     raw_step = data_range / (num_ticks - 1)

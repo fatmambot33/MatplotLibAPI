@@ -480,6 +480,24 @@ class NetworkGraph:
         return NetworkGraph(network_G)
 
 
+def _prepare_network_graph(pd_df: pd.DataFrame, source: str, target: str, weight: str, sort_by: Optional[str], node_list: Optional[List]) -> NetworkGraph:
+    """Prepare NetworkGraph for plotting."""
+    if node_list:
+        df = pd_df.loc[(pd_df["source"].isin(node_list)) |
+                       (pd_df["target"].isin(node_list))]
+    else:
+        df = pd_df
+    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
+
+    graph = NetworkGraph.from_pandas_edgelist(
+        df, source=source, target=target, weight=weight
+    )
+    graph = graph.get_core_subgraph(k=2)
+    graph.calculate_node_weights_from_edges(weight=weight, k=10)
+    graph = graph.trim_edges(weight=weight, top_k_per_node=5)
+    return graph
+
+
 def aplot_network(pd_df: pd.DataFrame,
                   source: str = "source",
                   target: str = "target",
@@ -507,20 +525,8 @@ def aplot_network(pd_df: pd.DataFrame,
     Returns:
         Axes: Matplotlib axes with the plotted network.
     """
-    if node_list:
-        df = pd_df.loc[(pd_df["source"].isin(node_list)) |
-                       (pd_df["target"].isin(node_list))]
-    else:
-        df = pd_df
-    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
-
-    graph = NetworkGraph.from_pandas_edgelist(
-        df, source=source, target=target, weight=weight
-    )
-    graph = graph.get_core_subgraph(k=2)
-    graph.calculate_node_weights_from_edges(weight=weight, k=10)
-    graph = graph.trim_edges(weight=weight, top_k_per_node=5)
-
+    graph = _prepare_network_graph(
+        pd_df, source, target, weight, sort_by, node_list)
     return graph.plot_network(title=title,
                               style=style,
                               weight=weight,
@@ -551,19 +557,8 @@ def aplot_network_components(pd_df: pd.DataFrame,
         ascending (bool, optional): Sort order for the data. Defaults to ``False``.
         axes (Optional[np.ndarray], optional): Existing axes to draw on. If None, new axes are created. Defaults to ``None``.
     """
-    if node_list:
-        df = pd_df.loc[(pd_df["source"].isin(node_list)) |
-                       (pd_df["target"].isin(node_list))]
-    else:
-        df = pd_df
-    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
-
-    graph = NetworkGraph.from_pandas_edgelist(
-        df, source=source, target=target, weight=weight
-    )
-    graph = graph.get_core_subgraph(k=2)
-    graph.calculate_node_weights_from_edges(weight=weight, k=10)
-    graph = graph.trim_edges(weight=weight, top_k_per_node=5)
+    graph = _prepare_network_graph(
+        pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
 
