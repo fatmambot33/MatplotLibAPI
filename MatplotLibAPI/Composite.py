@@ -1,7 +1,5 @@
 """Composite plotting routines combining multiple charts."""
 
-# Hint for Visual Code Python Interactive window
-# %%
 from typing import Optional, Tuple, List, Dict
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -142,7 +140,8 @@ def plot_composite_treemap(pd_dfs: Dict[str, pd.DataFrame],
         fig = make_subplots(
             rows=num_dimensions,
             cols=1,
-            specs = [[{"type": "treemap"} for _ in range(0, 1)] for _ in range(0, num_dimensions)],
+            specs=[[{"type": "treemap"}
+                    for _ in range(0, 1)] for _ in range(0, num_dimensions)],
             subplot_titles=subplot_titles,
             vertical_spacing=0.2
         )
