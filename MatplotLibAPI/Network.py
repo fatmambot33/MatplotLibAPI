@@ -336,7 +336,7 @@ class NetworkGraph:
             self._nx_graph,
             pos,
             ax=ax,
-            node_size=node_sizes_int,
+            node_size=cast(Any, node_sizes_int),
             node_color=cast(Any, node_sizes),
             cmap=plt.get_cmap(style.palette),
         )
