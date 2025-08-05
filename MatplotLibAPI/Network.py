@@ -13,7 +13,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from src.StyleTemplate import (
+from MatplotLibAPI.StyleTemplate import (
     StyleTemplate,
     string_formatter,
     format_func,
