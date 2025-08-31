@@ -25,11 +25,15 @@ def _prepare_table_data(
     """Prepare data for table plotting."""
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
 
-    plot_df = pd_df[cols].copy()
-    if sort_by:
-        plot_df = plot_df.sort_values(by=[sort_by], ascending=ascending)
+    if sort_by is None:
+        sort_by = cols[0]
 
-    plot_df = plot_df.head(max_values)
+    plot_df = (
+        pd_df[cols]
+        .sort_values(by=[sort_by], ascending=ascending)  # type: ignore
+        .head(max_values)
+        .copy()
+    )
 
     if style.format_funcs:
         for col, func in style.format_funcs.items():
