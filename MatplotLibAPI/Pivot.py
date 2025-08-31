@@ -124,7 +124,13 @@ def plot_pivoted_bars(
     format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
 
     pivot_df = _pivot_and_sort_data(
-        data, index=x, columns=label, values=y, aggfunc=agg, sort_by=sort_by, ascending=ascending
+        data,
+        index=x,
+        columns=label,
+        values=y,
+        aggfunc=agg,
+        sort_by=sort_by,
+        ascending=ascending,
     )
 
     if not ax:

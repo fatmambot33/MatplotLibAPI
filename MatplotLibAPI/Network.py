@@ -20,28 +20,32 @@ from MatplotLibAPI.StyleTemplate import (
     validate_dataframe,
 )
 
-NETWORK_STYLE_TEMPLATE = StyleTemplate(
-)
+NETWORK_STYLE_TEMPLATE = StyleTemplate()
 
-DEFAULT = {"MAX_EDGES": 100,
-           "MAX_NODES": 30,
-           "MIN_NODE_SIZE": 100,
-           "MAX_NODE_SIZE": 2000,
-           "MAX_EDGE_WIDTH": 10,
-           "GRAPH_SCALE": 2,
-           "MAX_FONT_SIZE": 20,
-           "MIN_FONT_SIZE": 8
-           }
+DEFAULT = {
+    "MAX_EDGES": 100,
+    "MAX_NODES": 30,
+    "MIN_NODE_SIZE": 100,
+    "MAX_NODE_SIZE": 2000,
+    "MAX_EDGE_WIDTH": 10,
+    "GRAPH_SCALE": 2,
+    "MAX_FONT_SIZE": 20,
+    "MIN_FONT_SIZE": 8,
+}
 
 
 def softmax(x):
     """Compute softmax values for array ``x``.
 
-    Args:
-        x (Iterable[float]): Input values.
+    Parameters
+    ----------
+    x : Iterable[float]
+        Input values.
 
-    Returns:
-        np.ndarray: Softmax-transformed values.
+    Returns
+    -------
+    np.ndarray
+        Softmax-transformed values.
     """
     return np.exp(x - np.max(x)) / np.exp(x - np.max(x)).sum()
 
@@ -49,13 +53,19 @@ def softmax(x):
 def scale_weights(weights, scale_min=0, scale_max=1):
     """Scale weights into deciles within the given range.
 
-    Args:
-        weights (Iterable[float]): Sequence of weights to scale.
-        scale_min (float, optional): Minimum of the output range. Defaults to ``0``.
-        scale_max (float, optional): Maximum of the output range. Defaults to ``1``.
+    Parameters
+    ----------
+    weights : Iterable[float]
+        Sequence of weights to scale.
+    scale_min : float, optional
+        Minimum of the output range. Default is 0.
+    scale_max : float, optional
+        Maximum of the output range. Default is 1.
 
-    Returns:
-        List[float]: Scaled weights.
+    Returns
+    -------
+    list[float]
+        Scaled weights.
     """
     deciles = np.percentile(weights, [10, 20, 30, 40, 50, 60, 70, 80, 90])
     outs = np.searchsorted(deciles, weights)
@@ -65,17 +75,20 @@ def scale_weights(weights, scale_min=0, scale_max=1):
 class NodeView(nx.classes.reportviews.NodeView):
     """Extended node view with convenience helpers."""
 
-    def sort(self,
-             attribute: str = "weight",
-             reverse: bool = True) -> List[Any]:
+    def sort(self, attribute: str = "weight", reverse: bool = True) -> List[Any]:
         """Return nodes sorted by the specified attribute.
 
-        Args:
-            attribute (str, optional): Node attribute used for sorting. Defaults to ``"weight"``.
-            reverse (bool, optional): Sort order. Defaults to ``True``.
+        Parameters
+        ----------
+        attribute : str, optional
+            Node attribute used for sorting. Default is "weight".
+        reverse : bool, optional
+            Sort order. Default is True.
 
-        Returns:
-            List[Any]: Sorted nodes.
+        Returns
+        -------
+        list[Any]
+            Sorted nodes.
         """
         sorted_nodes = sorted(
             self, key=lambda node: self[node].get(attribute, 1), reverse=reverse
@@ -85,35 +98,39 @@ class NodeView(nx.classes.reportviews.NodeView):
     def filter(self, attribute: str, value: str):
         """Return nodes where ``attribute`` equals ``value``.
 
-        Args:
-            attribute (str): Node attribute to compare.
-            value (str): Desired attribute value.
+        Parameters
+        ----------
+        attribute : str
+            Node attribute to compare.
+        value : str
+            Desired attribute value.
 
-        Returns:
-            List: Nodes matching the condition.
+        Returns
+        -------
+        list
+            Nodes matching the condition.
         """
-        filtered_nodes = [
-            node
-            for node in self
-            if self[node].get(attribute) == value
-        ]
+        filtered_nodes = [node for node in self if self[node].get(attribute) == value]
         return filtered_nodes
 
 
 class AdjacencyView(nx.classes.coreviews.AdjacencyView):
     """Adjacency view with sorting and filtering helpers."""
 
-    def sort(self,
-             attribute: str = "weight",
-             reverse: bool = True) -> List[Any]:
+    def sort(self, attribute: str = "weight", reverse: bool = True) -> List[Any]:
         """Return adjacent nodes sorted by the given attribute.
 
-        Args:
-            attribute (str, optional): Attribute used for sorting. Defaults to ``"weight"``.
-            reverse (bool, optional): Sort order. Defaults to ``True``.
+        Parameters
+        ----------
+        attribute : str, optional
+            Attribute used for sorting. Default is "weight".
+        reverse : bool, optional
+            Sort order. Default is True.
 
-        Returns:
-            List[Any]: Sorted adjacent nodes.
+        Returns
+        -------
+        list[Any]
+            Sorted adjacent nodes.
         """
         sorted_nodes = sorted(
             self, key=lambda node: self[node].get(attribute, 1), reverse=reverse
@@ -123,35 +140,41 @@ class AdjacencyView(nx.classes.coreviews.AdjacencyView):
     def filter(self, attribute: str, value: str):
         """Return adjacent nodes where ``attribute`` equals ``value``.
 
-        Args:
-            attribute (str): Node attribute to compare.
-            value (str): Desired attribute value.
+        Parameters
+        ----------
+        attribute : str
+            Node attribute to compare.
+        value : str
+            Desired attribute value.
 
-        Returns:
-            List: Adjacent nodes matching the value.
+        Returns
+        -------
+        list
+            Adjacent nodes matching the value.
         """
-        filtered_nodes = [
-            node
-            for node in self
-            if self[node].get(attribute) == value
-        ]
+        filtered_nodes = [node for node in self if self[node].get(attribute) == value]
         return filtered_nodes
 
 
 class EdgeView(nx.classes.reportviews.EdgeView):
     """Edge view with sorting and filtering helpers."""
 
-    def sort(self,
-             attribute: str = "weight",
-             reverse: bool = True) -> Dict[Tuple[Any, Any], Dict[str, Any]]:
+    def sort(
+        self, attribute: str = "weight", reverse: bool = True
+    ) -> Dict[Tuple[Any, Any], Dict[str, Any]]:
         """Return edges sorted by the given attribute.
 
-        Args:
-            attribute (str, optional): Edge attribute used for sorting. Defaults to ``"weight"``.
-            reverse (bool, optional): Sort order. Defaults to ``True``.
+        Parameters
+        ----------
+        attribute : str, optional
+            Edge attribute used for sorting. Default is "weight".
+        reverse : bool, optional
+            Sort order. Default is True.
 
-        Returns:
-            Dict[Tuple[Any, Any], Dict[str, Any]]: Mapping of edge tuples to their attributes.
+        Returns
+        -------
+        dict[tuple[Any, Any], dict[str, Any]]
+            Mapping of edge tuples to their attributes.
         """
         sorted_edges = sorted(
             self(data=True), key=lambda t: t[2].get(attribute, 1), reverse=reverse
@@ -161,18 +184,19 @@ class EdgeView(nx.classes.reportviews.EdgeView):
     def filter(self, attribute: str, value: str):
         """Return edges where ``attribute`` equals ``value``.
 
-        Args:
-            attribute (str): Edge attribute to compare.
-            value (str): Desired attribute value.
+        Parameters
+        ----------
+        attribute : str
+            Edge attribute to compare.
+        value : str
+            Desired attribute value.
 
-        Returns:
-            List[Tuple[Any, Any]]: Edges matching the condition.
+        Returns
+        -------
+        list[tuple[Any, Any]]
+            Edges matching the condition.
         """
-        filtered_edges = [
-            edge
-            for edge in self
-            if self[edge].get(attribute) == value
-        ]
+        filtered_edges = [edge for edge in self if self[edge].get(attribute) == value]
         return [(edge[0], edge[1]) for edge in filtered_edges]
 
 
@@ -184,8 +208,10 @@ class NetworkGraph:
     def __init__(self, nx_graph: nx.Graph):
         """Initialize with an existing NetworkX graph.
 
-        Args:
-            nx_graph (nx.Graph): Graph to wrap.
+        Parameters
+        ----------
+        nx_graph : nx.Graph
+            Graph to wrap.
         """
         self._nx_graph = nx_graph
         self._scale = 1.0
@@ -199,8 +225,10 @@ class NetworkGraph:
     def scale(self, value: float):
         """Set scaling factor for plotting sizes.
 
-        Args:
-            value (float): Scaling factor.
+        Parameters
+        ----------
+        value : float
+            Scaling factor.
         """
         self._scale = value
 
@@ -219,14 +247,18 @@ class NetworkGraph:
         """Return an ``AdjacencyView`` of the graph."""
         return AdjacencyView(self._nx_graph.adj)
 
-    def edge_subgraph(self, edges: Iterable) -> 'NetworkGraph':
+    def edge_subgraph(self, edges: Iterable) -> "NetworkGraph":
         """Return a subgraph containing only the specified edges.
 
-        Args:
-            edges (Iterable): Edges to include.
+        Parameters
+        ----------
+        edges : Iterable
+            Edges to include.
 
-        Returns:
-            NetworkGraph: Subgraph with only ``edges``.
+        Returns
+        -------
+        NetworkGraph
+            Subgraph with only ``edges``.
         """
         return NetworkGraph(nx.edge_subgraph(self._nx_graph, edges))
 
@@ -241,32 +273,47 @@ class NetworkGraph:
     ) -> Tuple[List[float], List[float], Dict[int, List[str]]]:
         """Calculate node, edge and font sizes based on weights.
 
-        Args:
-            max_node_size (int, optional): Upper bound for node size. Defaults to ``DEFAULT["MAX_NODE_SIZE"]``.
-            min_node_size (int, optional): Lower bound for node size. Defaults to ``DEFAULT["MIN_NODE_SIZE"]``.
-            max_edge_width (int, optional): Upper bound for edge width. Defaults to ``DEFAULT["MAX_EDGE_WIDTH"]``.
-            max_font_size (int, optional): Upper bound for font size. Defaults to ``DEFAULT["MAX_FONT_SIZE"]``.
-            min_font_size (int, optional): Lower bound for font size. Defaults to ``DEFAULT["MIN_FONT_SIZE"]``.
-            weight (str, optional): Node attribute used for weighting. Defaults to ``"weight"``.
+        Parameters
+        ----------
+        max_node_size : int, optional
+            Upper bound for node size. Default is DEFAULT["MAX_NODE_SIZE"].
+        min_node_size : int, optional
+            Lower bound for node size. Default is DEFAULT["MIN_NODE_SIZE"].
+        max_edge_width : int, optional
+            Upper bound for edge width. Default is DEFAULT["MAX_EDGE_WIDTH"].
+        max_font_size : int, optional
+            Upper bound for font size. Default is DEFAULT["MAX_FONT_SIZE"].
+        min_font_size : int, optional
+            Lower bound for font size. Default is DEFAULT["MIN_FONT_SIZE"].
+        weight : str, optional
+            Node attribute used for weighting. Default is "weight".
 
-        Returns:
-            Tuple[List[float], List[float], Dict[int, List[str]]]: Node sizes, edge widths and nodes grouped by font size.
+        Returns
+        -------
+        tuple[list[float], list[float], dict[int, list[str]]]
+            Node sizes, edge widths and nodes grouped by font size.
         """
         # Normalize and scale nodes' weights within the desired range of edge widths
-        node_weights = [data.get(weight, 1)
-                        for node, data in self.nodes(data=True)]
+        node_weights = [data.get(weight, 1) for node, data in self.nodes(data=True)]
         node_size = scale_weights(
-            weights=node_weights, scale_max=max_node_size, scale_min=min_node_size)
+            weights=node_weights, scale_max=max_node_size, scale_min=min_node_size
+        )
 
         # Normalize and scale edges' weights within the desired range of edge widths
-        edge_weights = [data.get(weight, 1)
-                        for _, _, data in self.edges(data=True)]
-        edges_width = scale_weights(
-            weights=edge_weights, scale_max=max_edge_width)
+        edge_weights = [data.get(weight, 1) for _, _, data in self.edges(data=True)]
+        edges_width = scale_weights(weights=edge_weights, scale_max=max_edge_width)
 
         # Scale the normalized node weights within the desired range of font sizes
-        node_size_dict = dict(zip(self.nodes, scale_weights(
-            weights=node_weights, scale_max=max_font_size, scale_min=min_font_size)))
+        node_size_dict = dict(
+            zip(
+                self.nodes,
+                scale_weights(
+                    weights=node_weights,
+                    scale_max=max_font_size,
+                    scale_min=min_font_size,
+                ),
+            )
+        )
         fonts_size = defaultdict(list)
         for node, width in node_size_dict.items():
             fonts_size[int(width)].append(node)
@@ -280,17 +327,24 @@ class NetworkGraph:
         max_edges: int = DEFAULT["MAX_EDGES"],
         min_degree: int = 2,
         top_k_edges_per_node: int = 5,
-    ) -> 'NetworkGraph':
+    ) -> "NetworkGraph":
         """Return a trimmed subgraph limited by nodes and edges.
 
-        Args:
-            node_list (Optional[List[str]], optional): Nodes to include. Defaults to ``None``.
-            max_edges (int, optional): Maximum edges to retain. Defaults to ``DEFAULT["MAX_EDGES"]``.
-            min_degree (int, optional): Minimum degree for nodes in the core subgraph. Defaults to 2.
-            top_k_edges_per_node (int, optional): Number of top edges to keep per node. Defaults to 5.
+        Parameters
+        ----------
+        node_list : list[str], optional
+            Nodes to include. Default is None.
+        max_edges : int, optional
+            Maximum edges to retain. Default is DEFAULT["MAX_EDGES"].
+        min_degree : int, optional
+            Minimum degree for nodes in the core subgraph. Default is 2.
+        top_k_edges_per_node : int, optional
+            Number of top edges to keep per node. Default is 5.
 
-        Returns:
-            NetworkGraph: Trimmed subgraph.
+        Returns
+        -------
+        NetworkGraph
+            Trimmed subgraph.
         """
         if node_list is None:
             node_list = self.nodes.sort("weight")[: DEFAULT["MAX_NODES"]]
@@ -302,21 +356,30 @@ class NetworkGraph:
         subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
         return subgraph
 
-    def plot_network(self,
-                     title: Optional[str] = None,
-                     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                     weight: str = "weight",
-                     ax: Optional[Axes] = None) -> Axes:
+    def plot_network(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        weight: str = "weight",
+        ax: Optional[Axes] = None,
+    ) -> Axes:
         """Plot the graph using node and edge weights.
 
-        Args:
-            title (Optional[str], optional): Plot title. Defaults to ``None``.
-            style (StyleTemplate, optional): Style configuration. Defaults to ``NETWORK_STYLE_TEMPLATE``.
-            weight (str, optional): Edge attribute used for weighting. Defaults to ``"weight"``.
-            ax (Optional[Axes], optional): Axes to draw on. Defaults to ``None``.
+        Parameters
+        ----------
+        title : str, optional
+            Plot title. Default is None.
+        style : StyleTemplate, optional
+            Style configuration. Default is NETWORK_STYLE_TEMPLATE.
+        weight : str, optional
+            Edge attribute used for weighting. Default is "weight".
+        ax : Axes, optional
+            Axes to draw on. Default is None.
 
-        Returns:
-            Axes: Matplotlib axes with the plotted network.
+        Returns
+        -------
+        Axes
+            Matplotlib axes with the plotted network.
         """
         sns.set_palette(style.palette)
         if ax is None:
@@ -328,7 +391,8 @@ class NetworkGraph:
             max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
             min_font_size=style.font_mapping.get(0, DEFAULT["MIN_FONT_SIZE"]),
             max_font_size=style.font_mapping.get(4, DEFAULT["MAX_FONT_SIZE"]),
-            weight=weight)
+            weight=weight,
+        )
         pos = nx.spring_layout(self._nx_graph, k=1)
         # nodes
         node_sizes_int = [int(size) for size in node_sizes]
@@ -357,17 +421,16 @@ class NetworkGraph:
                 ax=ax,
                 font_size=font_size,
                 font_color=style.font_color,
-                labels={n: string_formatter(n) for n in nodes})
+                labels={n: string_formatter(n) for n in nodes},
+            )
         ax.set_facecolor(style.background_color)
         if title:
-            ax.set_title(title, color=style.font_color,
-                         fontsize=style.font_size*2)
+            ax.set_title(title, color=style.font_color, fontsize=style.font_size * 2)
         ax.set_axis_off()
 
         return ax
 
-    def plot_network_components(self,
-                                *args, **kwargs):
+    def plot_network_components(self, *args, **kwargs):
         """Plot network components (DEPRECATED).
 
         .. deprecated:: 0.1.0
@@ -376,6 +439,7 @@ class NetworkGraph:
             for plotting components.
         """
         import warnings
+
         warnings.warn(
             "`plot_network_components` is deprecated and will be removed in a future version. "
             "Please use `fplot_network_components`.",
@@ -388,36 +452,49 @@ class NetworkGraph:
         # For now, we'll just warn.
         return []
 
-    def get_core_subgraph(self, k: int = 2) -> 'NetworkGraph':
+    def get_core_subgraph(self, k: int = 2) -> "NetworkGraph":
         """Return the k-core of the graph.
 
         The k-core is a subgraph containing only nodes with degree >= k.
 
-        Args:
-            k (int, optional): The minimum degree for nodes in the core. Defaults to 2.
+        Parameters
+        ----------
+        k : int, optional
+            The minimum degree for nodes in the core. Default is 2.
 
-        Returns:
-            NetworkGraph: The k-core subgraph.
+        Returns
+        -------
+        NetworkGraph
+            The k-core subgraph.
         """
         core_graph = nx.k_core(self._nx_graph, k=k)
         return NetworkGraph(core_graph)
 
-    def top_k_edges(self, attribute: str, reverse: bool = True, k: int = 5) -> Dict[Any, List[Tuple[Any, Dict]]]:
+    def top_k_edges(
+        self, attribute: str, reverse: bool = True, k: int = 5
+    ) -> Dict[Any, List[Tuple[Any, Dict]]]:
         """Return the top ``k`` edges based on a given attribute.
 
-        Args:
-            attribute (str): Attribute name used for sorting.
-            reverse (bool, optional): Whether to sort in descending order. Defaults to ``True``.
-            k (int, optional): Number of top edges to return. Defaults to ``5``.
+        Parameters
+        ----------
+        attribute : str
+            Attribute name used for sorting.
+        reverse : bool, optional
+            Whether to sort in descending order. Default is True.
+        k : int, optional
+            Number of top edges to return. Default is 5.
 
-        Returns:
-            Dict[Any, List[Tuple[Any, Dict]]]: Mapping of edge tuples to attribute values.
+        Returns
+        -------
+        dict[Any, list[tuple[Any, dict]]]
+            Mapping of edge tuples to attribute values.
         """
         top_list = {}
         for node in self.nodes:
             edges = self.edges(node, data=True)
-            edges_sorted = sorted(edges, key=lambda x: x[2].get(
-                attribute, 0), reverse=reverse)
+            edges_sorted = sorted(
+                edges, key=lambda x: x[2].get(attribute, 0), reverse=reverse
+            )
             top_k_edges = edges_sorted[:k]
             for u, v, data in top_k_edges:
                 edge_key = (u, v)
@@ -427,9 +504,12 @@ class NetworkGraph:
     def calculate_node_weights_from_edges(self, weight: str = "weight", k: int = 10):
         """Calculate node weights by summing weights of top k edges.
 
-        Args:
-            weight (str, optional): Edge attribute to use for weighting. Defaults to "weight".
-            k (int, optional): Number of top edges to consider for each node. Defaults to 10.
+        Parameters
+        ----------
+        weight : str, optional
+            Edge attribute to use for weighting. Default is "weight".
+        k : int, optional
+            Number of top edges to consider for each node. Default is 10.
         """
         edge_aggregates = self.top_k_edges(attribute=weight, k=k)
         node_aggregates = {}
@@ -443,15 +523,22 @@ class NetworkGraph:
 
         nx.set_node_attributes(self._nx_graph, node_aggregates, name=weight)
 
-    def trim_edges(self, weight: str = "weight", top_k_per_node: int = 5) -> 'NetworkGraph':
+    def trim_edges(
+        self, weight: str = "weight", top_k_per_node: int = 5
+    ) -> "NetworkGraph":
         """Trim the graph to keep only the top k edges per node.
 
-        Args:
-            weight (str, optional): Edge attribute to use for sorting. Defaults to "weight".
-            top_k_per_node (int, optional): Number of top edges to keep per node. Defaults to 5.
+        Parameters
+        ----------
+        weight : str, optional
+            Edge attribute to use for sorting. Default is "weight".
+        top_k_per_node : int, optional
+            Number of top edges to keep per node. Default is 5.
 
-        Returns:
-            NetworkGraph: A new graph containing only the top edges.
+        Returns
+        -------
+        NetworkGraph
+            A new graph containing only the top edges.
         """
         edges_to_keep = self.top_k_edges(attribute=weight, k=top_k_per_node)
         return self.edge_subgraph(edges=edges_to_keep)
@@ -462,17 +549,24 @@ class NetworkGraph:
         source: str = "source",
         target: str = "target",
         weight: str = "weight",
-    ) -> 'NetworkGraph':
+    ) -> "NetworkGraph":
         """Initialize a NetworkGraph from a simple DataFrame.
 
-        Args:
-            df (pd.DataFrame): DataFrame containing edge data.
-            source (str, optional): Column name for source nodes. Defaults to ``"source"``.
-            target (str, optional): Column name for target nodes. Defaults to ``"target"``.
-            weight (str, optional): Column name for edge weights. Defaults to ``"weight"``.
+        Parameters
+        ----------
+        df : pd.DataFrame
+            DataFrame containing edge data.
+        source : str, optional
+            Column name for source nodes. Default is "source".
+        target : str, optional
+            Column name for target nodes. Default is "target".
+        weight : str, optional
+            Column name for edge weights. Default is "weight".
 
-        Returns:
-            NetworkGraph: Initialized network graph.
+        Returns
+        -------
+        NetworkGraph
+            Initialized network graph.
         """
         network_G = nx.from_pandas_edgelist(
             df, source=source, target=target, edge_attr=weight
@@ -480,11 +574,19 @@ class NetworkGraph:
         return NetworkGraph(network_G)
 
 
-def _prepare_network_graph(pd_df: pd.DataFrame, source: str, target: str, weight: str, sort_by: Optional[str], node_list: Optional[List]) -> NetworkGraph:
+def _prepare_network_graph(
+    pd_df: pd.DataFrame,
+    source: str,
+    target: str,
+    weight: str,
+    sort_by: Optional[str],
+    node_list: Optional[List],
+) -> NetworkGraph:
     """Prepare NetworkGraph for plotting."""
     if node_list:
-        df = pd_df.loc[(pd_df["source"].isin(node_list)) |
-                       (pd_df["target"].isin(node_list))]
+        df = pd_df.loc[
+            (pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))
+        ]
     else:
         df = pd_df
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
@@ -498,67 +600,90 @@ def _prepare_network_graph(pd_df: pd.DataFrame, source: str, target: str, weight
     return graph
 
 
-def aplot_network(pd_df: pd.DataFrame,
-                  source: str = "source",
-                  target: str = "target",
-                  weight: str = "weight",
-                  title: Optional[str] = None,
-                  style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                  sort_by: Optional[str] = None,
-                  ascending: bool = False,
-                  node_list: Optional[List] = None,
-                  ax: Optional[Axes] = None) -> Axes:
+def aplot_network(
+    pd_df: pd.DataFrame,
+    source: str = "source",
+    target: str = "target",
+    weight: str = "weight",
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    node_list: Optional[List] = None,
+    ax: Optional[Axes] = None,
+) -> Axes:
     """Plot a network graph on the provided axes.
 
-    Args:
-        pd_df (pd.DataFrame): DataFrame containing edge data.
-        source (str, optional): Column name for source nodes. Defaults to ``"source"``.
-        target (str, optional): Column name for target nodes. Defaults to ``"target"``.
-        weight (str, optional): Column name for edge weights. Defaults to ``"weight"``.
-        title (Optional[str], optional): Plot title. Defaults to ``None``.
-        style (StyleTemplate, optional): Style configuration. Defaults to ``NETWORK_STYLE_TEMPLATE``.
-        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
-        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
-        ax (Optional[Axes], optional): Axes to draw on. Defaults to ``None``.
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing edge data.
+    source : str, optional
+        Column name for source nodes. Default is "source".
+    target : str, optional
+        Column name for target nodes. Default is "target".
+    weight : str, optional
+        Column name for edge weights. Default is "weight".
+    title : str, optional
+        Plot title. Default is None.
+    style : StyleTemplate, optional
+        Style configuration. Default is NETWORK_STYLE_TEMPLATE.
+    sort_by : str, optional
+        Column used to sort the data. Default is None.
+    ascending : bool, optional
+        Sort order for the data. Default is False.
+    node_list : list, optional
+        Nodes to include. Default is None.
+    ax : Axes, optional
+        Axes to draw on. Default is None.
 
-    Returns:
-        Axes: Matplotlib axes with the plotted network.
+    Returns
+    -------
+    Axes
+        Matplotlib axes with the plotted network.
     """
-    graph = _prepare_network_graph(
-        pd_df, source, target, weight, sort_by, node_list)
-    return graph.plot_network(title=title,
-                              style=style,
-                              weight=weight,
-                              ax=ax)
+    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
+    return graph.plot_network(title=title, style=style, weight=weight, ax=ax)
 
 
-def aplot_network_components(pd_df: pd.DataFrame,
-                             source: str = "source",
-                             target: str = "target",
-                             weight: str = "weight",
-                             title: Optional[str] = None,
-                             style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                             sort_by: Optional[str] = None,
-                             node_list: Optional[List] = None,
-                             ascending: bool = False,
-                             axes: Optional[np.ndarray] = None) -> None:
+def aplot_network_components(
+    pd_df: pd.DataFrame,
+    source: str = "source",
+    target: str = "target",
+    weight: str = "weight",
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    sort_by: Optional[str] = None,
+    node_list: Optional[List] = None,
+    ascending: bool = False,
+    axes: Optional[np.ndarray] = None,
+) -> None:
     """Plot network components separately on multiple axes.
 
-    Args:
-        pd_df (pd.DataFrame): DataFrame containing edge data.
-        source (str, optional): Column name for source nodes. Defaults to ``"source"``.
-        target (str, optional): Column name for target nodes. Defaults to ``"target"``.
-        weight (str, optional): Column name for edge weights. Defaults to ``"weight"``.
-        title (Optional[str], optional): Base title for subplots. Defaults to ``None``.
-        style (StyleTemplate, optional): Style configuration. Defaults to ``NETWORK_STYLE_TEMPLATE``.
-        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
-        node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
-        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        axes (Optional[np.ndarray], optional): Existing axes to draw on. If None, new axes are created. Defaults to ``None``.
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing edge data.
+    source : str, optional
+        Column name for source nodes. Default is "source".
+    target : str, optional
+        Column name for target nodes. Default is "target".
+    weight : str, optional
+        Column name for edge weights. Default is "weight".
+    title : str, optional
+        Base title for subplots. Default is None.
+    style : StyleTemplate, optional
+        Style configuration. Default is NETWORK_STYLE_TEMPLATE.
+    sort_by : str, optional
+        Column used to sort the data. Default is None.
+    node_list : list, optional
+        Nodes to include. Default is None.
+    ascending : bool, optional
+        Sort order for the data. Default is False.
+    axes : np.ndarray, optional
+        Existing axes to draw on. If None, new axes are created. Default is None.
     """
-    graph = _prepare_network_graph(
-        pd_df, source, target, weight, sort_by, node_list)
+    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
 
@@ -588,7 +713,7 @@ def aplot_network_components(pd_df: pd.DataFrame,
                     title=f"{title}::{i}" if title else str(i),
                     style=style,
                     weight=weight,
-                    ax=axes[i]
+                    ax=axes[i],
                 )
             axes[i].set_axis_on()
         else:
@@ -600,78 +725,110 @@ def aplot_network_components(pd_df: pd.DataFrame,
             axes[j].set_axis_off()
 
 
-def fplot_network(pd_df: pd.DataFrame,
-                  source: str = "source",
-                  target: str = "target",
-                  weight: str = "weight",
-                  title: Optional[str] = None,
-                  style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                  sort_by: Optional[str] = None,
-                  ascending: bool = False,
-                  node_list: Optional[List] = None,
-                  figsize: Tuple[float, float] = (19.2, 10.8)) -> Figure:
+def fplot_network(
+    pd_df: pd.DataFrame,
+    source: str = "source",
+    target: str = "target",
+    weight: str = "weight",
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    node_list: Optional[List] = None,
+    figsize: Tuple[float, float] = (19.2, 10.8),
+) -> Figure:
     """Return a figure with a network graph.
 
-    Args:
-        pd_df (pd.DataFrame): DataFrame containing edge data.
-        source (str, optional): Column name for source nodes. Defaults to ``"source"``.
-        target (str, optional): Column name for target nodes. Defaults to ``"target"``.
-        weight (str, optional): Column name for edge weights. Defaults to ``"weight"``.
-        title (Optional[str], optional): Plot title. Defaults to ``None``.
-        style (StyleTemplate, optional): Style configuration. Defaults to ``NETWORK_STYLE_TEMPLATE``.
-        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
-        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
-        figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing edge data.
+    source : str, optional
+        Column name for source nodes. Default is "source".
+    target : str, optional
+        Column name for target nodes. Default is "target".
+    weight : str, optional
+        Column name for edge weights. Default is "weight".
+    title : str, optional
+        Plot title. Default is None.
+    style : StyleTemplate, optional
+        Style configuration. Default is NETWORK_STYLE_TEMPLATE.
+    sort_by : str, optional
+        Column used to sort the data. Default is None.
+    ascending : bool, optional
+        Sort order for the data. Default is False.
+    node_list : list, optional
+        Nodes to include. Default is None.
+    figsize : tuple[float, float], optional
+        Size of the created figure. Default is (19.2, 10.8).
 
-    Returns:
-        Figure: Matplotlib figure with the network graph.
+    Returns
+    -------
+    Figure
+        Matplotlib figure with the network graph.
     """
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
-    ax = aplot_network(pd_df,
-                       source=source,
-                       target=target,
-                       weight=weight,
-                       title=title,
-                       style=style,
-                       sort_by=sort_by,
-                       ascending=ascending,
-                       node_list=node_list,
-                       ax=ax
-                       )
+    ax = aplot_network(
+        pd_df,
+        source=source,
+        target=target,
+        weight=weight,
+        title=title,
+        style=style,
+        sort_by=sort_by,
+        ascending=ascending,
+        node_list=node_list,
+        ax=ax,
+    )
     return fig
 
 
-def fplot_network_components(pd_df: pd.DataFrame,
-                             source: str = "source",
-                             target: str = "target",
-                             weight: str = "weight",
-                             title: Optional[str] = None,
-                             style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-                             sort_by: Optional[str] = None,
-                             ascending: bool = False,
-                             node_list: Optional[List] = None,
-                             figsize: Tuple[float, float] = (19.2, 10.8),
-                             n_cols: Optional[int] = None) -> Figure:
+def fplot_network_components(
+    pd_df: pd.DataFrame,
+    source: str = "source",
+    target: str = "target",
+    weight: str = "weight",
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    node_list: Optional[List] = None,
+    figsize: Tuple[float, float] = (19.2, 10.8),
+    n_cols: Optional[int] = None,
+) -> Figure:
     """Return a figure showing individual network components.
 
-    Args:
-        pd_df (pd.DataFrame): DataFrame containing edge data.
-        source (str, optional): Column name for source nodes. Defaults to ``"source"``.
-        target (str, optional): Column name for target nodes. Defaults to ``"target"``.
-        weight (str, optional): Column name for edge weights. Defaults to ``"weight"``.
-        title (Optional[str], optional): Plot title. Defaults to ``None``.
-        style (StyleTemplate, optional): Style configuration. Defaults to ``NETWORK_STYLE_TEMPLATE``.
-        sort_by (Optional[str], optional): Column used to sort the data. Defaults to ``None``.
-        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        node_list (Optional[List], optional): Nodes to include. Defaults to ``None``.
-        figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
-        n_cols (Optional[int], optional): Number of columns for subplots. If None, it's inferred. Defaults to ``None``.
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing edge data.
+    source : str, optional
+        Column name for source nodes. Default is "source".
+    target : str, optional
+        Column name for target nodes. Default is "target".
+    weight : str, optional
+        Column name for edge weights. Default is "weight".
+    title : str, optional
+        Plot title. Default is None.
+    style : StyleTemplate, optional
+        Style configuration. Default is NETWORK_STYLE_TEMPLATE.
+    sort_by : str, optional
+        Column used to sort the data. Default is None.
+    ascending : bool, optional
+        Sort order for the data. Default is False.
+    node_list : list, optional
+        Nodes to include. Default is None.
+    figsize : tuple[float, float], optional
+        Size of the created figure. Default is (19.2, 10.8).
+    n_cols : int, optional
+        Number of columns for subplots. If None, it's inferred. Default is None.
 
-    Returns:
-        Figure: Matplotlib figure displaying component plots.
+    Returns
+    -------
+    Figure
+        Matplotlib figure displaying component plots.
     """
     # First, get the graph and components to determine the layout
     df = pd_df.copy()
@@ -679,7 +836,9 @@ def fplot_network_components(pd_df: pd.DataFrame,
         df = df.loc[(df["source"].isin(node_list)) | (df["target"].isin(node_list))]
 
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
-    graph = NetworkGraph.from_pandas_edgelist(df, source=source, target=target, weight=weight)
+    graph = NetworkGraph.from_pandas_edgelist(
+        df, source=source, target=target, weight=weight
+    )
     graph = graph.get_core_subgraph(k=2)
     connected_components = list(nx.connected_components(graph._nx_graph))
 
@@ -706,7 +865,7 @@ def fplot_network_components(pd_df: pd.DataFrame,
         sort_by=sort_by,
         ascending=ascending,
         node_list=node_list,
-        axes=axes
+        axes=axes,
     )
 
     if title:
