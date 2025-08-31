@@ -21,11 +21,11 @@ def _prepare_table_data(pd_df: pd.DataFrame, cols: List[str], sort_by: Optional[
     """Prepare data for table plotting."""
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
 
-    if not sort_by:
-        sort_by = cols[0]
+    plot_df = pd_df[cols].copy()
+    if sort_by:
+        plot_df = plot_df.sort_values(by=[sort_by], ascending=ascending)
 
-    plot_df = pd_df[cols].sort_values(
-        by=sort_by, ascending=ascending).head(max_values)  # type: ignore
+    plot_df = plot_df.head(max_values)
 
     if style.format_funcs:
         for col, func in style.format_funcs.items():

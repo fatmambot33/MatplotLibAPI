@@ -1,10 +1,10 @@
 """Common style utilities and formatters for plotting."""
 
-from typing import List, Optional, Dict, Callable, Union
 from dataclasses import dataclass
+from typing import Callable, Dict, List, Optional, Union, cast
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from matplotlib.dates import num2date
 from matplotlib.ticker import FuncFormatter
 
@@ -14,20 +14,25 @@ FormatterFunc = Callable[[Union[int, float, str], Optional[int]], str]
 
 # region Validation
 
+
 def validate_dataframe(
-    pd_df: pd.DataFrame,
-    cols: List[str],
-    sort_by: Optional[str] = None
+    pd_df: pd.DataFrame, cols: List[str], sort_by: Optional[str] = None
 ) -> None:
     """Ensure required columns and optional sort column exist in a DataFrame.
 
-    Args:
-        pd_df (pd.DataFrame): The DataFrame to validate.
-        cols (List[str]): Required column names.
-        sort_by (Optional[str]): Optional column used for sorting.
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        The DataFrame to validate.
+    cols : list[str]
+        Required column names.
+    sort_by : str, optional
+        Optional column used for sorting.
 
-    Raises:
-        AttributeError: If any column is missing.
+    Raises
+    ------
+    AttributeError
+        If any column is missing.
     """
     required_cols = set(cols)
     if sort_by:
@@ -37,26 +42,37 @@ def validate_dataframe(
         raise AttributeError(f"Missing columns in DataFrame: {missing}")
 
 
+# endregion
+
 # region Format Dispatcher
+
 
 def format_func(
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
     label: Optional[str] = None,
     x: Optional[str] = None,
     y: Optional[str] = None,
-    z: Optional[str] = None
+    z: Optional[str] = None,
 ) -> Optional[Dict[str, Optional[FormatterFunc]]]:
     """Map shared formatters to specific keys if provided.
 
-    Args:
-        format_funcs (Optional[Dict[str, Optional[FormatterFunc]]]): Dictionary of formatting functions.
-        label (Optional[str]): Label column name.
-        x (Optional[str]): X-axis column name.
-        y (Optional[str]): Y-axis column name.
-        z (Optional[str]): Z-axis column name.
+    Parameters
+    ----------
+    format_funcs : dict[str, FormatterFunc], optional
+        Dictionary of formatting functions.
+    label : str, optional
+        Label column name.
+    x : str, optional
+        X-axis column name.
+    y : str, optional
+        Y-axis column name.
+    z : str, optional
+        Z-axis column name.
 
-    Returns:
-        Optional[Dict[str, Optional[FormatterFunc]]]: Updated format function dictionary.
+    Returns
+    -------
+    dict[str, FormatterFunc], optional
+        Updated format function dictionary.
     """
     if not format_funcs:
         return None
@@ -69,16 +85,22 @@ def format_func(
     return new_format_funcs
 
 
+# endregion
+
 # region Style Constants
 
 FIG_SIZE = (19.2, 10.8)
-BACKGROUND_COLOR = 'black'
-TEXT_COLOR = 'white'
+BACKGROUND_COLOR = "black"
+TEXT_COLOR = "white"
 PALETTE = "Greys_r"
 FONT_SIZE = 14
+MAX_RESULTS = 50
 
+
+# endregion
 
 # region Style Template
+
 
 @dataclass
 class StyleTemplate:
@@ -86,7 +108,7 @@ class StyleTemplate:
 
     background_color: str = BACKGROUND_COLOR
     fig_border: str = BACKGROUND_COLOR
-    font_name: str = 'Arial'
+    font_name: str = "Arial"
     font_size: int = FONT_SIZE
     font_color: str = TEXT_COLOR
     palette: str = PALETTE
@@ -102,8 +124,10 @@ class StyleTemplate:
     def font_mapping(self) -> Dict[int, int]:
         """Map font levels to adjusted font sizes.
 
-        Returns:
-            Dict[int, int]: Level to font size mapping.
+        Returns
+        -------
+        dict[int, int]
+            Level to font size mapping.
         """
         return {
             0: self.font_size - 3,
@@ -114,7 +138,10 @@ class StyleTemplate:
         }
 
 
+# endregion
+
 # region Custom Formatters
+
 
 class DynamicFuncFormatter(FuncFormatter):
     """A wrapper for dynamic formatting functions."""
@@ -122,8 +149,10 @@ class DynamicFuncFormatter(FuncFormatter):
     def __init__(self, func_name: FormatterFunc):
         """Initialize the formatter.
 
-        Args:
-            func_name (FormatterFunc): A formatting function.
+        Parameters
+        ----------
+        func_name : FormatterFunc
+            A formatting function.
         """
         super().__init__(func_name)
 
@@ -163,35 +192,46 @@ def string_formatter(val: Union[int, float, str], pos: Optional[int] = None) -> 
 
 def yy_mm_formatter(x: float, pos: Optional[int] = None) -> str:
     """Format a float date value as YYYY-MM."""
-    return num2date(x).strftime('%Y-%m')
+    return num2date(x).strftime("%Y-%m")
 
 
 def yy_mm_dd_formatter(x: float, pos: Optional[int] = None) -> str:
     """Format a float date value as YYYY-MM-DD."""
-    return num2date(x).strftime('%Y-%m-%d')
+    return num2date(x).strftime("%Y-%m-%d")
 
+
+# endregion
 
 # region Tick Generator
+
 
 def generate_ticks(
     min_val: Union[float, str, pd.Timestamp],
     max_val: Union[float, str, pd.Timestamp],
-    num_ticks: int = 5
+    num_ticks: int = 5,
 ) -> Union[np.ndarray, pd.DatetimeIndex]:
     """Generate evenly spaced ticks between min and max.
 
-    Args:
-        min_val (float | str | pd.Timestamp): Minimum value of range.
-        max_val (float | str | pd.Timestamp): Maximum value of range.
-        num_ticks (int): Number of tick marks.
+    Parameters
+    ----------
+    min_val : float | str | pd.Timestamp
+        Minimum value of range.
+    max_val : float | str | pd.Timestamp
+        Maximum value of range.
+    num_ticks : int
+        Number of tick marks.
 
-    Returns:
-        Union[np.ndarray, pd.DatetimeIndex]: Tick values.
+    Returns
+    -------
+    np.ndarray | pd.DatetimeIndex
+        Tick values.
     """
     min_val_f: float = 0.0
     max_val_f: float = 0.0
 
-    if isinstance(min_val, (int, float, str)) and isinstance(max_val, (int, float, str)):
+    if isinstance(min_val, (int, float, str)) and isinstance(
+        max_val, (int, float, str)
+    ):
         try:
             min_val_f = float(min_val)
             max_val_f = float(max_val)
@@ -217,4 +257,53 @@ def generate_ticks(
     return np.arange(min_val_f, max_val_f + nice_step, nice_step)
 
 
+# endregion
+
+# region Style Presets
+
+BUBBLE_STYLE_TEMPLATE = StyleTemplate(
+    format_funcs=cast(
+        Dict[str, Optional[FormatterFunc]],
+        {
+            "label": string_formatter,
+            "x": bmk_formatter,
+            "y": percent_formatter,
+            "z": bmk_formatter,
+        },
+    ),
+    yscale="log",
+)
+
+TIMESERIE_STYLE_TEMPLATE = StyleTemplate(
+    format_funcs=cast(
+        Dict[str, Optional[FormatterFunc]],
+        {"x": yy_mm_formatter, "y": bmk_formatter},
+    )
+)
+
+TABLE_STYLE_TEMPLATE = StyleTemplate()
+
+TREEMAP_STYLE_TEMPLATE = StyleTemplate()
+
+PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
+    background_color="black",
+    fig_border="darkgrey",
+    font_color="white",
+    palette="magma",
+    format_funcs=cast(
+        Dict[str, Optional[FormatterFunc]],
+        {"y": percent_formatter, "label": string_formatter},
+    ),
+)
+PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
+    background_color="white",
+    fig_border="lightgrey",
+    palette="viridis",
+    format_funcs=cast(
+        Dict[str, Optional[FormatterFunc]],
+        {"y": percent_formatter, "label": string_formatter},
+    ),
+)
+
+NETWORK_STYLE_TEMPLATE = StyleTemplate()
 # endregion
