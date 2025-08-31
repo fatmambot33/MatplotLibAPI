@@ -26,7 +26,26 @@ from .StyleTemplate import (
 def _prepare_timeserie_data(
     pd_df: pd.DataFrame, label: str, x: str, y: str, sort_by: Optional[str]
 ) -> pd.DataFrame:
-    """Prepare data for time series plotting."""
+    """Prepare data for time series plotting by sorting and setting the index.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        The input DataFrame.
+    label : str
+        The column for grouping series.
+    x : str
+        The column for x-axis values (time).
+    y : str
+        The column for y-axis values.
+    sort_by : str or None
+        The column to sort by (for validation).
+
+    Returns
+    -------
+    pd.DataFrame
+        The prepared DataFrame with a datetime index.
+    """
     validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
     df = pd_df[[label, x, y]].sort_values(by=[label, x])  # type: ignore
     df[x] = pd.to_datetime(df[x])
@@ -44,7 +63,27 @@ def _plot_timeserie_lines(
     style: StyleTemplate,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Plot the time series lines on the axes."""
+    """Draw the time series lines, optionally with shaded standard deviation.
+
+    Parameters
+    ----------
+    ax : Axes
+        The matplotlib axes to draw on.
+    df : pd.DataFrame
+        The DataFrame containing the data to plot.
+    label : str
+        The column for grouping series.
+    x : str
+        The column for x-axis values.
+    y : str
+        The column for y-axis values.
+    std : bool
+        Whether to plot a shaded area for the rolling standard deviation.
+    style : StyleTemplate
+        The style configuration object.
+    format_funcs : dict or None
+        A dictionary of formatting functions for labels and values.
+    """
     sns.set_palette(style.palette)
     # Get unique dimension_types
     label_types = df[label].unique()
@@ -91,7 +130,23 @@ def _setup_timeserie_axes(
     style: StyleTemplate,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Configure the axes for the time series plot."""
+    """Configure the axes, legend, and ticks for the time series plot.
+
+    Parameters
+    ----------
+    ax : Axes
+        The matplotlib axes to configure.
+    label : str
+        The column name for the legend title.
+    x : str
+        The column name for the x-axis label.
+    y : str
+        The column name for the y-axis label.
+    style : StyleTemplate
+        The style configuration object.
+    format_funcs : dict or None
+        A dictionary of formatting functions for the axes.
+    """
     ax.legend(
         title=label,
         fontsize=style.font_size - 4,

@@ -104,7 +104,42 @@ MAX_RESULTS = 50
 
 @dataclass
 class StyleTemplate:
-    """Configuration container for plot styling options."""
+    """Configuration container for plot styling options.
+
+    Attributes
+    ----------
+    background_color : str, optional
+        Background color of the plot. Defaults to `BACKGROUND_COLOR`.
+    fig_border : str, optional
+        Color of the figure border. Defaults to `BACKGROUND_COLOR`.
+    font_name : str, optional
+        Font name to use. Defaults to "Arial".
+    font_size : int, optional
+        Base font size. Defaults to `FONT_SIZE`.
+    font_color : str, optional
+        Color of text elements. Defaults to `TEXT_COLOR`.
+    palette : str, optional
+        Color palette to use for plots. Defaults to `PALETTE`.
+    legend : bool, optional
+        Whether to display a legend. Defaults to `True`.
+    xscale : str, optional
+        Scale for the x-axis (e.g., "log"). Defaults to `None`.
+    x_ticks : int, optional
+        Number of ticks on the x-axis. Defaults to 5.
+    yscale : str, optional
+        Scale for the y-axis (e.g., "log"). Defaults to `None`.
+    y_ticks : int, optional
+        Number of ticks on the y-axis. Defaults to 5.
+    format_funcs : dict[str, FormatterFunc], optional
+        Dictionary mapping column names to formatting functions. Defaults to `None`.
+    col_widths : list[float], optional
+        List of column widths for tables. Defaults to `None`.
+
+    Methods
+    -------
+    font_mapping()
+        Get a mapping of quintile levels to adjusted font sizes.
+    """
 
     background_color: str = BACKGROUND_COLOR
     fig_border: str = BACKGROUND_COLOR
@@ -144,21 +179,41 @@ class StyleTemplate:
 
 
 class DynamicFuncFormatter(FuncFormatter):
-    """A wrapper for dynamic formatting functions."""
+    """A matplotlib `FuncFormatter` that wraps a given formatting function.
+
+    This class allows a dynamic formatting function to be used with matplotlib's
+    tick formatting system.
+    """
 
     def __init__(self, func_name: FormatterFunc):
-        """Initialize the formatter.
+        """Initialize the formatter with a formatting function.
 
         Parameters
         ----------
         func_name : FormatterFunc
-            A formatting function.
+            The formatting function to apply. It must accept a value and an
+            optional position and return a string.
         """
         super().__init__(func_name)
 
 
 def percent_formatter(val: Union[int, float, str], pos: Optional[int] = None) -> str:
-    """Format a value as a percentage."""
+    """Format a numeric value as a percentage string.
+
+    The precision is adjusted based on the value's magnitude.
+
+    Parameters
+    ----------
+    val : int | float | str
+        The value to format. If a string, it will be cast to a float.
+    pos : int, optional
+        The tick position (unused, but required for matplotlib compatibility).
+
+    Returns
+    -------
+    str
+        The formatted percentage string (e.g., "0.25%", "1.5%", "25%").
+    """
     if isinstance(val, str):
         val = float(val)
     val *= 100
@@ -181,7 +236,20 @@ def bmk_formatter(val: float, pos: Optional[int] = None) -> str:
 
 
 def integer_formatter(val: float, pos: Optional[int] = None) -> str:
-    """Format a value as an integer."""
+    """Format a numeric value as an integer string.
+
+    Parameters
+    ----------
+    val : float
+        The value to format.
+    pos : int, optional
+        The tick position (unused, but required for matplotlib compatibility).
+
+    Returns
+    -------
+    str
+        The formatted integer string.
+    """
     return str(int(val))
 
 
@@ -191,12 +259,38 @@ def string_formatter(val: Union[int, float, str], pos: Optional[int] = None) -> 
 
 
 def yy_mm_formatter(x: float, pos: Optional[int] = None) -> str:
-    """Format a float date value as YYYY-MM."""
+    """Format a matplotlib date float as a 'YYYY-MM' string.
+
+    Parameters
+    ----------
+    x : float
+        The matplotlib date value.
+    pos : int, optional
+        The tick position (unused, but required for matplotlib compatibility).
+
+    Returns
+    -------
+    str
+        The formatted date string.
+    """
     return num2date(x).strftime("%Y-%m")
 
 
 def yy_mm_dd_formatter(x: float, pos: Optional[int] = None) -> str:
-    """Format a float date value as YYYY-MM-DD."""
+    """Format a matplotlib date float as a 'YYYY-MM-DD' string.
+
+    Parameters
+    ----------
+    x : float
+        The matplotlib date value.
+    pos : int, optional
+        The tick position (unused, but required for matplotlib compatibility).
+
+    Returns
+    -------
+    str
+        The formatted date string.
+    """
     return num2date(x).strftime("%Y-%m-%d")
 
 

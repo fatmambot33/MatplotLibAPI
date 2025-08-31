@@ -204,14 +204,47 @@ class EdgeView(nx.classes.reportviews.EdgeView):
 
 
 class NetworkGraph:
-    """Custom graph class based on NetworkX's ``Graph``.
+    """A custom graph class wrapping ``networkx.Graph`` with added functionality.
+
+    This class provides helper methods for layout, plotting, and subgraph
+    manipulation, along with custom view classes for nodes, edges, and adjacency.
+
+    Parameters
+    ----------
+    nx_graph : nx.Graph
+        The NetworkX graph instance to wrap.
+
+    Attributes
+    ----------
+    scale : float
+        A scaling factor used for adjusting plot element sizes.
 
     Methods
     -------
-    sort
-        Return nodes sorted by the specified attribute.
-    filter
-        Return nodes where ``attribute`` equals ``value``.
+    nodes()
+        Return a custom `NodeView` of the graph's nodes.
+    edges()
+        Return a custom `EdgeView` of the graph's edges.
+    adjacency()
+        Return a custom `AdjacencyView` of the graph.
+    edge_subgraph(edges)
+        Return a new `NetworkGraph` containing only the specified edges.
+    layout(...)
+        Calculate node sizes, edge widths, and font sizes for plotting.
+    subgraph(...)
+        Return a trimmed subgraph based on node lists and edge limits.
+    plot_network(...)
+        Plot the graph on a matplotlib `Axes` object.
+    get_core_subgraph(k)
+        Return the k-core of the graph.
+    top_k_edges(attribute, k)
+        Return the top k edges per node based on an attribute.
+    calculate_node_weights_from_edges(...)
+        Calculate and assign node weights by summing edge weights.
+    trim_edges(...)
+        Return a new graph keeping only the top k edges per node.
+    from_pandas_edgelist(df, ...)
+        Create a `NetworkGraph` from a pandas DataFrame.
     """
 
     _nx_graph: nx.Graph
@@ -444,10 +477,10 @@ class NetworkGraph:
     def plot_network_components(self, *args: Any, **kwargs: Any) -> List:
         """Plot network components (DEPRECATED).
 
+        This method is deprecated and will be removed in a future version.
+        Use `fplot_network_components` for a figure-level plotting interface.
+
         .. deprecated:: 0.1.0
-            This method will be removed in a future version.
-            Please use `fplot_network_components` which provides a figure-level interface
-            for plotting components.
         """
         import warnings
 
@@ -589,7 +622,32 @@ def _prepare_network_graph(
     sort_by: Optional[str],
     node_list: Optional[List],
 ) -> NetworkGraph:
-    """Prepare NetworkGraph for plotting."""
+    """Prepare a `NetworkGraph` instance from a DataFrame for plotting.
+
+    This function validates the DataFrame, creates a graph from an edgelist,
+    computes the k-core, calculates node weights, and trims edges to create
+    a clean, plottable graph.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        The DataFrame containing the edge data.
+    source : str
+        The column name for source nodes.
+    target : str
+        The column name for target nodes.
+    weight : str
+        The column name for edge weights.
+    sort_by : str or None
+        The column to sort by (used for validation).
+    node_list : list or None
+        An optional list of nodes to filter the graph by.
+
+    Returns
+    -------
+    NetworkGraph
+        The prepared and cleaned graph object.
+    """
     if node_list:
         df = pd_df.loc[
             (pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))

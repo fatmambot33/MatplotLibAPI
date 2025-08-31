@@ -1,16 +1,17 @@
-"""Tests for plotting functions."""
+"""Smoke tests for plotting functions to ensure they run without errors."""
 
 import pandas as pd
+import plotly.graph_objects as go
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-import MatplotLibAPI
 
+from MatplotLibAPI.Composite import plot_composite_bubble
+from MatplotLibAPI.Network import fplot_network
 from MatplotLibAPI.Pivot import plot_pivoted_bars
 from MatplotLibAPI.Table import fplot_table
 from MatplotLibAPI.Timeserie import fplot_timeserie
 from MatplotLibAPI.Treemap import fplot_treemap
-import plotly.graph_objects as go
 
 
 def test_plot_pivoted_bars():
@@ -48,7 +49,7 @@ def test_fplot_network():
     }
     df = pd.DataFrame(data)
 
-    fig = MatplotLibAPI.fplot_network(pd_df=df)
+    fig = fplot_network(pd_df=df)
 
     assert isinstance(fig, Figure)
     plt.close()
@@ -90,7 +91,7 @@ def test_plot_composite_bubble():
     }
     df = pd.DataFrame(data)
 
-    fig = MatplotLibAPI.plot_composite_bubble(
+    fig = plot_composite_bubble(
         pd_df=df,
         label="country",
         x="gdp_per_capita",

@@ -21,11 +21,10 @@ def plot_composite_bubble(
     x: str,
     y: str,
     z: str,
-    title: Optional[str] = "Test",
+    title: Optional[str] = "Composite Bubble Chart",
     style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
     max_values: int = 50,
     center_to_mean: bool = False,
-    filter_by: Optional[str] = None,
     sort_by: Optional[str] = None,
     ascending: bool = False,
     table_rows: int = 10,
@@ -46,15 +45,13 @@ def plot_composite_bubble(
     z : str
         Column name for bubble sizes.
     title : str, optional
-        Title of the plot. The default is "Test".
+        Title of the plot. The default is "Composite Bubble Chart".
     style : StyleTemplate, optional
         Style configuration. The default is `BUBBLE_STYLE_TEMPLATE`.
     max_values : int, optional
         Maximum number of rows to display in the chart. The default is 50.
     center_to_mean : bool, optional
         Whether to center the bubbles on the mean. The default is `False`.
-    filter_by : str, optional
-        Column used to filter the data.
     sort_by : str, optional
         Column used to sort the data.
     ascending : bool, optional
@@ -71,11 +68,9 @@ def plot_composite_bubble(
     """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
 
-    if not sort_by:
-        sort_by = z
-    if not filter_by:
-        filter_by = z
-    plot_df = pd_df.sort_values(by=filter_by, ascending=ascending)[
+    sort_col = sort_by or z
+
+    plot_df = pd_df.sort_values(by=sort_col, ascending=ascending)[
         [label, x, y, z]
     ].head(max_values)
 

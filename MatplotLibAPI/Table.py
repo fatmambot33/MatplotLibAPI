@@ -22,7 +22,28 @@ def _prepare_table_data(
     max_values: int,
     style: StyleTemplate,
 ) -> pd.DataFrame:
-    """Prepare data for table plotting."""
+    """Validate, sort, and filter data for table plotting.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        The input DataFrame.
+    cols : list[str]
+        The columns to include.
+    sort_by : str or None
+        The column to sort by. If `None`, the first column in `cols` is used.
+    ascending : bool
+        The sort order.
+    max_values : int
+        The maximum number of rows to return.
+    style : StyleTemplate
+        The style configuration, used for applying formatters.
+
+    Returns
+    -------
+    pd.DataFrame
+        The prepared DataFrame.
+    """
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
 
     if sort_by is None:
@@ -43,7 +64,15 @@ def _prepare_table_data(
 
 
 def _format_table(table, style: StyleTemplate):
-    """Format the table cells and font."""
+    """Apply styling to a matplotlib table object.
+
+    Parameters
+    ----------
+    table : matplotlib.table.Table
+        The table object to format.
+    style : StyleTemplate
+        The style configuration to apply.
+    """
     table.auto_set_font_size(False)
     table.set_fontsize(style.font_size)
     table.scale(1.2, 1.2)
@@ -64,20 +93,31 @@ def aplot_table(
     ascending: bool = False,
     ax: Optional[Axes] = None,
 ) -> Axes:
-    """Render a table into the provided axes.
+    """Render a styled table into a matplotlib Axes object.
 
-    Args:
-        pd_df (pd.DataFrame): DataFrame containing the data to display.
-        cols (List[str]): Columns to include in the table.
-        title (Optional[str], optional): Table title. Defaults to ``None``.
-        style (StyleTemplate, optional): Style configuration. Defaults to ``TABLE_STYLE_TEMPLATE``.
-        max_values (int, optional): Maximum number of rows to display. Defaults to ``20``.
-        sort_by (Optional[str], optional): Column used for sorting. Defaults to ``None``.
-        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        ax (Optional[Axes], optional): Axes to draw on. Defaults to ``None``.
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing the data to display.
+    cols : list[str]
+        Columns to include in the table.
+    title : str, optional
+        Table title. Defaults to `None`.
+    style : StyleTemplate, optional
+        Style configuration. Defaults to `TABLE_STYLE_TEMPLATE`.
+    max_values : int, optional
+        Maximum number of rows to display. Defaults to 20.
+    sort_by : str, optional
+        Column used for sorting. Defaults to `None`.
+    ascending : bool, optional
+        Sort order for the data. Defaults to `False`.
+    ax : Axes, optional
+        Axes to draw on. If `None`, the current axes are used.
 
-    Returns:
-        Axes: Matplotlib axes containing the rendered table.
+    Returns
+    -------
+    Axes
+        The matplotlib axes containing the rendered table.
     """
     if ax is None:
         ax = plt.gca()
@@ -115,18 +155,29 @@ def fplot_table(
 ) -> Figure:
     """Return a new figure containing a formatted table.
 
-    Args:
-        pd_df (pd.DataFrame): DataFrame containing the data to display.
-        cols (List[str]): Columns to include in the table.
-        title (Optional[str], optional): Table title. Defaults to ``None``.
-        style (StyleTemplate, optional): Style configuration. Defaults to ``TABLE_STYLE_TEMPLATE``.
-        max_values (int, optional): Maximum number of rows to display. Defaults to ``20``.
-        sort_by (Optional[str], optional): Column used for sorting. Defaults to ``None``.
-        ascending (bool, optional): Sort order for the data. Defaults to ``False``.
-        figsize (Tuple[float, float], optional): Size of the created figure. Defaults to ``(19.2, 10.8)``.
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing the data to display.
+    cols : list[str]
+        Columns to include in the table.
+    title : str, optional
+        Table title. Defaults to `None`.
+    style : StyleTemplate, optional
+        Style configuration. Defaults to `TABLE_STYLE_TEMPLATE`.
+    max_values : int, optional
+        Maximum number of rows to display. Defaults to 20.
+    sort_by : str, optional
+        Column used for sorting. Defaults to `None`.
+    ascending : bool, optional
+        Sort order for the data. Defaults to `False`.
+    figsize : tuple[float, float], optional
+        Size of the created figure. Defaults to `(19.2, 10.8)`.
 
-    Returns:
-        Figure: Matplotlib figure containing the table.
+    Returns
+    -------
+    Figure
+        The matplotlib figure containing the table.
     """
     fig = plt.figure(figsize=figsize)
     fig.patch.set_facecolor(style.background_color)

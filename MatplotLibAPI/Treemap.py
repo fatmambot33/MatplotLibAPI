@@ -25,7 +25,7 @@ def aplot_treemap(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     max_values: int = 100,
-) -> go.Trace:
+) -> go.Treemap:
     """Create a treemap trace from the data frame.
 
     Parameters
@@ -51,8 +51,8 @@ def aplot_treemap(
 
     Returns
     -------
-    go.Trace
-        Plotly treemap trace.
+    go.Treemap
+        A Plotly `Treemap` trace object.
     """
     cols = [path, values]
     if color:
@@ -89,7 +89,7 @@ def aplot_treemap(
         root_color=style.background_color,
     )
 
-    return g  # type: ignore
+    return g
 
 
 def fplot_treemap(

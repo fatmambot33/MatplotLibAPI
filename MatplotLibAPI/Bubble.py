@@ -40,7 +40,36 @@ def _prepare_bubble_data(
     center_to_mean: bool,
     style: StyleTemplate,
 ) -> pd.DataFrame:
-    """Prepare data for bubble chart."""
+    """Validate, sort, filter, and transform data for plotting.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        The input DataFrame.
+    label : str
+        The column for bubble labels.
+    x : str
+        The column for x-axis values.
+    y : str
+        The column for y-axis values.
+    z : str
+        The column for bubble sizes.
+    sort_by : str or None
+        The column to sort by. If None, `z` is used.
+    ascending : bool
+        The sort order.
+    max_values : int
+        The maximum number of bubbles to plot.
+    center_to_mean : bool
+        Whether to center x-values around their mean.
+    style : StyleTemplate
+        The style configuration object.
+
+    Returns
+    -------
+    pd.DataFrame
+        The prepared DataFrame with added "quintile" and "fontsize" columns.
+    """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
     sort_col = sort_by or z
 
@@ -67,7 +96,23 @@ def _setup_bubble_axes(
     y: str,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Configure axes for the bubble chart."""
+    """Configure the appearance of the bubble chart axes.
+
+    Parameters
+    ----------
+    ax : Axes
+        The matplotlib axes to configure.
+    style : StyleTemplate
+        The style configuration object.
+    pd_df : pd.DataFrame
+        The DataFrame (used for axis limits).
+    x : str
+        The column for x-axis values.
+    y : str
+        The column for y-axis values.
+    format_funcs : dict or None
+        A dictionary of formatting functions for the axes.
+    """
     ax.set_facecolor(style.background_color)
 
     if style.xscale:
@@ -101,7 +146,23 @@ def _setup_bubble_axes(
 def _draw_bubbles(
     ax: Axes, plot_df: pd.DataFrame, x: str, y: str, z: str, style: StyleTemplate
 ) -> None:
-    """Draw bubbles on the axes."""
+    """Draw the bubbles onto the axes using a scatterplot.
+
+    Parameters
+    ----------
+    ax : Axes
+        The matplotlib axes to draw on.
+    plot_df : pd.DataFrame
+        The DataFrame containing the data to plot.
+    x : str
+        The column for x-axis values.
+    y : str
+        The column for y-axis values.
+    z : str
+        The column for bubble sizes.
+    style : StyleTemplate
+        The style configuration object.
+    """
     sns.scatterplot(
         data=plot_df,
         x=x,
@@ -125,7 +186,25 @@ def _draw_bubble_labels(
     style: StyleTemplate,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Draw labels for each bubble."""
+    """Draw text labels on each bubble.
+
+    Parameters
+    ----------
+    ax : Axes
+        The matplotlib axes to draw on.
+    plot_df : pd.DataFrame
+        The DataFrame containing the data to plot.
+    label : str
+        The column for bubble labels.
+    x : str
+        The column for x-axis values.
+    y : str
+        The column for y-axis values.
+    style : StyleTemplate
+        The style configuration object.
+    format_funcs : dict or None
+        A dictionary of formatting functions for the labels.
+    """
     for _, row in plot_df.iterrows():
         x_val, y_val, label_val = row[x], row[y], str(row[label])
         if format_funcs and (fmt_label := format_funcs.get(label)):
@@ -149,7 +228,25 @@ def _draw_mean_lines(
     vline: bool,
     style: StyleTemplate,
 ) -> None:
-    """Draw horizontal and vertical mean lines."""
+    """Draw horizontal and vertical lines at the mean of the data.
+
+    Parameters
+    ----------
+    ax : Axes
+        The matplotlib axes to draw on.
+    plot_df : pd.DataFrame
+        The DataFrame containing the data.
+    x : str
+        The column for x-axis values.
+    y : str
+        The column for y-axis values.
+    hline : bool
+        Whether to draw a horizontal mean line.
+    vline : bool
+        Whether to draw a vertical mean line.
+    style : StyleTemplate
+        The style configuration object.
+    """
     if vline:
         ax.axvline(
             cast(float, plot_df[x].mean()), linestyle="--", color=style.font_color
@@ -207,7 +304,8 @@ def aplot_bubble(
     vline : bool, optional
         Whether to draw a vertical line at the mean of x. The default is `False`.
     ax : Axes, optional
-        Existing matplotlib axes to use. If None, uses current axes.
+        Existing matplotlib axes to plot on. If `None`, the current axes
+        are retrieved using `plt.gca()`.
 
     Returns
     -------
