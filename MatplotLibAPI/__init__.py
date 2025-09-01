@@ -673,7 +673,7 @@ class DataFrameAccessor:
 
     def fplot_composite_treemap(
         self,
-        pathes: List[str],
+        paths: List[str],
         values: str,
         style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
         title: Optional[str] = None,
@@ -687,8 +687,8 @@ class DataFrameAccessor:
 
         Parameters
         ----------
-        pathes : list[str]
-            List of columns representing the hierarchy paths for each treemap.
+        paths : list[str]
+            Columns representing the hierarchy paths for each treemap.
         values : str
             Column with values for the treemap areas.
         style : StyleTemplate, optional
@@ -712,7 +712,7 @@ class DataFrameAccessor:
             The Plotly figure with the composite treemap, or None if the input data is empty.
         """
         pd_dfs: Dict[str, pd.DataFrame] = {}
-        for path in pathes:
+        for path in paths:
             pd_dfs[path] = self._obj
 
         return plot_composite_treemap(
