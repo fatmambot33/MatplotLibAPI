@@ -164,7 +164,7 @@ def aplot_timeserie(
         Matplotlib axes with the time series plot.
     """
     if ax is None:
-        ax = plt.gca()
+        ax = cast(Axes, plt.gca())
 
     df = _prepare_timeserie_data(pd_df, label, x, y, sort_by)
 
@@ -224,7 +224,7 @@ def fplot_timeserie(
     Figure
         Matplotlib figure containing the time series plot.
     """
-    fig = plt.figure(figsize=figsize)
+    fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     ax = aplot_timeserie(

@@ -1,6 +1,6 @@
 """Table plotting helpers."""
 
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, cast
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -91,7 +91,7 @@ def aplot_table(
         Matplotlib axes containing the rendered table.
     """
     if ax is None:
-        ax = plt.gca()
+        ax = cast(Axes, plt.gca())
 
     plot_df = _prepare_table_data(pd_df, cols, sort_by, ascending, max_values, style)
 
@@ -150,7 +150,7 @@ def fplot_table(
     matplotlib.figure.Figure
         Matplotlib figure containing the table.
     """
-    fig = plt.figure(figsize=figsize)
+    fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     ax = aplot_table(pd_df, cols, title, style, max_values, sort_by, ascending, ax)
