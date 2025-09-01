@@ -13,7 +13,7 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from MatplotLibAPI.StyleTemplate import (
+from .StyleTemplate import (
     NETWORK_STYLE_TEMPLATE,
     StyleTemplate,
     format_func,
