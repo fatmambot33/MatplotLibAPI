@@ -79,7 +79,7 @@ def plot_composite_bubble(
         [label, x, y, z]
     ].head(max_values)
 
-    fig = plt.figure(figsize=figsize)
+    fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
     grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])

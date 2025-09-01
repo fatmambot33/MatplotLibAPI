@@ -77,14 +77,14 @@ def _setup_bubble_axes(
 
     # X-axis ticks and formatting
     x_min, x_max = cast(float, pd_df[x].min()), cast(float, pd_df[x].max())
-    ax.set_xticks(generate_ticks(x_min, x_max, num_ticks=style.x_ticks))
+    ax.xaxis.set_ticks(generate_ticks(x_min, x_max, num_ticks=style.x_ticks))
     ax.xaxis.grid(True, "major", linewidth=0.5, color=style.font_color)
     if format_funcs and (fmt_x := format_funcs.get(x)):
         ax.xaxis.set_major_formatter(DynamicFuncFormatter(fmt_x))
 
     # Y-axis ticks and formatting
     y_min, y_max = cast(float, pd_df[y].min()), cast(float, pd_df[y].max())
-    ax.set_yticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
+    ax.yaxis.set_ticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
     if style.yscale == "log":
         ax.yaxis.set_minor_locator(NullLocator())
     else:
@@ -152,11 +152,11 @@ def _draw_mean_lines(
     """Draw horizontal and vertical mean lines."""
     if vline:
         ax.axvline(
-            cast(float, plot_df[x].mean()), linestyle="--", color=style.font_color
+            int(cast(float, plot_df[x].mean())), linestyle="--", color=style.font_color
         )
     if hline:
         ax.axhline(
-            cast(float, plot_df[y].mean()), linestyle="--", color=style.font_color
+            int(cast(float, plot_df[y].mean())), linestyle="--", color=style.font_color
         )
 
 
@@ -215,7 +215,7 @@ def aplot_bubble(
         The matplotlib Axes object containing the bubble chart.
     """
     if ax is None:
-        ax = plt.gca()
+        ax = cast(Axes, plt.gca())
 
     plot_df = _prepare_bubble_data(
         pd_df, label, x, y, z, sort_by, ascending, max_values, center_to_mean, style
@@ -291,7 +291,7 @@ def fplot_bubble(
     Figure
         A matplotlib Figure object containing the bubble chart.
     """
-    fig = plt.figure(figsize=figsize)
+    fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     aplot_bubble(

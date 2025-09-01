@@ -394,7 +394,7 @@ class NetworkGraph:
         """
         sns.set_palette(style.palette)
         if ax is None:
-            ax = plt.gca()
+            ax = cast(Axes, plt.gca())
 
         node_sizes, edge_widths, font_sizes = self.layout(
             min_node_size=DEFAULT["MIN_NODE_SIZE"] // 5,
@@ -705,6 +705,7 @@ def aplot_network_components(
         n_cols = int(np.ceil(np.sqrt(n_components)))
         n_rows = int(np.ceil(n_components / n_cols))
         fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=(19.2, 10.8))
+        fig = cast(Figure, fig)
         fig.patch.set_facecolor(style.background_color)
         if not isinstance(axes_grid, np.ndarray):
             axes = np.array([axes_grid])
@@ -774,7 +775,7 @@ def fplot_network(
     Figure
         Matplotlib figure with the network graph.
     """
-    fig = plt.figure(figsize=figsize)
+    fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     ax = aplot_network(
@@ -855,6 +856,7 @@ def fplot_network_components(
     n_rows = int(np.ceil(n_components / n_cols))
 
     fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=figsize)
+    fig = cast(Figure, fig)
     fig.patch.set_facecolor(style.background_color)
 
     if not isinstance(axes_grid, np.ndarray):

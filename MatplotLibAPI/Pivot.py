@@ -1,6 +1,6 @@
 """Pivot chart helpers for bar and line plots."""
 
-from typing import Optional
+from typing import Optional, cast
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -114,8 +114,8 @@ def plot_pivoted_bars(
         ascending=ascending,
     )
 
-    if not ax:
-        ax = plt.gca()
+    if ax is None:
+        ax = cast(Axes, plt.gca())
 
     pivot_df.plot(kind="bar", x=x, stacked=stacked, ax=ax, alpha=0.7)
 
