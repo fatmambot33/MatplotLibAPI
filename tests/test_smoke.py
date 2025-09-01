@@ -1,9 +1,10 @@
 """Smoke tests for the MatplotLibAPI package."""
 
 import MatplotLibAPI
-import pandas as pd
-from matplotlib.axes import Axes
+
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+import pandas as pd
 
 
 def test_import():
