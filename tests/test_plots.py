@@ -100,3 +100,13 @@ def test_plot_composite_bubble():
 
     assert isinstance(fig, Figure)
     plt.close()
+
+
+def test_dataframe_accessor_fplot_composite_treemap():
+    """Test fplot_composite_treemap via the pandas accessor."""
+    data = {"group": ["A", "B", "C"], "value": [10, 20, 30]}
+    df = pd.DataFrame(data)
+
+    fig = df.mpl.fplot_composite_treemap(paths=["group"], values="value")
+
+    assert isinstance(fig, go.Figure)
