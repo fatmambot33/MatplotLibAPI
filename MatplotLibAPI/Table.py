@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
+from matplotlib.table import Table
 
 from .StyleTemplate import StyleTemplate, string_formatter, validate_dataframe
 
@@ -22,7 +23,33 @@ def _prepare_table_data(
     max_values: int,
     style: StyleTemplate,
 ) -> pd.DataFrame:
-    """Prepare data for table plotting."""
+    """Prepare data for table plotting.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        Input DataFrame.
+    cols : List[str]
+        Columns to include in the table.
+    sort_by : Optional[str]
+        Column to sort by.
+    ascending : bool
+        Sort order.
+    max_values : int
+        Maximum number of rows to display.
+    style : StyleTemplate
+        Styling for the plot.
+
+    Returns
+    -------
+    pd.DataFrame
+        Prepared DataFrame for plotting.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are missing from the DataFrame.
+    """
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
 
     if sort_by is None:
@@ -42,8 +69,16 @@ def _prepare_table_data(
     return plot_df
 
 
-def _format_table(table, style: StyleTemplate):
-    """Format the table cells and font."""
+def _format_table(table: Table, style: StyleTemplate):
+    """Format the table cells and font.
+
+    Parameters
+    ----------
+    table : matplotlib.table.Table
+        The table object to format.
+    style : StyleTemplate
+        The style configuration to apply.
+    """
     table.auto_set_font_size(False)
     table.set_fontsize(style.font_size)
     table.scale(1.2, 1.2)
@@ -89,6 +124,21 @@ def aplot_table(
     -------
     matplotlib.axes.Axes
         Matplotlib axes containing the rendered table.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are not in the DataFrame.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import matplotlib.pyplot as plt
+    >>> from MatplotLibAPI.Table import aplot_table
+    >>> data = {'col1': [1, 2], 'col2': [3, 4]}
+    >>> df = pd.DataFrame(data)
+    >>> fig, ax = plt.subplots()
+    >>> aplot_table(df, cols=['col1', 'col2'], ax=ax)
     """
     if ax is None:
         ax = cast(Axes, plt.gca())
@@ -149,6 +199,19 @@ def fplot_table(
     -------
     matplotlib.figure.Figure
         Matplotlib figure containing the table.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are not in the DataFrame.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from MatplotLibAPI.Table import fplot_table
+    >>> data = {'col1': [1, 2], 'col2': [3, 4]}
+    >>> df = pd.DataFrame(data)
+    >>> fig = fplot_table(df, cols=['col1', 'col2'])
     """
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)

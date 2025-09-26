@@ -26,7 +26,31 @@ from .StyleTemplate import (
 def _prepare_timeserie_data(
     pd_df: pd.DataFrame, label: str, x: str, y: str, sort_by: Optional[str]
 ) -> pd.DataFrame:
-    """Prepare data for time series plotting."""
+    """Prepare data for time series plotting.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        Input DataFrame.
+    label : str
+        Column to group series by.
+    x : str
+        Column for x-axis values (time).
+    y : str
+        Column for y-axis values.
+    sort_by : Optional[str]
+        Column to sort by before plotting.
+
+    Returns
+    -------
+    pd.DataFrame
+        Prepared DataFrame with a datetime index.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are missing from the DataFrame.
+    """
     validate_dataframe(pd_df, cols=[label, x, y], sort_by=sort_by)
     df = pd_df[[label, x, y]].sort_values(by=[label, x])  # type: ignore
     df[x] = pd.to_datetime(df[x])
@@ -44,7 +68,27 @@ def _plot_timeserie_lines(
     style: StyleTemplate,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Plot the time series lines on the axes."""
+    """Plot the time series lines on the axes.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes object.
+    df : pd.DataFrame
+        DataFrame with data for plotting.
+    label : str
+        Column used to group series.
+    x : str
+        Column for x-axis values.
+    y : str
+        Column for y-axis values.
+    std : bool
+        Whether to plot rolling standard deviation.
+    style : StyleTemplate
+        Styling for the plot.
+    format_funcs : Optional[Dict[str, Optional[FormatterFunc]]]
+        Functions to format labels and values.
+    """
     sns.set_palette(style.palette)
     # Get unique dimension_types
     label_types = df[label].unique()
@@ -91,7 +135,23 @@ def _setup_timeserie_axes(
     style: StyleTemplate,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Configure the axes for the time series plot."""
+    """Configure the axes for the time series plot.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes object.
+    label : str
+        Column used for grouping and legend title.
+    x : str
+        Column for x-axis label.
+    y : str
+        Column for y-axis label.
+    style : StyleTemplate
+        Styling for the plot.
+    format_funcs : Optional[Dict[str, Optional[FormatterFunc]]]
+        Functions to format axis tick labels.
+    """
     ax.legend(
         title=label,
         fontsize=style.font_size - 4,
@@ -162,6 +222,25 @@ def aplot_timeserie(
     -------
     Axes
         Matplotlib axes with the time series plot.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are not in the DataFrame.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import matplotlib.pyplot as plt
+    >>> from MatplotLibAPI.Timeserie import aplot_timeserie
+    >>> data = {
+    ...     'date': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-01', '2023-01-02']),
+    ...     'category': ['A', 'A', 'B', 'B'],
+    ...     'value': [10, 12, 15, 13]
+    ... }
+    >>> df = pd.DataFrame(data)
+    >>> fig, ax = plt.subplots()
+    >>> aplot_timeserie(df, label='category', x='date', y='value', ax=ax)
     """
     if ax is None:
         ax = cast(Axes, plt.gca())
@@ -223,6 +302,23 @@ def fplot_timeserie(
     -------
     Figure
         Matplotlib figure containing the time series plot.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are not in the DataFrame.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from MatplotLibAPI.Timeserie import fplot_timeserie
+    >>> data = {
+    ...     'date': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-01', '2023-01-02']),
+    ...     'category': ['A', 'A', 'B', 'B'],
+    ...     'value': [10, 12, 15, 13]
+    ... }
+    >>> df = pd.DataFrame(data)
+    >>> fig = fplot_timeserie(df, label='category', x='date', y='value')
     """
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
