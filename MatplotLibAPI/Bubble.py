@@ -40,7 +40,41 @@ def _prepare_bubble_data(
     center_to_mean: bool,
     style: StyleTemplate,
 ) -> pd.DataFrame:
-    """Prepare data for bubble chart."""
+    """Prepare data for bubble chart.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        Input DataFrame.
+    label : str
+        Column name for bubble labels.
+    x : str
+        Column name for x-axis values.
+    y : str
+        Column name for y-axis values.
+    z : str
+        Column name for bubble sizes.
+    sort_by : Optional[str]
+        Column to sort by.
+    ascending : bool
+        Sort order.
+    max_values : int
+        Maximum number of bubbles to display.
+    center_to_mean : bool
+        Whether to center x-axis values around the mean.
+    style : StyleTemplate
+        Styling for the plot.
+
+    Returns
+    -------
+    pd.DataFrame
+        Prepared DataFrame for plotting.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are missing from the DataFrame.
+    """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
     sort_col = sort_by or z
 
@@ -67,7 +101,23 @@ def _setup_bubble_axes(
     y: str,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Configure axes for the bubble chart."""
+    """Configure axes for the bubble chart.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes object.
+    style : StyleTemplate
+        Styling for the plot.
+    pd_df : pd.DataFrame
+        DataFrame used for plotting.
+    x : str
+        Column name for x-axis values.
+    y : str
+        Column name for y-axis values.
+    format_funcs : Optional[Dict[str, Optional[FormatterFunc]]]
+        Functions to format axis tick labels.
+    """
     ax.set_facecolor(style.background_color)
 
     if style.xscale:
@@ -101,7 +151,23 @@ def _setup_bubble_axes(
 def _draw_bubbles(
     ax: Axes, plot_df: pd.DataFrame, x: str, y: str, z: str, style: StyleTemplate
 ) -> None:
-    """Draw bubbles on the axes."""
+    """Draw bubbles on the axes.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes object.
+    plot_df : pd.DataFrame
+        DataFrame with data for plotting.
+    x : str
+        Column name for x-axis values.
+    y : str
+        Column name for y-axis values.
+    z : str
+        Column name for bubble sizes.
+    style : StyleTemplate
+        Styling for the plot.
+    """
     sns.scatterplot(
         data=plot_df,
         x=x,
@@ -125,7 +191,25 @@ def _draw_bubble_labels(
     style: StyleTemplate,
     format_funcs: Optional[Dict[str, Optional[FormatterFunc]]],
 ) -> None:
-    """Draw labels for each bubble."""
+    """Draw labels for each bubble.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes object.
+    plot_df : pd.DataFrame
+        DataFrame with data for plotting.
+    label : str
+        Column name for bubble labels.
+    x : str
+        Column name for x-axis values.
+    y : str
+        Column name for y-axis values.
+    style : StyleTemplate
+        Styling for the plot.
+    format_funcs : Optional[Dict[str, Optional[FormatterFunc]]]
+        Functions to format bubble labels.
+    """
     for _, row in plot_df.iterrows():
         x_val, y_val, label_val = row[x], row[y], str(row[label])
         if format_funcs and (fmt_label := format_funcs.get(label)):
@@ -149,7 +233,25 @@ def _draw_mean_lines(
     vline: bool,
     style: StyleTemplate,
 ) -> None:
-    """Draw horizontal and vertical mean lines."""
+    """Draw horizontal and vertical mean lines.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes object.
+    plot_df : pd.DataFrame
+        DataFrame with data for plotting.
+    x : str
+        Column name for x-axis values.
+    y : str
+        Column name for y-axis values.
+    hline : bool
+        Whether to draw a horizontal line at the mean of y.
+    vline : bool
+        Whether to draw a vertical line at the mean of x.
+    style : StyleTemplate
+        Styling for the plot.
+    """
     if vline:
         ax.axvline(
             int(cast(float, plot_df[x].mean())), linestyle="--", color=style.font_color
@@ -213,6 +315,26 @@ def aplot_bubble(
     -------
     Axes
         The matplotlib Axes object containing the bubble chart.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are not in the DataFrame.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import matplotlib.pyplot as plt
+    >>> from MatplotLibAPI.Bubble import aplot_bubble
+    >>> data = {
+    ...     'country': ['A', 'B', 'C', 'D'],
+    ...     'gdp_per_capita': [45000, 42000, 52000, 48000],
+    ...     'life_expectancy': [81, 78, 83, 82],
+    ...     'population': [10, 20, 5, 30]
+    ... }
+    >>> df = pd.DataFrame(data)
+    >>> fig, ax = plt.subplots()
+    >>> aplot_bubble(df, label='country', x='gdp_per_capita', y='life_expectancy', z='population', ax=ax)
     """
     if ax is None:
         ax = cast(Axes, plt.gca())
@@ -223,7 +345,7 @@ def aplot_bubble(
 
     format_funcs = format_func(style.format_funcs, label=label, x=x, y=y, z=z)
 
-    _setup_bubble_axes(ax, style, pd_df, x, y, format_funcs)
+    _setup_bubble_axes(ax, style, plot_df, x, y, format_funcs)
 
     _draw_bubbles(ax, plot_df, x, y, z, style)
 
@@ -290,6 +412,24 @@ def fplot_bubble(
     -------
     Figure
         A matplotlib Figure object containing the bubble chart.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are not in the DataFrame.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from MatplotLibAPI.Bubble import fplot_bubble
+    >>> data = {
+    ...     'country': ['A', 'B', 'C', 'D'],
+    ...     'gdp_per_capita': [45000, 42000, 52000, 48000],
+    ...     'life_expectancy': [81, 78, 83, 82],
+    ...     'population': [10, 20, 5, 30]
+    ... }
+    >>> df = pd.DataFrame(data)
+    >>> fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='life_expectancy', z='population')
     """
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
