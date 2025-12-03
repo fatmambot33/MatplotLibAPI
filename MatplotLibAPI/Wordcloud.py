@@ -81,7 +81,7 @@ def _prepare_word_frequencies(
     weight_column: Optional[str],
     max_words: int,
     stopwords: Optional[Iterable[str]],
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[list[str], list[float]]:
     """Aggregate and filter word frequencies.
 
     Parameters
@@ -99,8 +99,8 @@ def _prepare_word_frequencies(
 
     Returns
     -------
-    tuple of numpy.ndarray
-        Arrays of filtered words and their corresponding weights.
+    tuple of list
+        Lists of filtered words and their corresponding weights.
 
     Raises
     ------
@@ -110,11 +110,11 @@ def _prepare_word_frequencies(
     validate_dataframe(pd_df, cols=[text_column], sort_by=weight_column)
 
     if weight_column is None:
-        freq_series = pd_df[text_column].value_counts()
+        freq_series: pd.Series = pd_df[text_column].value_counts()
     else:
-        freq_series = (
-            pd_df.groupby(text_column)[weight_column].sum().sort_values(ascending=False)
-        )
+        weight_col = cast(str, weight_column)
+        freq_series = cast(pd.Series, pd_df.groupby(text_column)[weight_col].sum())
+        freq_series = freq_series.sort_values(ascending=False)
 
     words = freq_series.index.to_numpy()
     weights = freq_series.to_numpy(dtype=float)
@@ -124,8 +124,8 @@ def _prepare_word_frequencies(
     weights = weights[mask]
 
     sorted_indices = np.argsort(weights)[::-1]
-    words = words[sorted_indices][:max_words]
-    weights = weights[sorted_indices][:max_words]
+    words = words[sorted_indices][:max_words].tolist()
+    weights = weights[sorted_indices][:max_words].tolist()
 
     return words, weights
 
