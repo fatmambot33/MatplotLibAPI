@@ -292,7 +292,10 @@ def fplot_wordcloud(
     AttributeError
         If required columns are missing from the DataFrame.
     """
-    fig, ax = plt.subplots(figsize=figsize)
+    fig_raw, ax_raw = plt.subplots(figsize=figsize)
+    fig = cast(Figure, fig_raw)
+    ax = cast(Axes, ax_raw)
+
     _plot_words(
         ax,
         *_prepare_word_frequencies(
