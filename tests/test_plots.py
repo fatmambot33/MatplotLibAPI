@@ -108,7 +108,9 @@ def test_fplot_wordcloud():
     data = {"word": ["alpha", "beta", "gamma", "alpha"], "weight": [2, 1, 3, 1]}
     df = pd.DataFrame(data)
 
-    fig = fplot_wordcloud(pd_df=df, text_column="word", weight_column="weight", random_state=42)
+    fig = fplot_wordcloud(
+        pd_df=df, text_column="word", weight_column="weight", random_state=42
+    )
 
     assert isinstance(fig, Figure)
     plt.close()

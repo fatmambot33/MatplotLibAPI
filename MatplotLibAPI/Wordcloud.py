@@ -11,9 +11,17 @@ from matplotlib import colormaps
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import FIG_SIZE, MAX_RESULTS, StyleTemplate, string_formatter, validate_dataframe
+from .StyleTemplate import (
+    FIG_SIZE,
+    MAX_RESULTS,
+    StyleTemplate,
+    string_formatter,
+    validate_dataframe,
+)
 
-WORDCLOUD_STYLE_TEMPLATE = StyleTemplate(background_color="black", font_color="white", palette="plasma")
+WORDCLOUD_STYLE_TEMPLATE = StyleTemplate(
+    background_color="black", font_color="white", palette="plasma"
+)
 
 
 def _normalize_weights(weights: Sequence[float], base_size: int) -> np.ndarray:
@@ -43,7 +51,9 @@ def _normalize_weights(weights: Sequence[float], base_size: int) -> np.ndarray:
     return np.interp(numeric_weights, (min_weight, max_weight), (min_size, max_size))
 
 
-def _filter_stopwords(words: Iterable[str], stopwords: Optional[Iterable[str]]) -> np.ndarray:
+def _filter_stopwords(
+    words: Iterable[str], stopwords: Optional[Iterable[str]]
+) -> np.ndarray:
     """Remove stopwords from a sequence of words.
 
     Parameters
@@ -102,7 +112,9 @@ def _prepare_word_frequencies(
     if weight_column is None:
         freq_series = pd_df[text_column].value_counts()
     else:
-        freq_series = pd_df.groupby(text_column)[weight_column].sum().sort_values(ascending=False)
+        freq_series = (
+            pd_df.groupby(text_column)[weight_column].sum().sort_values(ascending=False)
+        )
 
     words = freq_series.index.to_numpy()
     weights = freq_series.to_numpy(dtype=float)
@@ -231,7 +243,9 @@ def aplot_wordcloud(
         max_words=max_words,
         stopwords=stopwords,
     )
-    return _plot_words(ax, words, weights, style=style, title=title, random_state=random_state)
+    return _plot_words(
+        ax, words, weights, style=style, title=title, random_state=random_state
+    )
 
 
 def fplot_wordcloud(
