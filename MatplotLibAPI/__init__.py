@@ -21,6 +21,7 @@ from .StyleTemplate import StyleTemplate
 from .Table import TABLE_STYLE_TEMPLATE, aplot_table, fplot_table
 from .Timeserie import TIMESERIE_STYLE_TEMPLATE, aplot_timeserie, fplot_timeserie
 from .Treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap, fplot_treemap
+from .Wordcloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
 
 
 @register_dataframe_accessor("mpl")
@@ -43,6 +44,10 @@ class DataFrameAccessor:
         Plot a time series on a Matplotlib axes.
     fplot_timeserie
         Plot a time series on a new figure.
+    aplot_wordcloud
+        Plot a word cloud on a Matplotlib axes.
+    fplot_wordcloud
+        Plot a word cloud on a new figure.
     aplot_network
         Plot a network graph on a Matplotlib axes.
     aplot_network_components
@@ -465,6 +470,104 @@ class DataFrameAccessor:
             figsize=figsize,
         )
 
+    def aplot_wordcloud(
+        self,
+        text_column: str,
+        weight_column: Optional[str] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        max_words: int = 50,
+        stopwords: Optional[List[str]] = None,
+        random_state: Optional[int] = None,
+        ax: Optional[Axes] = None,
+    ) -> Axes:
+        """Plot a word cloud on a Matplotlib axes.
+
+        Parameters
+        ----------
+        text_column : str
+            Column containing words or phrases.
+        weight_column : str, optional
+            Column containing numeric weights. The default is ``None`` for equal weights.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `WORDCLOUD_STYLE_TEMPLATE`.
+        max_words : int, optional
+            Maximum number of words to display. The default is 50.
+        stopwords : list[str], optional
+            Words to exclude from the visualization. The default is ``None``.
+        random_state : int, optional
+            Seed for word placement. The default is ``None``.
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, uses the current axes.
+
+        Returns
+        -------
+        Axes
+            The Matplotlib axes object with the plot.
+        """
+        return aplot_wordcloud(
+            pd_df=self._obj,
+            text_column=text_column,
+            weight_column=weight_column,
+            title=title,
+            style=style,
+            max_words=max_words,
+            stopwords=stopwords,
+            random_state=random_state,
+            ax=ax,
+        )
+
+    def fplot_wordcloud(
+        self,
+        text_column: str,
+        weight_column: Optional[str] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        max_words: int = 50,
+        stopwords: Optional[List[str]] = None,
+        random_state: Optional[int] = None,
+        figsize: Tuple[float, float] = (19.2, 10.8),
+    ) -> Figure:
+        """Plot a word cloud on a new figure.
+
+        Parameters
+        ----------
+        text_column : str
+            Column containing words or phrases.
+        weight_column : str, optional
+            Column containing numeric weights. The default is ``None`` for equal weights.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `WORDCLOUD_STYLE_TEMPLATE`.
+        max_words : int, optional
+            Maximum number of words to display. The default is 50.
+        stopwords : list[str], optional
+            Words to exclude from the visualization. The default is ``None``.
+        random_state : int, optional
+            Seed for word placement. The default is ``None``.
+        figsize : tuple[float, float], optional
+            Figure size. The default is (19.2, 10.8).
+
+        Returns
+        -------
+        Figure
+            The new Matplotlib figure with the plot.
+        """
+        return fplot_wordcloud(
+            pd_df=self._obj,
+            text_column=text_column,
+            weight_column=weight_column,
+            title=title,
+            style=style,
+            max_words=max_words,
+            stopwords=stopwords,
+            random_state=random_state,
+            figsize=figsize,
+        )
+
     def aplot_network(
         self,
         source: str = "source",
@@ -735,10 +838,12 @@ __all__ = [
     "aplot_network_components",
     "aplot_table",
     "aplot_timeserie",
+    "aplot_wordcloud",
     "fplot_bubble",
     "fplot_network",
     "fplot_table",
     "fplot_timeserie",
+    "fplot_wordcloud",
     "fplot_treemap",
     "plot_composite_bubble",
     "plot_composite_treemap",

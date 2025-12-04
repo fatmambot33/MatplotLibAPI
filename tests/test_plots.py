@@ -10,6 +10,7 @@ from MatplotLibAPI.Pivot import plot_pivoted_bars
 from MatplotLibAPI.Table import fplot_table
 from MatplotLibAPI.Timeserie import fplot_timeserie
 from MatplotLibAPI.Treemap import fplot_treemap
+from MatplotLibAPI.Wordcloud import fplot_wordcloud
 import plotly.graph_objects as go
 
 
@@ -96,6 +97,19 @@ def test_plot_composite_bubble():
         x="gdp_per_capita",
         y="life_expectancy",
         z="population",
+    )
+
+    assert isinstance(fig, Figure)
+    plt.close()
+
+
+def test_fplot_wordcloud():
+    """Test fplot_wordcloud returns a Figure object."""
+    data = {"word": ["alpha", "beta", "gamma", "alpha"], "weight": [2, 1, 3, 1]}
+    df = pd.DataFrame(data)
+
+    fig = fplot_wordcloud(
+        pd_df=df, text_column="word", weight_column="weight", random_state=42
     )
 
     assert isinstance(fig, Figure)

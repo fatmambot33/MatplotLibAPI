@@ -2,8 +2,7 @@
 
 import logging
 from collections import defaultdict
-from collections.abc import Iterable
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 import networkx as nx
