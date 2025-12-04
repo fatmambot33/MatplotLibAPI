@@ -441,12 +441,11 @@ class NetworkGraph:
         return ax
 
     def plot_network_components(self, *args: Any, **kwargs: Any) -> List:
-        """Plot network components (DEPRECATED).
+        """Plot network components.
 
         .. deprecated:: 0.1.0
-            This method will be removed in a future version.
-            Please use `fplot_network_components` which provides a figure-level interface
-            for plotting components.
+          `plot_network_components` will be removed in a future version.
+          Use `fplot_network_components` instead.
         """
         import warnings
 
@@ -686,8 +685,8 @@ def aplot_network_components(
         Nodes to include.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
-    axes : np.ndarray, optional
-        Existing axes to draw on. If None, new axes are created.
+    axes : np.ndarray
+        Existing axes to draw on.
     """
     graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
@@ -700,16 +699,7 @@ def aplot_network_components(
         return
 
     if axes is None:
-        n_components = len(connected_components)
-        n_cols = int(np.ceil(np.sqrt(n_components)))
-        n_rows = int(np.ceil(n_components / n_cols))
-        fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=(19.2, 10.8))
-        fig = cast(Figure, fig)
-        fig.patch.set_facecolor(style.background_color)
-        if not isinstance(axes_grid, np.ndarray):
-            axes = np.array([axes_grid])
-        else:
-            axes = axes_grid.flatten()
+        return
 
     i = -1
     for i, component in enumerate(connected_components):
