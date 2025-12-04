@@ -683,7 +683,7 @@ def aplot_network(
 
 def aplot_network_components(
     pd_df: pd.DataFrame,
-    axes: np.ndarray,
+    axes: Optional[np.ndarray],
     source: str = "source",
     target: str = "target",
     weight: str = "weight",
@@ -718,18 +718,17 @@ def aplot_network_components(
     axes : np.ndarray
         Existing axes to draw on.
     """
+    if axes is None:
+        return
+
     graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
 
     if not connected_components:
-        if axes is not None:
-            for ax in axes.flatten():
-                ax.set_axis_off()
+        for ax in axes.flatten():
+            ax.set_axis_off()
         return
-
-
-      
 
     i = -1
     for i, component in enumerate(connected_components):
@@ -747,9 +746,8 @@ def aplot_network_components(
             break  # Stop if there are more components than axes
 
     # Turn off any unused axes
-    if axes is not None:
-        for j in range(i + 1, len(axes)):
-            axes[j].set_axis_off()
+    for j in range(i + 1, len(axes)):
+        axes[j].set_axis_off()
 
 
 def fplot_network(
