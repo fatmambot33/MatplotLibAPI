@@ -440,6 +440,22 @@ class NetworkGraph:
 
         return ax
 
+    def plot_network_components(self, *args: Any, **kwargs: Any) -> List:
+        """Plot network components.
+
+        .. deprecated:: 0.1.0
+          `plot_network_components` will be removed in a future version.
+          Use `fplot_network_components` instead.
+        """
+        import warnings
+
+        warnings.warn(
+            "`plot_network_components` is deprecated and will be removed in a future version. "
+            "Please use `fplot_network_components`.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return []
 
     def get_core_subgraph(self, k: int = 2) -> "NetworkGraph":
         """Return the k-core of the graph.
