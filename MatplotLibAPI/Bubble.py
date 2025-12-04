@@ -365,7 +365,7 @@ def fplot_bubble(
     x: str,
     y: str,
     z: str,
-    title: Optional[str] = "Bubble Chart",
+    title: Optional[str] = None,
     style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
     max_values: int = MAX_RESULTS,
     center_to_mean: bool = False,
@@ -390,7 +390,7 @@ def fplot_bubble(
     z : str
         Column name for bubble sizes.
     title : str, optional
-        Title for the chart. The default is "Bubble Chart".
+        Title for the chart. The default is ``None``.
     style : StyleTemplate, optional
         Plot styling. The default is `BUBBLE_STYLE_TEMPLATE`.
     max_values : int, optional

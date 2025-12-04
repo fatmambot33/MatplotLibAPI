@@ -21,7 +21,7 @@ def plot_composite_bubble(
     x: str,
     y: str,
     z: str,
-    title: Optional[str] = "Test",
+    title: Optional[str] = None,
     style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
     max_values: int = 50,
     center_to_mean: bool = False,
@@ -46,7 +46,7 @@ def plot_composite_bubble(
     z : str
         Column name for bubble sizes.
     title : str, optional
-        Title of the plot. The default is "Test".
+        Title of the plot. The default is ``None``.
     style : StyleTemplate, optional
         Style configuration. The default is `BUBBLE_STYLE_TEMPLATE`.
     max_values : int, optional
