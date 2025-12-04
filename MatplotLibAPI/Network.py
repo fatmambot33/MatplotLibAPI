@@ -582,6 +582,20 @@ class NetworkGraph:
 def compute_network_grid(
     connected_components: List[set], style: StyleTemplate
 ) -> tuple[Figure, np.ndarray]:
+    """Compute the grid layout for network component subplots.
+
+    Parameters
+    ----------
+    connected_components : list[set]
+        A list of sets, where each set contains the nodes of a connected component.
+    style : StyleTemplate
+        The style template used for plotting.
+
+    Returns
+    -------
+    tuple[Figure, np.ndarray]
+        A tuple containing the Matplotlib figure and the grid of axes.
+    """
     n_components = len(connected_components)
     n_cols = int(np.ceil(np.sqrt(n_components)))
     n_rows = int(np.ceil(n_components / n_cols))
@@ -734,12 +748,11 @@ def aplot_network_components(
     axes : np.ndarray
         Existing axes to draw on.
     """
-
     graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
     if axes is None:
-        fig, axes =compute_network_grid(connected_components, style)
+        fig, axes = compute_network_grid(connected_components, style)
     if not connected_components:
         for ax in axes.flatten():
             ax.set_axis_off()
