@@ -10,6 +10,7 @@ from matplotlib.figure import Figure
 from pandas.api.extensions import register_dataframe_accessor
 
 from .Bubble import BUBBLE_STYLE_TEMPLATE, aplot_bubble, fplot_bubble
+from .Sunburst import fplot_sunburst
 from .Composite import plot_composite_bubble, plot_composite_treemap
 from .Network import (
     NETWORK_STYLE_TEMPLATE,
@@ -57,6 +58,8 @@ class DataFrameAccessor:
         Plot a network graph on a new figure.
     fplot_treemap
         Plot a treemap on a new Plotly figure.
+    fplot_sunburst
+        Plot a sunburst chart on a new Plotly figure.
     fplot_composite_treemap
         Plot a composite treemap on a new Plotly figure.
     """
@@ -775,6 +778,58 @@ class DataFrameAccessor:
             fig=fig,
         )
 
+    def fplot_sunburst(
+        self,
+        labels: str,
+        parents: str,
+        values: str,
+        style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+        title: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        max_values: int = 100,
+        fig: Optional[go.Figure] = None,
+    ) -> go.Figure:
+        """Plot a sunburst chart on a new Plotly figure.
+
+        Parameters
+        ----------
+        labels : str
+            Column representing the labels of the sectors.
+        parents : str
+            Column representing the parent of each sector.
+        values : str
+            Column with values for the sunburst areas.
+        style : StyleTemplate, optional
+            Styling template. The default is `TREEMAP_STYLE_TEMPLATE`.
+        title : str, optional
+            Chart title.
+        sort_by : str, optional
+            Column to sort by.
+        max_values : int, optional
+            Maximum number of items to display. The default is 100.
+        ascending : bool, optional
+            Sort order. The default is `False`.
+        fig : go.Figure, optional
+            Existing Plotly figure to add to. If None, a new figure is created.
+        Returns
+        -------
+        go.Figure
+            The Plotly figure with the sunburst chart.
+        """
+        return fplot_sunburst(
+            pd_df=self._obj,
+            labels=labels,
+            parents=parents,
+            values=values,
+            title=title,
+            style=style,
+            sort_by=sort_by,
+            ascending=ascending,
+            max_values=max_values,
+            fig=fig,
+        )
+
     def fplot_composite_treemap(
         self,
         paths: List[str],
@@ -846,6 +901,7 @@ __all__ = [
     "fplot_timeserie",
     "fplot_wordcloud",
     "fplot_treemap",
+    "fplot_sunburst",
     "plot_composite_bubble",
     "plot_composite_treemap",
     "prepare_network_graph",
