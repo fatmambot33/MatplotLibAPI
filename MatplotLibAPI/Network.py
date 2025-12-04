@@ -653,6 +653,7 @@ def aplot_network(
 
 def aplot_network_components(
     pd_df: pd.DataFrame,
+    axes: np.ndarray,
     source: str = "source",
     target: str = "target",
     weight: str = "weight",
@@ -661,7 +662,6 @@ def aplot_network_components(
     sort_by: Optional[str] = None,
     node_list: Optional[List] = None,
     ascending: bool = False,
-    axes: Optional[np.ndarray] = None,
 ) -> None:
     """Plot network components separately on multiple axes.
 
