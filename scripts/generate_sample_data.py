@@ -7,10 +7,10 @@ import pandas as pd
 def generate_bubble_data():
     """Generate and save sample data for a bubble chart."""
     data = {
-        "country": ["A", "B", "C", "D"],
-        "gdp_per_capita": [45000, 42000, 52000, 48000],
-        "life_expectancy": [81, 78, 83, 82],
-        "population": [10, 20, 5, 30],
+        "country": ["USA", "China", "India", "Brazil", "Nigeria"],
+        "population": [331, 1441, 1393, 213, 206],  # in millions
+        "gdp_per_capita": [63593, 10500, 2191, 7741, 2229],
+        "continent": ["North America", "Asia", "Asia", "South America", "Africa"],
     }
     df = pd.DataFrame(data)
     df.to_csv("data/bubble.csv", index=False)
@@ -19,9 +19,9 @@ def generate_bubble_data():
 def generate_network_data():
     """Generate and save sample data for a network graph."""
     data = {
-        "source": ["A", "B", "C", "D"],
-        "target": ["B", "C", "D", "A"],
-        "weight": [1, 1, 1, 1],
+        "city_a": ["New York", "London", "Tokyo", "Sydney", "New York"],
+        "city_b": ["London", "Tokyo", "Sydney", "New York", "Tokyo"],
+        "distance_km": [5585, 9562, 7824, 16027, 10850],
     }
     df = pd.DataFrame(data)
     df.to_csv("data/network.csv", index=False)
@@ -30,9 +30,9 @@ def generate_network_data():
 def generate_pivot_data():
     """Generate and save sample data for a pivot table."""
     data = {
-        "date": ["2023-01-01", "2023-01-01", "2023-01-02", "2023-01-02"],
-        "category": ["A", "B", "A", "B"],
-        "value": [10, 20, 15, 25],
+        "year": [2020, 2020, 2021, 2021, 2022, 2022],
+        "city": ["New York", "Tokyo", "New York", "Tokyo", "New York", "Tokyo"],
+        "population_increase": [10000, 5000, 12000, 4000, 11000, 6000],
     }
     df = pd.DataFrame(data)
     df.to_csv("data/pivot.csv", index=False)
@@ -40,7 +40,10 @@ def generate_pivot_data():
 
 def generate_table_data():
     """Generate and save sample data for a table."""
-    data = {"col1": [1, 2, 3], "col2": ["A", "B", "C"]}
+    data = {
+        "country": ["USA", "China", "India", "Brazil", "Nigeria"],
+        "capital": ["Washington D.C.", "Beijing", "New Delhi", "Brasília", "Abuja"],
+    }
     df = pd.DataFrame(data)
     df.to_csv("data/table.csv", index=False)
 
@@ -48,9 +51,18 @@ def generate_table_data():
 def generate_timeserie_data():
     """Generate and save sample data for a timeseries plot."""
     data = {
-        "date": pd.to_datetime(["2023-01-01", "2023-01-02", "2023-01-03"]),
-        "group": ["A", "A", "B"],
-        "value": [1, 2, 3],
+        "year": pd.to_datetime(
+            [
+                "2020-01-01",
+                "2021-01-01",
+                "2022-01-01",
+                "2020-01-01",
+                "2021-01-01",
+                "2022-01-01",
+            ]
+        ),
+        "city": ["New York", "New York", "New York", "Tokyo", "Tokyo", "Tokyo"],
+        "population": [8.4, 8.5, 8.6, 13.9, 13.9, 14.0],  # in millions
     }
     df = pd.DataFrame(data)
     df.to_csv("data/timeserie.csv", index=False)
@@ -58,27 +70,77 @@ def generate_timeserie_data():
 
 def generate_treemap_data():
     """Generate and save sample data for a treemap."""
-    data = {"path": ["A", "B", "C"], "values": [10, 20, 30]}
+    data = {
+        "location": [
+            "North America",
+            "Asia",
+            "South America",
+            "Africa",
+            "USA",
+            "China",
+            "India",
+            "Brazil",
+            "Nigeria",
+        ],
+        "parent": [
+            "",
+            "",
+            "",
+            "",
+            "North America",
+            "Asia",
+            "Asia",
+            "South America",
+            "Africa",
+        ],
+        "population": [579, 4561, 422, 1216, 331, 1441, 1393, 213, 206],  # in millions
+    }
     df = pd.DataFrame(data)
+    # For treemap, we need a path-like structure. We will create it here.
+    df["path"] = df["parent"] + "/" + df["location"]
+    df["path"] = df["path"].str.lstrip("/")
     df.to_csv("data/treemap.csv", index=False)
 
 
 def generate_sunburst_data():
     """Generate and save sample data for a sunburst chart."""
     data = {
-        "labels": [
-            "Eve",
-            "Cain",
-            "Seth",
-            "Enos",
-            "Noam",
-            "Abel",
-            "Awan",
-            "Enoch",
-            "Azura",
+        "name": [
+            "World",
+            "North America",
+            "Asia",
+            "South America",
+            "Africa",
+            "USA",
+            "China",
+            "India",
+            "Brazil",
+            "Nigeria",
         ],
-        "parents": ["", "Eve", "Eve", "Seth", "Seth", "Eve", "Eve", "Awan", "Eve"],
-        "values": [10, 14, 12, 10, 2, 6, 6, 4, 4],
+        "parent": [
+            "",
+            "World",
+            "World",
+            "World",
+            "World",
+            "North America",
+            "Asia",
+            "Asia",
+            "South America",
+            "Africa",
+        ],
+        "population": [
+            7000,
+            579,
+            4561,
+            422,
+            1216,
+            331,
+            1441,
+            1393,
+            213,
+            206,
+        ],  # in millions
     }
     df = pd.DataFrame(data)
     df.to_csv("data/sunburst.csv", index=False)
@@ -86,7 +148,21 @@ def generate_sunburst_data():
 
 def generate_wordcloud_data():
     """Generate and save sample data for a word cloud."""
-    data = {"word": ["alpha", "beta", "gamma", "alpha"], "weight": [2, 1, 3, 1]}
+    data = {
+        "country": [
+            "USA",
+            "China",
+            "India",
+            "Brazil",
+            "Nigeria",
+            "Russia",
+            "Japan",
+            "Germany",
+            "UK",
+            "France",
+        ],
+        "population": [331, 1441, 1393, 213, 206, 145, 126, 83, 67, 65],  # in millions
+    }
     df = pd.DataFrame(data)
     df.to_csv("data/wordcloud.csv", index=False)
 

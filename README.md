@@ -33,7 +33,7 @@ from MatplotLibAPI import fplot_bubble
 df = pd.read_csv('data/bubble.csv')
 
 # Generate the bubble chart
-fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='life_expectancy', z='population', title='Country Statistics')
+fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='population', z='population', title='Country Statistics')
 
 # Display the plot
 plt.show()
