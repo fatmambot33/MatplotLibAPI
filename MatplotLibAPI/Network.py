@@ -579,6 +579,22 @@ class NetworkGraph:
         return NetworkGraph(network_G)
 
 
+def compute_network_grid(
+    connected_components: List[set], style: StyleTemplate
+) -> tuple[Figure, np.ndarray]:
+    n_components = len(connected_components)
+    n_cols = int(np.ceil(np.sqrt(n_components)))
+    n_rows = int(np.ceil(n_components / n_cols))
+    fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=(19.2, 10.8))
+    fig = cast(Figure, fig)
+    fig.patch.set_facecolor(style.background_color)
+    if not isinstance(axes_grid, np.ndarray):
+        axes = np.array([axes_grid])
+    else:
+        axes = axes_grid.flatten()
+    return fig, axes
+
+
 def prepare_network_graph(
     pd_df: pd.DataFrame,
     source: str,
@@ -718,13 +734,12 @@ def aplot_network_components(
     axes : np.ndarray
         Existing axes to draw on.
     """
-    if axes is None:
-        return
 
     graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
-
+    if axes is None:
+        fig, axes =compute_network_grid(connected_components, style)
     if not connected_components:
         for ax in axes.flatten():
             ax.set_axis_off()
