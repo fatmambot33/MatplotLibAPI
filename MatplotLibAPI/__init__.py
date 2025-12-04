@@ -16,6 +16,7 @@ from .Network import (
     aplot_network,
     aplot_network_components,
     fplot_network,
+    prepare_network_graph,
 )
 from .StyleTemplate import StyleTemplate
 from .Table import TABLE_STYLE_TEMPLATE, aplot_table, fplot_table
@@ -847,4 +848,5 @@ __all__ = [
     "fplot_treemap",
     "plot_composite_bubble",
     "plot_composite_treemap",
+    "prepare_network_graph",
 ]
