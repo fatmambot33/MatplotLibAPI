@@ -26,10 +26,10 @@ These instructions apply to any automated agent contributing to this repository.
 
 ## 3. Code Quality and Testing
 
-Before running tests, install the development dependencies:
+Before running tests, install the development dependencies declared in `pyproject.toml`:
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -e .[dev]
 ```
 
 To ensure your changes will pass the automated checks in our Continuous Integration (CI) pipeline, run the following commands locally before committing. All checks must pass.
