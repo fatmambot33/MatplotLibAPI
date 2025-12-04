@@ -440,23 +440,6 @@ class NetworkGraph:
 
         return ax
 
-    def plot_network_components(self, *args: Any, **kwargs: Any) -> List:
-        """Plot network components (DEPRECATED).
-
-        .. deprecated:: 0.1.0
-            This method will be removed in a future version.
-            Please use `fplot_network_components` which provides a figure-level interface
-            for plotting components.
-        """
-        import warnings
-
-        warnings.warn(
-            "`plot_network_components` is deprecated and will be removed in a future version. "
-            "Please use `fplot_network_components`.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return []
 
     def get_core_subgraph(self, k: int = 2) -> "NetworkGraph":
         """Return the k-core of the graph.
@@ -654,6 +637,7 @@ def aplot_network(
 
 def aplot_network_components(
     pd_df: pd.DataFrame,
+    axes: np.ndarray,
     source: str = "source",
     target: str = "target",
     weight: str = "weight",
@@ -662,7 +646,6 @@ def aplot_network_components(
     sort_by: Optional[str] = None,
     node_list: Optional[List] = None,
     ascending: bool = False,
-    axes: Optional[np.ndarray] = None,
 ) -> None:
     """Plot network components separately on multiple axes.
 
@@ -686,8 +669,8 @@ def aplot_network_components(
         Nodes to include.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
-    axes : np.ndarray, optional
-        Existing axes to draw on. If None, new axes are created.
+    axes : np.ndarray
+        Existing axes to draw on.
     """
     graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
@@ -699,17 +682,6 @@ def aplot_network_components(
                 ax.set_axis_off()
         return
 
-    if axes is None:
-        n_components = len(connected_components)
-        n_cols = int(np.ceil(np.sqrt(n_components)))
-        n_rows = int(np.ceil(n_components / n_cols))
-        fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=(19.2, 10.8))
-        fig = cast(Figure, fig)
-        fig.patch.set_facecolor(style.background_color)
-        if not isinstance(axes_grid, np.ndarray):
-            axes = np.array([axes_grid])
-        else:
-            axes = axes_grid.flatten()
 
     i = -1
     for i, component in enumerate(connected_components):
