@@ -10,6 +10,7 @@ from MatplotLibAPI.Pivot import plot_pivoted_bars
 from MatplotLibAPI.Table import fplot_table
 from MatplotLibAPI.Timeserie import fplot_timeserie
 from MatplotLibAPI.Treemap import fplot_treemap
+from MatplotLibAPI.Sunburst import fplot_sunburst
 from MatplotLibAPI.Wordcloud import fplot_wordcloud
 import plotly.graph_objects as go
 
@@ -122,5 +123,29 @@ def test_dataframe_accessor_fplot_composite_treemap():
     df = pd.DataFrame(data)
 
     fig = df.mpl.fplot_composite_treemap(paths=["group"], values="value")
+
+    assert isinstance(fig, go.Figure)
+
+
+def test_fplot_sunburst():
+    """Test fplot_sunburst returns a Plotly Figure object."""
+    data = {
+        "labels": [
+            "Eve",
+            "Cain",
+            "Seth",
+            "Enos",
+            "Noam",
+            "Abel",
+            "Awan",
+            "Enoch",
+            "Azura",
+        ],
+        "parents": ["", "Eve", "Eve", "Seth", "Seth", "Eve", "Eve", "Awan", "Eve"],
+        "values": [10, 14, 12, 10, 2, 6, 6, 4, 4],
+    }
+    df = pd.DataFrame(data)
+
+    fig = fplot_sunburst(df, labels="labels", parents="parents", values="values")
 
     assert isinstance(fig, go.Figure)
