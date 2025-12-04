@@ -62,7 +62,7 @@ import pandas as pd
 from MatplotLibAPI import fplot_bubble
 
 df = pd.read_csv('data/bubble.csv')
-fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='population', z='population')
+fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='life_expectancy', z='population')
 fig.show()
 ```
 
@@ -73,7 +73,7 @@ import pandas as pd
 from MatplotLibAPI import fplot_network
 
 df = pd.read_csv('data/network.csv')
-fig = fplot_network(df, source='city_a', target='city_b', weight='distance_km')
+fig = fplot_network(df)
 fig.show()
 ```
 
@@ -84,7 +84,7 @@ import pandas as pd
 from MatplotLibAPI.Pivot import plot_pivoted_bars
 
 df = pd.read_csv('data/pivot.csv')
-ax = plot_pivoted_bars(data=df, label="city", x="year", y="population_increase")
+ax = plot_pivoted_bars(data=df, label="category", x="date", y="value")
 ax.figure.show()
 ```
 
@@ -95,7 +95,7 @@ import pandas as pd
 from MatplotLibAPI import fplot_table
 
 df = pd.read_csv('data/table.csv')
-fig = fplot_table(pd_df=df, cols=["country", "capital"])
+fig = fplot_table(pd_df=df, cols=["col1", "col2"])
 fig.show()
 ```
 
@@ -106,7 +106,7 @@ import pandas as pd
 from MatplotLibAPI import fplot_timeserie
 
 df = pd.read_csv('data/timeserie.csv')
-fig = fplot_timeserie(pd_df=df, label="city", x="year", y="population")
+fig = fplot_timeserie(pd_df=df, label="group", x="date", y="value")
 fig.show()
 ```
 
@@ -117,7 +117,7 @@ import pandas as pd
 from MatplotLibAPI import fplot_treemap
 
 df = pd.read_csv('data/treemap.csv')
-fig = fplot_treemap(pd_df=df, path="path", values="population")
+fig = fplot_treemap(pd_df=df, path="path", values="values")
 fig.show()
 ```
 
@@ -128,7 +128,7 @@ import pandas as pd
 from MatplotLibAPI import fplot_sunburst
 
 df = pd.read_csv('data/sunburst.csv')
-fig = fplot_sunburst(df, labels="name", parents="parent", values="population")
+fig = fplot_sunburst(df, labels="labels", parents="parents", values="values")
 fig.show()
 ```
 
@@ -139,6 +139,6 @@ import pandas as pd
 from MatplotLibAPI import fplot_wordcloud
 
 df = pd.read_csv('data/wordcloud.csv')
-fig = fplot_wordcloud(df, text_column="country", weight_column="population")
+fig = fplot_wordcloud(df, text_column="word", weight_column="weight")
 fig.show()
 ```
