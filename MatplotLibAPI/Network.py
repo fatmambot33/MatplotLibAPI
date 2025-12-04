@@ -579,7 +579,7 @@ class NetworkGraph:
         return NetworkGraph(network_G)
 
 
-def _prepare_network_graph(
+def prepare_network_graph(
     pd_df: pd.DataFrame,
     source: str,
     target: str,
@@ -587,7 +587,37 @@ def _prepare_network_graph(
     sort_by: Optional[str],
     node_list: Optional[List],
 ) -> NetworkGraph:
-    """Prepare NetworkGraph for plotting."""
+    """Prepare a NetworkGraph for plotting from a pandas DataFrame.
+
+    This function takes a DataFrame and prepares it for network visualization by:
+    1. Filtering the DataFrame to include only the nodes in `node_list` (if provided).
+    2. Validating the DataFrame to ensure it has the required columns.
+    3. Creating a `NetworkGraph` from the edge list.
+    4. Extracting the k-core of the graph (k=2) to focus on the main structure.
+    5. Calculating node weights based on the sum of their top k edge weights.
+    6. Trimming the graph to keep only the top k edges per node.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing the edge list.
+    source : str
+        Column name for source nodes.
+    target : str
+        Column name for target nodes.
+    weight : str
+        Column name for edge weights.
+    sort_by : str, optional
+        Column to sort the DataFrame by before processing.
+    node_list : list, optional
+        A list of nodes to include in the graph. If provided, the DataFrame
+        will be filtered to include only edges connected to these nodes.
+
+    Returns
+    -------
+    NetworkGraph
+        The prepared `NetworkGraph` object.
+    """
     if node_list:
         df = pd_df.loc[
             (pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))
@@ -647,7 +677,7 @@ def aplot_network(
     Axes
         Matplotlib axes with the plotted network.
     """
-    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
+    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
     return graph.plot_network(title=title, style=style, weight=weight, ax=ax)
 
 
@@ -688,7 +718,7 @@ def aplot_network_components(
     axes : np.ndarray
         Existing axes to draw on.
     """
-    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
+    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
 
@@ -698,8 +728,8 @@ def aplot_network_components(
                 ax.set_axis_off()
         return
 
-    if axes is None:
-        return
+
+      
 
     i = -1
     for i, component in enumerate(connected_components):
