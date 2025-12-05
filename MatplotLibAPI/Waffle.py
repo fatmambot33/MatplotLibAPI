@@ -2,11 +2,12 @@
 
 from typing import Optional, Tuple
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from matplotlib.patches import Rectangle
+import matplotlib.pyplot as plt
 
 from .StyleTemplate import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
 from ._visualization_utils import _get_axis, _wrap_aplot
@@ -36,7 +37,7 @@ def aplot_waffle(
             row = square // rows
             col = square % rows
             plot_ax.add_patch(
-                plt.Rectangle(
+                Rectangle(
                     (col, rows - row),
                     1,
                     1,
@@ -51,7 +52,7 @@ def aplot_waffle(
     plot_ax.axis("off")
     if title:
         plot_ax.set_title(title)
-    legend_handles = [plt.Rectangle((0, 0), 1, 1, color=color) for color in colors]
+    legend_handles = [Rectangle((0, 0), 1, 1, color=color) for color in colors]
     plot_ax.legend(
         legend_handles, pd_df[category], loc="upper center", ncol=3, frameon=False
     )

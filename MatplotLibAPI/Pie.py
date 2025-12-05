@@ -7,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from matplotlib.patches import Circle
 
 from .StyleTemplate import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
 from ._visualization_utils import _get_axis, _wrap_aplot
@@ -24,7 +25,7 @@ def aplot_pie_donut(
     """Plot pie or donut charts for categorical share visualization."""
     validate_dataframe(pd_df, cols=[category, value])
     plot_ax = _get_axis(ax)
-    labels = pd_df[category]
+    labels = pd_df[category].astype(str).tolist()
     sizes = pd_df[value]
 
     wedges, *_ = plot_ax.pie(
@@ -34,7 +35,7 @@ def aplot_pie_donut(
         colors=sns.color_palette(style.palette),
     )
     if donut:
-        centre_circle = plt.Circle((0, 0), 0.70, fc=style.background_color)
+        centre_circle = Circle((0, 0), 0.70, fc=style.background_color)
         plot_ax.add_artist(centre_circle)
     plot_ax.axis("equal")
     if title:

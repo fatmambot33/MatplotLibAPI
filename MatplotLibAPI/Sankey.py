@@ -4,7 +4,6 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 import plotly.graph_objects as go
-from matplotlib.figure import Figure
 
 from .StyleTemplate import SANKEY_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
 
@@ -16,7 +15,7 @@ def fplot_sankey(
     value: str,
     title: Optional[str] = None,
     style: StyleTemplate = SANKEY_STYLE_TEMPLATE,
-) -> Figure:
+) -> go.Figure:
     """Plot a Sankey diagram showing flows between categories."""
     validate_dataframe(pd_df, cols=[source, target, value])
 

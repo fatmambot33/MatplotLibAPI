@@ -43,6 +43,7 @@ def aplot_heatmap(
 def aplot_correlation_matrix(
     pd_df: pd.DataFrame,
     columns: Optional[Sequence[str]] = None,
+    method: str = "pearson",
     title: Optional[str] = None,
     style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
@@ -59,7 +60,8 @@ def aplot_correlation_matrix(
     validate_dataframe(pd_df, cols=list(subset))
     plot_ax = _get_axis(ax)
 
-    corr = pd_df[list(subset)].corr()
+    selected: pd.DataFrame = pd_df[list(subset)]
+    corr = selected.corr(method=method)
     sns.heatmap(corr, cmap=style.palette, annot=True, fmt=".2f", ax=plot_ax)
     if title:
         plot_ax.set_title(title)
@@ -91,6 +93,7 @@ def fplot_heatmap(
 def fplot_correlation_matrix(
     pd_df: pd.DataFrame,
     columns: Optional[Sequence[str]] = None,
+    method: str = "pearson",
     title: Optional[str] = None,
     style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (10, 6),
@@ -101,6 +104,7 @@ def fplot_correlation_matrix(
         pd_df=pd_df,
         figsize=figsize,
         columns=columns,
+        method=method,
         title=title,
         style=style,
     )

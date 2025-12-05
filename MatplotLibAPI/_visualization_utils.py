@@ -1,6 +1,6 @@
 """Shared utilities for matplotlib-based plotting helpers."""
 
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -16,7 +16,7 @@ def _wrap_aplot(
     plot_func,
     pd_df,
     figsize: Tuple[float, float],
-    ax_args: Optional[Dict[str, object]] = None,
+    ax_args: Optional[Dict[str, Any]] = None,
     **kwargs,
 ) -> Figure:
     """Create a new figure and delegate plotting to an axis-level function."""

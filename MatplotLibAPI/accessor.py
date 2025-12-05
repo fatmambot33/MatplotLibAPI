@@ -1032,8 +1032,6 @@ class DataFrameAccessor:
         title: Optional[str] = None,
         style: StyleTemplate = TABLE_STYLE_TEMPLATE,
         max_values: int = 20,
-        col_width: float = 0.2,
-        padding: float = 0.1,
         sort_by: Optional[str] = None,
         ascending: bool = False,
         ax: Optional[Axes] = None,
@@ -1050,10 +1048,6 @@ class DataFrameAccessor:
             Styling template. The default is `TABLE_STYLE_TEMPLATE`.
         max_values : int, optional
             Maximum number of rows to show. The default is 20.
-        col_width : float, optional
-            Width of each column. The default is 0.2.
-        padding : float, optional
-            Padding between table elements. The default is 0.1.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
@@ -1072,8 +1066,6 @@ class DataFrameAccessor:
             title=title,
             style=style,
             max_values=max_values,
-            col_width=col_width,
-            padding=padding,
             sort_by=sort_by,
             ascending=ascending,
             ax=ax,
@@ -1085,8 +1077,6 @@ class DataFrameAccessor:
         title: Optional[str] = None,
         style: StyleTemplate = TABLE_STYLE_TEMPLATE,
         max_values: int = 20,
-        col_width: float = 0.2,
-        padding: float = 0.1,
         sort_by: Optional[str] = None,
         ascending: bool = False,
         figsize: Tuple[float, float] = (19.2, 10.8),
@@ -1103,10 +1093,6 @@ class DataFrameAccessor:
             Styling template. The default is `TABLE_STYLE_TEMPLATE`.
         max_values : int, optional
             Maximum number of rows to show. The default is 20.
-        col_width : float, optional
-            Width of each column. The default is 0.2.
-        padding : float, optional
-            Padding between table elements. The default is 0.1.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
@@ -1125,8 +1111,6 @@ class DataFrameAccessor:
             title=title,
             style=style,
             max_values=max_values,
-            col_width=col_width,
-            padding=padding,
             sort_by=sort_by,
             ascending=ascending,
             figsize=figsize,
@@ -1500,11 +1484,11 @@ class DataFrameAccessor:
 
     def fplot_treemap(
         self,
-        labels: str,
-        parents: str,
+        path: str,
         values: str,
         style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
         title: Optional[str] = None,
+        color: Optional[str] = None,
         sort_by: Optional[str] = None,
         max_values: int = 100,
         ascending: bool = False,
@@ -1514,16 +1498,16 @@ class DataFrameAccessor:
 
         Parameters
         ----------
-        labels : str
-            Column for labels.
-        parents : str
-            Column for parent relationships.
+        path : str
+            Column representing the hierarchical path.
         values : str
             Column with values for the treemap areas.
         style : StyleTemplate, optional
             Styling template. The default is `TREEMAP_STYLE_TEMPLATE`.
         title : str, optional
             Chart title.
+        color : str, optional
+            Column to use for coloring blocks. The default is ``None``.
         sort_by : str, optional
             Column to sort by.
         max_values : int, optional
@@ -1540,11 +1524,11 @@ class DataFrameAccessor:
         """
         return fplot_treemap(
             pd_df=self._obj,
-            labels=labels,
-            parents=parents,
+            path=path,
             values=values,
             style=style,
             title=title,
+            color=color,
             sort_by=sort_by,
             max_values=max_values,
             ascending=ascending,
@@ -1553,11 +1537,11 @@ class DataFrameAccessor:
 
     def fplot_sunburst(
         self,
-        labels: str,
-        parents: str,
+        path: str,
         values: str,
         style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
         title: Optional[str] = None,
+        color: Optional[str] = None,
         sort_by: Optional[str] = None,
         max_values: int = 100,
         ascending: bool = False,
@@ -1567,16 +1551,16 @@ class DataFrameAccessor:
 
         Parameters
         ----------
-        labels : str
-            Column for labels.
-        parents : str
-            Column for parent relationships.
+        path : str
+            Column representing the hierarchical path.
         values : str
             Column with values for the sunburst areas.
         style : StyleTemplate, optional
             Styling template. The default is `TREEMAP_STYLE_TEMPLATE`.
         title : str, optional
             Chart title.
+        color : str, optional
+            Column to use for coloring blocks. The default is ``None``.
         sort_by : str, optional
             Column to sort by.
         max_values : int, optional
@@ -1592,11 +1576,11 @@ class DataFrameAccessor:
         """
         return fplot_sunburst(
             pd_df=self._obj,
-            labels=labels,
-            parents=parents,
+            path=path,
             values=values,
             title=title,
             style=style,
+            color=color,
             sort_by=sort_by,
             ascending=ascending,
             max_values=max_values,
