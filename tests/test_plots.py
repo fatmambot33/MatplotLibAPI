@@ -12,7 +12,12 @@ from MatplotLibAPI.Timeserie import fplot_timeserie
 from MatplotLibAPI.Treemap import fplot_treemap
 from MatplotLibAPI.Sunburst import fplot_sunburst
 from MatplotLibAPI.Wordcloud import fplot_wordcloud
-from MatplotLibAPI import fplot_bar, fplot_histogram_kde, fplot_correlation_matrix, fplot_pie_donut
+from MatplotLibAPI import (
+    fplot_bar,
+    fplot_histogram_kde,
+    fplot_correlation_matrix,
+    fplot_pie_donut,
+)
 import plotly.graph_objects as go
 
 
@@ -157,7 +162,9 @@ def test_fplot_bar():
     data = {"category": ["A", "B", "A"], "group": ["X", "Y", "X"], "value": [5, 7, 3]}
     df = pd.DataFrame(data)
 
-    fig = fplot_bar(pd_df=df, category="category", value="value", group="group", stacked=True)
+    fig = fplot_bar(
+        pd_df=df, category="category", value="value", group="group", stacked=True
+    )
 
     assert isinstance(fig, Figure)
     plt.close()

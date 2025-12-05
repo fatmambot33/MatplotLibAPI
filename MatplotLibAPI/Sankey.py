@@ -34,5 +34,7 @@ def fplot_sankey(
 
     fig = go.Figure(sankey)
     if title:
-        fig.update_layout(title_text=title, font=dict(color=style.font_color, size=style.font_size))
+        fig.update_layout(
+            title_text=title, font=dict(color=style.font_color, size=style.font_size)
+        )
     return fig

@@ -246,7 +246,16 @@ def generate_heatmap_and_correlation_data():
 
     data = {
         "month": ["Jan", "Jan", "Feb", "Feb", "Mar", "Mar", "Apr", "Apr"],
-        "channel": ["Email", "Social", "Email", "Social", "Email", "Social", "Email", "Social"],
+        "channel": [
+            "Email",
+            "Social",
+            "Email",
+            "Social",
+            "Email",
+            "Social",
+            "Email",
+            "Social",
+        ],
         "engagements": [340, 420, 380, 510, 410, 560, 390, 530],
         "conversions": [34, 28, 30, 32, 36, 35, 33, 31],
         "cost_per_click": [0.75, 0.65, 0.72, 0.68, 0.74, 0.64, 0.73, 0.66],
@@ -263,7 +272,16 @@ def generate_area_data():
 
     data = {
         "quarter": ["Q1", "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q4"],
-        "segment": ["SMB", "SMB", "SMB", "SMB", "Enterprise", "Enterprise", "Enterprise", "Enterprise"],
+        "segment": [
+            "SMB",
+            "SMB",
+            "SMB",
+            "SMB",
+            "Enterprise",
+            "Enterprise",
+            "Enterprise",
+            "Enterprise",
+        ],
         "subscriptions": [120, 150, 170, 190, 200, 230, 260, 300],
     }
     df = pd.DataFrame(data)

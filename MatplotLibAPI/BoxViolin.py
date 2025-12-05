@@ -7,7 +7,12 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import DISTRIBUTION_STYLE_TEMPLATE, StyleTemplate, string_formatter, validate_dataframe
+from .StyleTemplate import (
+    DISTRIBUTION_STYLE_TEMPLATE,
+    StyleTemplate,
+    string_formatter,
+    validate_dataframe,
+)
 from ._visualization_utils import _get_axis, _wrap_aplot
 
 

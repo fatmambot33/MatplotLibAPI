@@ -36,7 +36,13 @@ def aplot_waffle(
             row = square // rows
             col = square % rows
             plot_ax.add_patch(
-                plt.Rectangle((col, rows - row), 1, 1, facecolor=colors[idx], edgecolor=style.background_color)
+                plt.Rectangle(
+                    (col, rows - row),
+                    1,
+                    1,
+                    facecolor=colors[idx],
+                    edgecolor=style.background_color,
+                )
             )
         start += count
 
@@ -46,7 +52,9 @@ def aplot_waffle(
     if title:
         plot_ax.set_title(title)
     legend_handles = [plt.Rectangle((0, 0), 1, 1, color=color) for color in colors]
-    plot_ax.legend(legend_handles, pd_df[category], loc="upper center", ncol=3, frameon=False)
+    plot_ax.legend(
+        legend_handles, pd_df[category], loc="upper center", ncol=3, frameon=False
+    )
     return plot_ax
 
 

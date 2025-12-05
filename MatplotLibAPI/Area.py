@@ -6,7 +6,12 @@ import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import AREA_STYLE_TEMPLATE, StyleTemplate, string_formatter, validate_dataframe
+from .StyleTemplate import (
+    AREA_STYLE_TEMPLATE,
+    StyleTemplate,
+    string_formatter,
+    validate_dataframe,
+)
 from ._visualization_utils import _get_axis, _wrap_aplot
 
 
@@ -28,11 +33,15 @@ def aplot_area(
     plot_ax = _get_axis(ax)
 
     if label:
-        pivot_df = pd_df.pivot_table(index=x, columns=label, values=y, aggfunc="sum").sort_index()
+        pivot_df = pd_df.pivot_table(
+            index=x, columns=label, values=y, aggfunc="sum"
+        ).sort_index()
         pivot_df.plot(kind="area", stacked=stacked, alpha=0.7, ax=plot_ax)
     else:
         sorted_df = pd_df.sort_values(by=x)
-        plot_ax.fill_between(sorted_df[x], sorted_df[y], color=style.font_color, alpha=0.4)
+        plot_ax.fill_between(
+            sorted_df[x], sorted_df[y], color=style.font_color, alpha=0.4
+        )
         plot_ax.plot(sorted_df[x], sorted_df[y], color=style.font_color)
 
     plot_ax.set_xlabel(string_formatter(x))

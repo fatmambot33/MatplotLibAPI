@@ -8,7 +8,12 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import HEATMAP_STYLE_TEMPLATE, StyleTemplate, string_formatter, validate_dataframe
+from .StyleTemplate import (
+    HEATMAP_STYLE_TEMPLATE,
+    StyleTemplate,
+    string_formatter,
+    validate_dataframe,
+)
 from ._visualization_utils import _get_axis, _wrap_aplot
 
 
@@ -43,7 +48,11 @@ def aplot_correlation_matrix(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot a correlation matrix heatmap for numeric columns."""
-    subset = columns if columns is not None else pd_df.select_dtypes(include=[np.number]).columns
+    subset = (
+        columns
+        if columns is not None
+        else pd_df.select_dtypes(include=[np.number]).columns
+    )
     if len(subset) == 0:
         raise AttributeError("No numeric columns available for correlation matrix")
 

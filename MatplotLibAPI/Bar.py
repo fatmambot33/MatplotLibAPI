@@ -7,7 +7,12 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import DISTRIBUTION_STYLE_TEMPLATE, StyleTemplate, string_formatter, validate_dataframe
+from .StyleTemplate import (
+    DISTRIBUTION_STYLE_TEMPLATE,
+    StyleTemplate,
+    string_formatter,
+    validate_dataframe,
+)
 from ._visualization_utils import _get_axis, _wrap_aplot
 
 
@@ -31,10 +36,14 @@ def aplot_bar(
     plot_df = pd_df.copy()
 
     if group:
-        pivot_df = plot_df.pivot_table(index=category, columns=group, values=value, aggfunc="sum")
+        pivot_df = plot_df.pivot_table(
+            index=category, columns=group, values=value, aggfunc="sum"
+        )
         pivot_df.plot(kind="bar", stacked=stacked, ax=plot_ax, alpha=0.85)
     else:
-        sns.barplot(data=plot_df, x=category, y=value, palette=style.palette, ax=plot_ax)
+        sns.barplot(
+            data=plot_df, x=category, y=value, palette=style.palette, ax=plot_ax
+        )
 
     plot_ax.set_facecolor(style.background_color)
     plot_ax.set_xlabel(string_formatter(category))
