@@ -7,7 +7,6 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from matplotlib.patches import Circle
 
 from .StyleTemplate import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
 from ._visualization_utils import _get_axis, _wrap_aplot
@@ -29,16 +28,16 @@ def aplot_pie_donut(
     labels = pd_df[category].astype(str).tolist()
     sizes = pd_df[value]
 
+    wedgeprops: dict[str, Any] | None = None
+    if donut:
+        wedgeprops = {"width": 0.3}
     wedges, *_ = plot_ax.pie(
         sizes,
         labels=labels,
         autopct="%1.1f%%",
         colors=sns.color_palette(style.palette),
+        wedgeprops=wedgeprops,
     )
-    if donut:
-        donut_radius: float = 0.70
-        centre_circle = Circle((0.0, 0.0), donut_radius, fc=style.background_color)
-        plot_ax.add_artist(centre_circle)
     plot_ax.axis("equal")
     if title:
         plot_ax.set_title(title)

@@ -3,6 +3,7 @@
 from typing import Any, Callable, Dict, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
+from numpy import ndarray
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from typing_extensions import Protocol
@@ -26,7 +27,12 @@ def _wrap_aplot(
 ) -> Figure:
     """Create a new figure and delegate plotting to an axis-level function."""
     ax_args = ax_args or {}
-    fig, ax = plt.subplots(figsize=figsize, **ax_args)
+    fig, axes_obj = plt.subplots(figsize=figsize, **ax_args)
+    ax: Axes
+    if isinstance(axes_obj, Axes):
+        ax = axes_obj
+    else:
+        ax = cast(Axes, axes_obj.flat[0] if isinstance(axes_obj, ndarray) else axes_obj)
     plot_func(pd_df=pd_df, ax=ax, **kwargs)
     fig_obj: Figure = cast(Figure, fig)
     return fig_obj
