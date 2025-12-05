@@ -257,6 +257,21 @@ class NetworkGraph:
         """Return an ``AdjacencyView`` of the graph."""
         return AdjacencyView(self._nx_graph.adj)
 
+    @property
+    def connected_components(self) -> List[set]:
+        """Return the connected components of the graph."""
+        return list(nx.connected_components(self._nx_graph))
+
+    @property
+    def number_of_nodes(self) -> int:
+        """Return the number of nodes in the graph."""
+        return self._nx_graph.number_of_nodes()
+
+    @property
+    def number_of_edges(self) -> int:
+        """Return the number of edges in the graph."""
+        return self._nx_graph.number_of_edges()
+
     def edge_subgraph(self, edges: Iterable) -> "NetworkGraph":
         """Return a subgraph containing only the specified edges.
 
