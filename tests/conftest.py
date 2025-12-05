@@ -1,9 +1,8 @@
 """Shared fixtures for visualization tests."""
 
 import os
-from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import pandas as pd
 import pytest
