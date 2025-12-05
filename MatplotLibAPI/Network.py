@@ -581,7 +581,7 @@ class NetworkGraph:
 
 def compute_network_grid(
     connected_components: List[set], style: StyleTemplate
-) -> tuple[Figure, np.ndarray]:
+) -> Tuple[Figure, np.ndarray]:
     """Compute the grid layout for network component subplots.
 
     Parameters
@@ -593,7 +593,7 @@ def compute_network_grid(
 
     Returns
     -------
-    tuple[Figure, np.ndarray]
+    Tuple[Figure, np.ndarray]
         A tuple containing the Matplotlib figure and the grid of axes.
     """
     n_components = len(connected_components)
@@ -751,31 +751,34 @@ def aplot_network_components(
     graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
-    if axes is None:
-        fig, axes = compute_network_grid(connected_components, style)
+
     if not connected_components:
-        for ax in axes.flatten():
-            ax.set_axis_off()
+        if axes is not None:
+            for ax in axes.flatten():
+                ax.set_axis_off()
         return
+
+    local_axes = axes
+    if local_axes is None:
+        fig, local_axes = compute_network_grid(connected_components, style)
 
     i = -1
     for i, component in enumerate(connected_components):
-        if i < len(axes):
+        if i < len(local_axes):
             if len(component) > 5:
                 component_graph = graph.subgraph(node_list=list(component))
                 component_graph.plot_network(
                     title=f"{title}::{i}" if title else str(i),
                     style=style,
                     weight=weight,
-                    ax=axes[i],
+                    ax=local_axes[i],
                 )
-            axes[i].set_axis_on()
+            local_axes[i].set_axis_on()
         else:
-            break  # Stop if there are more components than axes
+            break
 
-    # Turn off any unused axes
-    for j in range(i + 1, len(axes)):
-        axes[j].set_axis_off()
+    for j in range(i + 1, len(local_axes)):
+        local_axes[j].set_axis_off()
 
 
 def fplot_network(
