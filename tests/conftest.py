@@ -2,6 +2,7 @@
 
 import os
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -11,7 +12,7 @@ from scripts import generate_sample_data
 
 
 @pytest.fixture(scope="session")
-def sample_data_dir(tmp_path_factory: pytest.TempPathFactory) -> os.PathLike[str]:
+def sample_data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Generate sample CSV files in an isolated directory for tests."""
 
     base_dir = tmp_path_factory.mktemp("sample_data")
@@ -27,7 +28,7 @@ def sample_data_dir(tmp_path_factory: pytest.TempPathFactory) -> os.PathLike[str
 
 @pytest.fixture(scope="session")
 def load_sample_df(
-    sample_data_dir: os.PathLike[str],
+    sample_data_dir: Path,
 ) -> Callable[[str, Any], pd.DataFrame]:
     """Return a loader that reads generated sample CSVs into dataframes."""
 
