@@ -12,4 +12,3 @@ import pandas as pd
 CorrelationMethod: TypeAlias = Union[
     Literal["pearson", "kendall", "spearman"], Callable[[pd.Series], pd.Series]
 ]
-
