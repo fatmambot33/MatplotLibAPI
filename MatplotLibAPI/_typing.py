@@ -1,6 +1,8 @@
 """Internal type aliases used across MatplotLibAPI."""
 
-from typing import Callable, Literal, TypeAlias, Union
+from typing import Callable, Literal, Union
+
+from typing_extensions import TypeAlias
 
 import pandas as pd
 
