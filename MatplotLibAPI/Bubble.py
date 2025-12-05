@@ -4,7 +4,7 @@ Provides functions to create and render bubble charts using seaborn and matplotl
 with customizable styling via `StyleTemplate`.
 """
 
-from typing import Dict, Optional, Tuple, cast
+from typing import Any, Dict, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -374,6 +374,8 @@ def fplot_bubble(
     hline: bool = False,
     vline: bool = False,
     figsize: Tuple[float, float] = (19.2, 10.8),
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Create a new matplotlib Figure with a bubble chart.
 
@@ -450,4 +452,6 @@ def fplot_bubble(
         vline=vline,
         ax=ax,
     )
+    if save_path:
+        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig

@@ -1,6 +1,6 @@
 """Treemap plotting utilities."""
 
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -103,6 +103,8 @@ def fplot_treemap(
     ascending: bool = False,
     max_values: int = 100,
     fig: Optional[go.Figure] = None,
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> go.Figure:
     """Return a figure containing the treemap plot.
 
@@ -162,4 +164,9 @@ def fplot_treemap(
     # Apply color scale
     fig.update_traces(marker=dict(colorscale=style.palette))
 
+    if save_path:
+        if save_path.lower().endswith((".html", ".htm")):
+            fig.write_html(save_path, **(savefig_kwargs or {}))
+        else:
+            fig.write_image(save_path, **(savefig_kwargs or {}))
     return fig

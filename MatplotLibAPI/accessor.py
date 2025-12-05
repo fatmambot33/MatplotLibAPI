@@ -1,6 +1,6 @@
 """Pandas accessor exposing MatplotLibAPI plotting helpers."""
 
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -211,6 +211,8 @@ class DataFrameAccessor:
         hline: bool = False,
         vline: bool = False,
         figsize: Tuple[float, float] = (19.2, 10.8),
+        save_path: Optional[str] = None,
+        savefig_kwargs: Optional[Dict[str, Any]] = None,
     ) -> Figure:
         """Plot a bubble chart on a new figure.
 
@@ -263,6 +265,8 @@ class DataFrameAccessor:
             hline=hline,
             vline=vline,
             figsize=figsize,
+            save_path=save_path,
+            savefig_kwargs=savefig_kwargs,
         )
 
     def fplot_composite_bubble(

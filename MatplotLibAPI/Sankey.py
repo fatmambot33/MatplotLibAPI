@@ -1,6 +1,6 @@
 """Sankey plotting helpers."""
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -15,6 +15,8 @@ def fplot_sankey(
     value: str,
     title: Optional[str] = None,
     style: StyleTemplate = SANKEY_STYLE_TEMPLATE,
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> go.Figure:
     """Plot a Sankey diagram showing flows between categories."""
     validate_dataframe(pd_df, cols=[source, target, value])
@@ -36,4 +38,9 @@ def fplot_sankey(
         fig.update_layout(
             title_text=title, font=dict(color=style.font_color, size=style.font_size)
         )
+    if save_path:
+        if save_path.lower().endswith((".html", ".htm")):
+            fig.write_html(save_path, **(savefig_kwargs or {}))
+        else:
+            fig.write_image(save_path, **(savefig_kwargs or {}))
     return fig

@@ -1,6 +1,6 @@
 """Bar and stacked bar chart helpers."""
 
-from typing import Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
@@ -64,6 +64,8 @@ def fplot_bar(
     title: Optional[str] = None,
     style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (10, 6),
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Plot bar or stacked bar charts on a new figure."""
     return _wrap_aplot(
@@ -76,4 +78,6 @@ def fplot_bar(
         stacked=stacked,
         title=title,
         style=style,
+        save_path=save_path,
+        savefig_kwargs=savefig_kwargs,
     )

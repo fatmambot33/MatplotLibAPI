@@ -1,6 +1,6 @@
 """Timeserie plotting helpers."""
 
-from typing import Dict, Optional, Tuple, cast
+from typing import Any, Dict, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -270,6 +270,8 @@ def fplot_timeserie(
     ascending: bool = False,
     std: bool = False,
     figsize: Tuple[float, float] = (19.2, 10.8),
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a figure plotting the time series.
 
@@ -336,6 +338,8 @@ def fplot_timeserie(
         ascending=ascending,
         ax=ax,
     )
+    if save_path:
+        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig
 
 

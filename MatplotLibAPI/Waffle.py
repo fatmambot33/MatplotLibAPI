@@ -1,6 +1,6 @@
 """Waffle chart helpers."""
 
-from typing import Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
@@ -68,6 +68,8 @@ def fplot_waffle(
     title: Optional[str] = None,
     style: StyleTemplate = PIE_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (8, 8),
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Plot waffle charts on a new figure."""
     return _wrap_aplot(
@@ -79,4 +81,6 @@ def fplot_waffle(
         rows=rows,
         title=title,
         style=style,
+        save_path=save_path,
+        savefig_kwargs=savefig_kwargs,
     )
