@@ -118,6 +118,7 @@ class DataFrameAccessor:
     fplot_composite_treemap
         Plot a composite treemap on a new Plotly figure.
     """
+
     def __init__(self, pd_df: pd.DataFrame):
         """Store the parent DataFrame."""
         self._obj = pd_df
@@ -403,7 +404,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the bar chart.
         """
-
         return fplot_bar(
             pd_df=self._obj,
             category=category,
@@ -487,7 +487,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the histogram.
         """
-
         return fplot_histogram_kde(
             pd_df=self._obj,
             column=column,
@@ -570,7 +569,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the distribution summary.
         """
-
         return fplot_box_violin(
             pd_df=self._obj,
             column=column,
@@ -653,7 +651,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the heatmap.
         """
-
         return fplot_heatmap(
             pd_df=self._obj,
             x=x,
@@ -729,7 +726,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the correlation matrix.
         """
-
         return fplot_correlation_matrix(
             pd_df=self._obj,
             columns=columns,
@@ -818,7 +814,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the area chart.
         """
-
         return fplot_area(
             pd_df=self._obj,
             x=x,
@@ -902,7 +897,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the pie or donut chart.
         """
-
         return fplot_pie_donut(
             pd_df=self._obj,
             category=category,
@@ -985,7 +979,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the waffle chart.
         """
-
         return fplot_waffle(
             pd_df=self._obj,
             category=category,
