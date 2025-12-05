@@ -1529,7 +1529,6 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with component plots.
         """
-
         return fplot_network_components(
             pd_df=self._obj,
             source=source,
