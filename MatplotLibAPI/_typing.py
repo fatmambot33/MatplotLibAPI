@@ -12,5 +12,6 @@ import numpy.typing as npt
 # avoids depending on the private ``pandas._typing`` module, which is not
 # considered stable across releases.
 CorrelationMethod: TypeAlias = Union[
-    Literal["pearson", "kendall", "spearman"], Callable[[npt.NDArray[Any], npt.NDArray[Any]], float]
+    Literal["pearson", "kendall", "spearman"],
+    Callable[[npt.NDArray[Any], npt.NDArray[Any]], float],
 ]
