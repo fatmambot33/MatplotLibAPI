@@ -26,6 +26,7 @@ dev = [
     "black",
     "pytest",
     "pytest-cov",
+    "tomli",
 ]
 
 [tool.hatch.build.targets.wheel]
