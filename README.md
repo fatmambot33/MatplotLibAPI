@@ -44,6 +44,14 @@ plt.show()
 The library supports the following plot types:
 
 - **Bubble (Scatter plot)**
+- **Bar / Stacked Bar**
+- **Histogram + KDE**
+- **Box / Violin**
+- **Heatmap / Correlation Matrix**
+- **Area**
+- **Pie / Donut**
+- **Waffle**
+- **Sankey**
 - **Network (Graph)**
 - **Pivot**
 - **Table**
@@ -74,6 +82,99 @@ from MatplotLibAPI import fplot_network
 
 df = pd.read_csv('data/network.csv')
 fig = fplot_network(df)
+fig.show()
+```
+
+### Bar / Stacked Bar
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_bar
+
+df = pd.read_csv('data/bar.csv')
+fig = fplot_bar(df, category='product', value='revenue', group='region', stacked=True)
+fig.show()
+```
+
+### Histogram + KDE
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_histogram_kde
+
+df = pd.read_csv('data/histogram.csv')
+fig = fplot_histogram_kde(df, column='waiting_time_minutes', bins=8, kde=True)
+fig.show()
+```
+
+### Box / Violin
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_box_violin
+
+df = pd.read_csv('data/box_violin.csv')
+fig = fplot_box_violin(df, column='satisfaction_score', category='department', use_violin=True)
+fig.show()
+```
+
+### Heatmap / Correlation Matrix
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_heatmap, fplot_correlation_matrix
+
+heatmap_df = pd.read_csv('data/heatmap.csv')
+correlation_df = pd.read_csv('data/correlation.csv')
+
+fig_heatmap = fplot_heatmap(heatmap_df, index='month', columns='channel', values='engagements')
+fig_corr = fplot_correlation_matrix(correlation_df)
+
+fig_heatmap.show()
+fig_corr.show()
+```
+
+### Area
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_area
+
+df = pd.read_csv('data/area.csv')
+fig = fplot_area(df, x='quarter', y='subscriptions', label='segment', stacked=True)
+fig.show()
+```
+
+### Pie / Donut
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_pie_donut
+
+df = pd.read_csv('data/pie.csv')
+fig = fplot_pie_donut(df, category='device', value='sessions', donut=True)
+fig.show()
+```
+
+### Waffle
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_waffle
+
+df = pd.read_csv('data/waffle.csv')
+fig = fplot_waffle(df, category='device', value='sessions')
+fig.show()
+```
+
+### Sankey
+
+```python
+import pandas as pd
+from MatplotLibAPI import fplot_sankey
+
+df = pd.read_csv('data/sankey.csv')
+fig = fplot_sankey(df, source='source', target='target', value='value')
 fig.show()
 ```
 

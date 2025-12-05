@@ -306,4 +306,9 @@ PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
 )
 
 NETWORK_STYLE_TEMPLATE = StyleTemplate()
+DISTRIBUTION_STYLE_TEMPLATE = StyleTemplate(palette="magma")
+HEATMAP_STYLE_TEMPLATE = StyleTemplate(palette="viridis")
+AREA_STYLE_TEMPLATE = StyleTemplate(palette="crest")
+PIE_STYLE_TEMPLATE = StyleTemplate(palette="Set2")
+SANKEY_STYLE_TEMPLATE = StyleTemplate()
 # endregion
