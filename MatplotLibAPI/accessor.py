@@ -118,7 +118,6 @@ class DataFrameAccessor:
     fplot_composite_treemap
         Plot a composite treemap on a new Plotly figure.
     """
-
     def __init__(self, pd_df: pd.DataFrame):
         """Store the parent DataFrame."""
         self._obj = pd_df
@@ -359,7 +358,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the bar chart.
         """
-
         return aplot_bar(
             pd_df=self._obj,
             category=category,
@@ -448,7 +446,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the histogram.
         """
-
         return aplot_histogram_kde(
             pd_df=self._obj,
             column=column,
@@ -532,7 +529,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the distribution summary.
         """
-
         return aplot_box_violin(
             pd_df=self._obj,
             column=column,
@@ -616,7 +612,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the heatmap.
         """
-
         return aplot_heatmap(
             pd_df=self._obj,
             x=x,
@@ -697,7 +692,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the correlation matrix.
         """
-
         return aplot_correlation_matrix(
             pd_df=self._obj,
             columns=columns,
@@ -779,7 +773,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the area chart.
         """
-
         return aplot_area(
             pd_df=self._obj,
             x=x,
@@ -868,7 +861,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the pie or donut chart.
         """
-
         return aplot_pie_donut(
             pd_df=self._obj,
             category=category,
@@ -952,7 +944,6 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the waffle chart.
         """
-
         return aplot_waffle(
             pd_df=self._obj,
             category=category,
@@ -1033,7 +1024,6 @@ class DataFrameAccessor:
         go.Figure
             The Plotly Sankey figure.
         """
-
         return fplot_sankey(
             pd_df=self._obj,
             source=source,

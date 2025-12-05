@@ -22,7 +22,6 @@ def aplot_heatmap(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot a matrix heatmap for multivariate pattern detection."""
-
     validate_dataframe(pd_df, cols=[x, y, value])
     plot_ax = _get_axis(ax)
 
@@ -44,7 +43,6 @@ def aplot_correlation_matrix(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot a correlation matrix heatmap for numeric columns."""
-
     subset = columns if columns is not None else pd_df.select_dtypes(include=[np.number]).columns
     if len(subset) == 0:
         raise AttributeError("No numeric columns available for correlation matrix")
@@ -69,7 +67,6 @@ def fplot_heatmap(
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot a matrix heatmap on a new figure."""
-
     return _wrap_aplot(
         aplot_heatmap,
         pd_df=pd_df,
@@ -90,7 +87,6 @@ def fplot_correlation_matrix(
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot a correlation matrix heatmap on a new figure."""
-
     return _wrap_aplot(
         aplot_correlation_matrix,
         pd_df=pd_df,

@@ -22,7 +22,6 @@ def aplot_pie_donut(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot pie or donut charts for categorical share visualization."""
-
     validate_dataframe(pd_df, cols=[category, value])
     plot_ax = _get_axis(ax)
     labels = pd_df[category]
@@ -53,7 +52,6 @@ def fplot_pie_donut(
     figsize: Tuple[float, float] = (8, 8),
 ) -> Figure:
     """Plot pie or donut charts on a new figure."""
-
     return _wrap_aplot(
         aplot_pie_donut,
         pd_df=pd_df,

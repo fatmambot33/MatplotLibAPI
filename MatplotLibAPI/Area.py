@@ -21,7 +21,6 @@ def aplot_area(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot area charts, optionally stacked for part-to-whole trends."""
-
     cols = [x, y]
     if label:
         cols.append(label)
@@ -54,7 +53,6 @@ def fplot_area(
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot area charts on a new figure."""
-
     return _wrap_aplot(
         aplot_area,
         pd_df=pd_df,

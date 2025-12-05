@@ -9,7 +9,6 @@ from matplotlib.figure import Figure
 
 def _get_axis(ax: Optional[Axes] = None) -> Axes:
     """Return a Matplotlib axes, defaulting to the current one."""
-
     return ax if ax is not None else plt.gca()
 
 
@@ -21,7 +20,6 @@ def _wrap_aplot(
     **kwargs,
 ) -> Figure:
     """Create a new figure and delegate plotting to an axis-level function."""
-
     ax_args = ax_args or {}
     fig, ax = plt.subplots(figsize=figsize, **ax_args)
     plot_func(pd_df=pd_df, ax=ax, **kwargs)

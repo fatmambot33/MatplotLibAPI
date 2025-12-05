@@ -22,7 +22,6 @@ def aplot_bar(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot bar or stacked bar charts for categorical comparisons."""
-
     cols = [category, value]
     if group:
         cols.append(group)
@@ -57,7 +56,6 @@ def fplot_bar(
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot bar or stacked bar charts on a new figure."""
-
     return _wrap_aplot(
         aplot_bar,
         pd_df=pd_df,

@@ -21,7 +21,6 @@ def aplot_histogram_kde(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot a histogram with an optional kernel density estimate."""
-
     validate_dataframe(pd_df, cols=[column])
     plot_ax = _get_axis(ax)
 
@@ -52,7 +51,6 @@ def fplot_histogram_kde(
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot a histogram with optional KDE on a new figure."""
-
     return _wrap_aplot(
         aplot_histogram_kde,
         pd_df=pd_df,

@@ -18,7 +18,6 @@ def fplot_sankey(
     style: StyleTemplate = SANKEY_STYLE_TEMPLATE,
 ) -> Figure:
     """Plot a Sankey diagram showing flows between categories."""
-
     validate_dataframe(pd_df, cols=[source, target, value])
 
     labels: List[str] = list(pd.unique(pd.concat([pd_df[source], pd_df[target]])))

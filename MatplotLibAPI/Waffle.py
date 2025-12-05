@@ -22,7 +22,6 @@ def aplot_waffle(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot a simple waffle chart as a grid of proportional squares."""
-
     validate_dataframe(pd_df, cols=[category, value])
     plot_ax = _get_axis(ax)
     total = float(pd_df[value].sum())
@@ -61,7 +60,6 @@ def fplot_waffle(
     figsize: Tuple[float, float] = (8, 8),
 ) -> Figure:
     """Plot waffle charts on a new figure."""
-
     return _wrap_aplot(
         aplot_waffle,
         pd_df=pd_df,

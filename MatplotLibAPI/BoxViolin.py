@@ -21,7 +21,6 @@ def aplot_box_violin(
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot box or violin charts to summarize distributions."""
-
     cols = [column]
     if by:
         cols.append(by)
@@ -52,7 +51,6 @@ def fplot_box_violin(
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot box or violin charts on a new figure."""
-
     return _wrap_aplot(
         aplot_box_violin,
         pd_df=pd_df,
