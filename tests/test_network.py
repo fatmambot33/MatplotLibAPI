@@ -15,3 +15,15 @@ def test_fplot_network(load_sample_df):
     )
 
     assert isinstance(fig, Figure)
+
+
+def test_accessor_fplot_network_components(load_sample_df):
+    """Render network component figures via the pandas accessor."""
+
+    df = load_sample_df("network.csv")
+
+    fig = df.mpl.fplot_network_components(
+        source="city_a", target="city_b", weight="distance_km"
+    )
+
+    assert isinstance(fig, Figure)

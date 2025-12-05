@@ -26,6 +26,7 @@ from .Network import (
     NETWORK_STYLE_TEMPLATE,
     aplot_network,
     aplot_network_components,
+    fplot_network_components,
     fplot_network,
 )
 from .Pie import aplot_pie_donut, fplot_pie_donut
@@ -112,6 +113,8 @@ class DataFrameAccessor:
         Plot connected components of a network graph on multiple axes.
     fplot_network
         Plot a network graph on a new figure.
+    fplot_network_components
+        Plot connected components of a network graph on a new figure.
     fplot_treemap
         Plot a treemap on a new Plotly figure.
     fplot_sunburst
@@ -1481,6 +1484,64 @@ class DataFrameAccessor:
             ascending=ascending,
             node_list=node_list,
             figsize=figsize,
+        )
+
+    def fplot_network_components(
+        self,
+        source: str = "source",
+        target: str = "target",
+        weight: str = "weight",
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        node_list: Optional[List] = None,
+        figsize: Tuple[float, float] = (19.2, 10.8),
+        n_cols: Optional[int] = None,
+    ) -> Figure:
+        """Plot network components on a new figure.
+
+        Parameters
+        ----------
+        source : str, optional
+            Column for source nodes. The default is "source".
+        target : str, optional
+            Column for target nodes. The default is "target".
+        weight : str, optional
+            Column for edge weights. The default is "weight".
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        sort_by : str, optional
+            Column to sort by.
+        ascending : bool, optional
+            Sort order. The default is `False`.
+        node_list : list, optional
+            List of nodes to include. If None, all nodes are used.
+        figsize : tuple[float, float], optional
+            Figure size. The default is (19.2, 10.8).
+        n_cols : int, optional
+            Number of columns for arranging component subplots.
+
+        Returns
+        -------
+        Figure
+            The new Matplotlib figure with component plots.
+        """
+
+        return fplot_network_components(
+            pd_df=self._obj,
+            source=source,
+            target=target,
+            weight=weight,
+            title=title,
+            style=style,
+            sort_by=sort_by,
+            ascending=ascending,
+            node_list=node_list,
+            figsize=figsize,
+            n_cols=n_cols,
         )
 
     def fplot_treemap(
