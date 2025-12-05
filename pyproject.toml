@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "MatplotLibAPI"
-version = "3.2.15"
+version = "3.2.16"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [

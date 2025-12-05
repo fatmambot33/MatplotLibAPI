@@ -7,7 +7,6 @@ import pandas as pd
 import plotly.graph_objects as go
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from pandas._typing import CorrelationMethod
 from pandas.api.extensions import register_dataframe_accessor
 
 from .Area import aplot_area, fplot_area
@@ -40,6 +39,7 @@ from .StyleTemplate import (
     TREEMAP_STYLE_TEMPLATE,
     StyleTemplate,
 )
+from ._typing import CorrelationMethod
 from .Table import aplot_table, fplot_table
 from .Timeserie import aplot_timeserie, fplot_timeserie
 from .Sunburst import fplot_sunburst

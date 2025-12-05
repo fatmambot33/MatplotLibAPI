@@ -7,7 +7,6 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from pandas._typing import CorrelationMethod
 
 from .StyleTemplate import (
     HEATMAP_STYLE_TEMPLATE,
@@ -16,6 +15,7 @@ from .StyleTemplate import (
     validate_dataframe,
 )
 from ._visualization_utils import _get_axis, _wrap_aplot
+from ._typing import CorrelationMethod
 
 
 def aplot_heatmap(
