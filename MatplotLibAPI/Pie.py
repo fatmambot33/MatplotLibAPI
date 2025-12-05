@@ -1,6 +1,6 @@
 """Pie and donut chart helpers."""
 
-from typing import Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -28,7 +28,7 @@ def aplot_pie_donut(
     labels = pd_df[category].astype(str).tolist()
     sizes = pd_df[value]
 
-    wedgeprops: dict[str, Any] | None = None
+    wedgeprops: Optional[Dict[str, Any]] = None
     if donut:
         wedgeprops = {"width": 0.3}
     wedges, *_ = plot_ax.pie(
