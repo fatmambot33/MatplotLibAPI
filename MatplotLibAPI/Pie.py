@@ -35,7 +35,8 @@ def aplot_pie_donut(
         colors=sns.color_palette(style.palette),
     )
     if donut:
-        centre_circle = Circle((0, 0), 0.70, fc=style.background_color)
+        donut_radius: float = 0.70
+        centre_circle = Circle((0.0, 0.0), donut_radius, fc=style.background_color)
         plot_ax.add_artist(centre_circle)
     plot_ax.axis("equal")
     if title:

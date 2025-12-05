@@ -1537,11 +1537,11 @@ class DataFrameAccessor:
 
     def fplot_sunburst(
         self,
-        path: str,
+        labels: str,
+        parents: str,
         values: str,
         style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
         title: Optional[str] = None,
-        color: Optional[str] = None,
         sort_by: Optional[str] = None,
         max_values: int = 100,
         ascending: bool = False,
@@ -1551,18 +1551,18 @@ class DataFrameAccessor:
 
         Parameters
         ----------
-        path : str
-            Column representing the hierarchical path.
+        labels : str
+            Column representing the labels of the sectors.
+        parents : str
+            Column representing the parent of each sector.
         values : str
             Column with values for the sunburst areas.
         style : StyleTemplate, optional
             Styling template. The default is `TREEMAP_STYLE_TEMPLATE`.
         title : str, optional
             Chart title.
-        color : str, optional
-            Column to use for coloring blocks. The default is ``None``.
         sort_by : str, optional
-            Column to sort by.
+            Column to sort by. Defaults to the ``values`` column when omitted.
         max_values : int, optional
             Maximum number of items to display. The default is 100.
         ascending : bool, optional
@@ -1576,11 +1576,11 @@ class DataFrameAccessor:
         """
         return fplot_sunburst(
             pd_df=self._obj,
-            path=path,
+            labels=labels,
+            parents=parents,
             values=values,
             title=title,
             style=style,
-            color=color,
             sort_by=sort_by,
             ascending=ascending,
             max_values=max_values,

@@ -7,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from pandas._typing import CorrelationMethod
 
 from .StyleTemplate import (
     HEATMAP_STYLE_TEMPLATE,
@@ -43,7 +44,7 @@ def aplot_heatmap(
 def aplot_correlation_matrix(
     pd_df: pd.DataFrame,
     columns: Optional[Sequence[str]] = None,
-    method: str = "pearson",
+    method: CorrelationMethod = "pearson",
     title: Optional[str] = None,
     style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
@@ -60,7 +61,7 @@ def aplot_correlation_matrix(
     validate_dataframe(pd_df, cols=list(subset))
     plot_ax = _get_axis(ax)
 
-    selected: pd.DataFrame = pd_df[list(subset)]
+    selected: pd.DataFrame = pd_df.loc[:, list(subset)]
     corr = selected.corr(method=method)
     sns.heatmap(corr, cmap=style.palette, annot=True, fmt=".2f", ax=plot_ax)
     if title:
