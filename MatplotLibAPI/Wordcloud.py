@@ -169,14 +169,15 @@ def _plot_words(
             ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
         return ax
 
-    fig = ax.get_figure()
-    if fig is None:
+    fig_obj = ax.get_figure()
+    if not isinstance(fig_obj, Figure):
         raise RuntimeError("Axes is not associated with a Figure.")
 
-    if fig.canvas is None:
+    canvas = fig_obj.canvas
+    if canvas is None:
         raise RuntimeError("Figure does not have an attached canvas.")
 
-    fig.canvas.draw()
+    canvas.draw()
     ax_bbox = ax.get_window_extent()
     width = max(int(ax_bbox.width), 1)
     height = max(int(ax_bbox.height), 1)
