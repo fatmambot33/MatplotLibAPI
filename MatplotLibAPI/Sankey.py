@@ -39,7 +39,7 @@ def fplot_sankey(
             title_text=title, font=dict(color=style.font_color, size=style.font_size)
         )
     if save_path:
-        if save_path.lower().endswith(('.html', '.htm')):
+        if save_path.lower().endswith((".html", ".htm")):
             fig.write_html(save_path, **(savefig_kwargs or {}))
         else:
             fig.write_image(save_path, **(savefig_kwargs or {}))

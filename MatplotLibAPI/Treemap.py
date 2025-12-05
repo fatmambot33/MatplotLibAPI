@@ -165,7 +165,7 @@ def fplot_treemap(
     fig.update_traces(marker=dict(colorscale=style.palette))
 
     if save_path:
-        if save_path.lower().endswith(('.html', '.htm')):
+        if save_path.lower().endswith((".html", ".htm")):
             fig.write_html(save_path, **(savefig_kwargs or {}))
         else:
             fig.write_image(save_path, **(savefig_kwargs or {}))
