@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colormaps
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from wordcloud import WordCloud
 
 from .StyleTemplate import (
     FIG_SIZE,
@@ -160,29 +161,35 @@ def _plot_words(
     matplotlib.axes.Axes
         Axes containing the rendered word cloud.
     """
-    rng = np.random.default_rng(seed=random_state)
-    font_sizes = _normalize_weights(weights, base_size=style.font_size)
-    cmap = colormaps.get_cmap(style.palette)
-
     ax.set_facecolor(style.background_color)
     ax.axis("off")
 
-    x_positions = rng.uniform(0.05, 0.95, size=len(words))
-    y_positions = rng.uniform(0.05, 0.95, size=len(words))
+    if not words:
+        if title:
+            ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
+        return ax
 
-    for idx, (word, weight) in enumerate(zip(words, weights)):
-        size = font_sizes[idx]
-        color = cmap(rng.random())
-        ax.text(
-            x_positions[idx],
-            y_positions[idx],
-            string_formatter(word),
-            ha="center",
-            va="center",
-            fontsize=size,
-            color=color,
-            transform=ax.transAxes,
-        )
+    ax.figure.canvas.draw()
+    ax_bbox = ax.get_window_extent().transformed(ax.figure.dpi_scale_trans)
+    width = max(int(ax_bbox.width), 1)
+    height = max(int(ax_bbox.height), 1)
+
+    frequency_map = {
+        string_formatter(word): weight for word, weight in zip(words, weights)
+    }
+
+    font_sizes = _normalize_weights(weights, base_size=style.font_size)
+    wc = WordCloud(
+        width=width,
+        height=height,
+        background_color=style.background_color,
+        colormap=colormaps.get_cmap(style.palette),
+        min_font_size=int(font_sizes.min(initial=style.font_size)),
+        max_font_size=int(font_sizes.max(initial=style.font_size * 4)),
+        random_state=random_state,
+    ).generate_from_frequencies(frequency_map)
+
+    ax.imshow(wc, interpolation="bilinear")
 
     if title:
         ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)

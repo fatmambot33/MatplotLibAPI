@@ -16,6 +16,7 @@ dependencies = [
     "kaleido",
     "nbformat",
     "numpy",
+    "wordcloud",
 ]
 
 [project.optional-dependencies]
