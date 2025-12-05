@@ -807,6 +807,8 @@ def fplot_network(
     ascending: bool = False,
     node_list: Optional[List] = None,
     figsize: Tuple[float, float] = (19.2, 10.8),
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a figure with a network graph.
 
@@ -853,6 +855,8 @@ def fplot_network(
         node_list=node_list,
         ax=ax,
     )
+    if save_path:
+        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig
 
 
@@ -868,6 +872,8 @@ def fplot_network_components(
     node_list: Optional[List] = None,
     figsize: Tuple[float, float] = (19.2, 10.8),
     n_cols: Optional[int] = None,
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a figure showing individual network components.
 
@@ -945,4 +951,6 @@ def fplot_network_components(
 
     plt.tight_layout(rect=(0, 0.03, 1, 0.95))
 
+    if save_path:
+        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig

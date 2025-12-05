@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable, Optional, Sequence, Tuple, cast
+from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -273,6 +273,8 @@ def fplot_wordcloud(
     stopwords: Optional[Iterable[str]] = None,
     random_state: Optional[int] = None,
     figsize: Tuple[float, float] = FIG_SIZE,
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Create a new figure with a word cloud.
 
@@ -326,4 +328,6 @@ def fplot_wordcloud(
     )
     fig.patch.set_facecolor(style.background_color)
     fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig

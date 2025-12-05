@@ -1,6 +1,6 @@
 """Table plotting helpers."""
 
-from typing import List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -173,6 +173,8 @@ def fplot_table(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     figsize: Tuple[float, float] = (19.2, 10.8),
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a new figure containing a formatted table.
 
@@ -217,4 +219,6 @@ def fplot_table(
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     ax = aplot_table(pd_df, cols, title, style, max_values, sort_by, ascending, ax)
+    if save_path:
+        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig

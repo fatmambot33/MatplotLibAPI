@@ -1,6 +1,6 @@
 """Area chart helpers."""
 
-from typing import Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
 from matplotlib.axes import Axes
@@ -61,6 +61,8 @@ def fplot_area(
     title: Optional[str] = None,
     style: StyleTemplate = AREA_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (10, 6),
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Plot area charts on a new figure."""
     return _wrap_aplot(
@@ -73,4 +75,6 @@ def fplot_area(
         stacked=stacked,
         title=title,
         style=style,
+        save_path=save_path,
+        savefig_kwargs=savefig_kwargs,
     )
