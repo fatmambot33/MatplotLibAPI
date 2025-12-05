@@ -162,7 +162,7 @@ def create_circular_mask(size: int = 300, radius: Optional[int] = None) -> np.nd
     center = (size - 1) / 2
     x, y = np.ogrid[:size, :size]
     mask_region = (x - center) ** 2 + (y - center) ** 2 > resolved_radius**2
-    return (255 * mask_region.astype(np.uint8))
+    return 255 * mask_region.astype(np.uint8)
 
 
 def _plot_words(
