@@ -17,6 +17,7 @@ from .Network import (
     NETWORK_STYLE_TEMPLATE,
     aplot_network,
     aplot_network_components,
+    fplot_network_components,
     fplot_network,
     prepare_network_graph,
 )
@@ -56,6 +57,7 @@ __all__ = [
     "aplot_waffle",
     "fplot_bubble",
     "fplot_network",
+    "fplot_network_components",
     "fplot_table",
     "fplot_timeserie",
     "fplot_wordcloud",
