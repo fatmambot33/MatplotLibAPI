@@ -167,6 +167,133 @@ def generate_wordcloud_data():
     df.to_csv("data/wordcloud.csv", index=False)
 
 
+def generate_bar_data():
+    """Generate and save sample data for bar and stacked bar charts."""
+
+    data = {
+        "product": ["Gadget", "Gadget", "Gadget", "Widget", "Widget", "Widget"],
+        "region": ["North", "South", "West", "North", "South", "West"],
+        "revenue": [120000, 95000, 88000, 110000, 102000, 76000],
+    }
+    df = pd.DataFrame(data)
+    df.to_csv("data/bar.csv", index=False)
+
+
+def generate_histogram_data():
+    """Generate and save sample data for histogram and KDE plots."""
+
+    data = {
+        "waiting_time_minutes": [
+            5,
+            7,
+            6,
+            12,
+            15,
+            9,
+            4,
+            18,
+            20,
+            11,
+            6,
+            7,
+            9,
+            14,
+            16,
+            8,
+            10,
+            6,
+            13,
+            12,
+        ]
+    }
+    df = pd.DataFrame(data)
+    df.to_csv("data/histogram.csv", index=False)
+
+
+def generate_box_violin_data():
+    """Generate and save sample data for box and violin plots."""
+
+    data = {
+        "department": [
+            "Engineering",
+            "Engineering",
+            "Engineering",
+            "Sales",
+            "Sales",
+            "Sales",
+            "Support",
+            "Support",
+            "Support",
+        ],
+        "satisfaction_score": [
+            7.8,
+            8.3,
+            7.5,
+            6.4,
+            6.9,
+            7.2,
+            7.0,
+            7.4,
+            6.8,
+        ],
+    }
+    df = pd.DataFrame(data)
+    df.to_csv("data/box_violin.csv", index=False)
+
+
+def generate_heatmap_and_correlation_data():
+    """Generate and save sample data for heatmaps and correlation matrices."""
+
+    data = {
+        "month": ["Jan", "Jan", "Feb", "Feb", "Mar", "Mar", "Apr", "Apr"],
+        "channel": ["Email", "Social", "Email", "Social", "Email", "Social", "Email", "Social"],
+        "engagements": [340, 420, 380, 510, 410, 560, 390, 530],
+        "conversions": [34, 28, 30, 32, 36, 35, 33, 31],
+        "cost_per_click": [0.75, 0.65, 0.72, 0.68, 0.74, 0.64, 0.73, 0.66],
+    }
+    df = pd.DataFrame(data)
+    df.to_csv("data/heatmap.csv", index=False)
+    df[["engagements", "conversions", "cost_per_click"]].to_csv(
+        "data/correlation.csv", index=False
+    )
+
+
+def generate_area_data():
+    """Generate and save sample data for area charts."""
+
+    data = {
+        "quarter": ["Q1", "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q4"],
+        "segment": ["SMB", "SMB", "SMB", "SMB", "Enterprise", "Enterprise", "Enterprise", "Enterprise"],
+        "subscriptions": [120, 150, 170, 190, 200, 230, 260, 300],
+    }
+    df = pd.DataFrame(data)
+    df.to_csv("data/area.csv", index=False)
+
+
+def generate_pie_waffle_data():
+    """Generate and save sample data for pie, donut, and waffle charts."""
+
+    data = {
+        "device": ["Desktop", "Mobile", "Tablet", "Other"],
+        "sessions": [5200, 8900, 1300, 600],
+    }
+    df = pd.DataFrame(data)
+    df.to_csv("data/pie.csv", index=False)
+    df.to_csv("data/waffle.csv", index=False)
+
+
+def generate_sankey_data():
+    """Generate and save sample data for Sankey diagrams."""
+
+    data = {
+        "source": ["Homepage", "Homepage", "Landing Page", "Landing Page", "Cart"],
+        "target": ["Landing Page", "Product", "Product", "Signup", "Checkout"],
+        "value": [3000, 1500, 1200, 800, 500],
+    }
+    df = pd.DataFrame(data)
+    df.to_csv("data/sankey.csv", index=False)
+
+
 def main():
     """Generate all sample data."""
     if not os.path.exists("data"):
@@ -180,6 +307,13 @@ def main():
     generate_treemap_data()
     generate_sunburst_data()
     generate_wordcloud_data()
+    generate_bar_data()
+    generate_histogram_data()
+    generate_box_violin_data()
+    generate_heatmap_and_correlation_data()
+    generate_area_data()
+    generate_pie_waffle_data()
+    generate_sankey_data()
 
 
 if __name__ == "__main__":
