@@ -1,6 +1,6 @@
 """Area chart helpers."""
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 from matplotlib.axes import Axes
@@ -24,6 +24,7 @@ def aplot_area(
     title: Optional[str] = None,
     style: StyleTemplate = AREA_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot area charts, optionally stacked for part-to-whole trends."""
     cols = [x, y]

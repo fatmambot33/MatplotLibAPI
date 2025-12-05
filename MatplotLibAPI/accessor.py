@@ -7,6 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from pandas._typing import CorrelationMethod
 from pandas.api.extensions import register_dataframe_accessor
 
 from .Area import aplot_area, fplot_area
@@ -664,7 +665,7 @@ class DataFrameAccessor:
     def aplot_correlation_matrix(
         self,
         columns: Optional[List[str]] = None,
-        method: str = "pearson",
+        method: CorrelationMethod = "pearson",
         title: Optional[str] = None,
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
         ax: Optional[Axes] = None,
@@ -675,7 +676,7 @@ class DataFrameAccessor:
         ----------
         columns : list[str], optional
             Numeric columns to include. The default is ``None`` for all numeric columns.
-        method : str, optional
+        method : CorrelationMethod, optional
             Correlation method. The default is "pearson".
         title : str, optional
             Chart title.
@@ -701,7 +702,7 @@ class DataFrameAccessor:
     def fplot_correlation_matrix(
         self,
         columns: Optional[List[str]] = None,
-        method: str = "pearson",
+        method: CorrelationMethod = "pearson",
         title: Optional[str] = None,
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (19.2, 10.8),
@@ -712,7 +713,7 @@ class DataFrameAccessor:
         ----------
         columns : list[str], optional
             Numeric columns to include. The default is ``None`` for all numeric columns.
-        method : str, optional
+        method : CorrelationMethod, optional
             Correlation method. The default is "pearson".
         title : str, optional
             Chart title.

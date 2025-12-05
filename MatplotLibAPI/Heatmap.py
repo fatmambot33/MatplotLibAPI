@@ -1,6 +1,6 @@
 """Heatmap and correlation matrix helpers."""
 
-from typing import Optional, Sequence, Tuple
+from typing import Any, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -26,6 +26,7 @@ def aplot_heatmap(
     title: Optional[str] = None,
     style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot a matrix heatmap for multivariate pattern detection."""
     validate_dataframe(pd_df, cols=[x, y, value])
@@ -48,6 +49,7 @@ def aplot_correlation_matrix(
     title: Optional[str] = None,
     style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot a correlation matrix heatmap for numeric columns."""
     subset = (
@@ -94,7 +96,7 @@ def fplot_heatmap(
 def fplot_correlation_matrix(
     pd_df: pd.DataFrame,
     columns: Optional[Sequence[str]] = None,
-    method: str = "pearson",
+    method: CorrelationMethod = "pearson",
     title: Optional[str] = None,
     style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (10, 6),

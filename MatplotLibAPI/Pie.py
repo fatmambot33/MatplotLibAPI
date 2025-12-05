@@ -1,6 +1,6 @@
 """Pie and donut chart helpers."""
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -21,6 +21,7 @@ def aplot_pie_donut(
     title: Optional[str] = None,
     style: StyleTemplate = PIE_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot pie or donut charts for categorical share visualization."""
     validate_dataframe(pd_df, cols=[category, value])

@@ -28,4 +28,5 @@ def _wrap_aplot(
     ax_args = ax_args or {}
     fig, ax = plt.subplots(figsize=figsize, **ax_args)
     plot_func(pd_df=pd_df, ax=ax, **kwargs)
-    return cast(Figure, fig)
+    fig_obj: Figure = cast(Figure, fig)
+    return fig_obj

@@ -1,6 +1,6 @@
 """Histogram and KDE plotting helpers."""
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
@@ -24,6 +24,7 @@ def aplot_histogram_kde(
     title: Optional[str] = None,
     style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot a histogram with an optional kernel density estimate."""
     validate_dataframe(pd_df, cols=[column])

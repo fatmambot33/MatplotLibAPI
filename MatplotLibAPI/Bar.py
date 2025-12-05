@@ -1,6 +1,6 @@
 """Bar and stacked bar chart helpers."""
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
@@ -25,6 +25,7 @@ def aplot_bar(
     title: Optional[str] = None,
     style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot bar or stacked bar charts for categorical comparisons."""
     cols = [category, value]

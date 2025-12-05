@@ -1,6 +1,6 @@
 """Waffle chart helpers."""
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
@@ -21,6 +21,7 @@ def aplot_waffle(
     title: Optional[str] = None,
     style: StyleTemplate = PIE_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot a simple waffle chart as a grid of proportional squares."""
     validate_dataframe(pd_df, cols=[category, value])

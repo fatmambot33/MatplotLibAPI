@@ -1,6 +1,6 @@
 """Box and violin plot helpers."""
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
@@ -24,6 +24,7 @@ def aplot_box_violin(
     title: Optional[str] = None,
     style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot box or violin charts to summarize distributions."""
     cols = [column]
