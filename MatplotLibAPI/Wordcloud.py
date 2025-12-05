@@ -170,7 +170,7 @@ def _plot_words(
         return ax
 
     ax.figure.canvas.draw()
-    ax_bbox = ax.get_window_extent().transformed(ax.figure.dpi_scale_trans)
+    ax_bbox = ax.get_window_extent()
     width = max(int(ax_bbox.width), 1)
     height = max(int(ax_bbox.height), 1)
 
