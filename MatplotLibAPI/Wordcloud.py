@@ -219,7 +219,7 @@ def _plot_words(
         mask=resolved_mask,
     ).generate_from_frequencies(frequency_map)
 
-    ax.imshow(wc, interpolation="bilinear")
+    ax.imshow(wc.to_array(), interpolation="bilinear")
 
     if title:
         ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
