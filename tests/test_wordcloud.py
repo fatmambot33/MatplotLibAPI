@@ -21,10 +21,14 @@ def test_fplot_wordcloud(load_sample_df):
     )
 
     assert isinstance(fig, Figure)
-    default_mask = create_circular_mask(size=300)
-    image = fig.axes[0].images[0].get_array()
+    fig.canvas.draw()
+    ax = fig.axes[0]
+    expected_size = int(
+        max(ax.get_window_extent().width, ax.get_window_extent().height)
+    )
+    image = ax.images[0].get_array()
     assert image is not None
-    assert tuple(image.shape[:2]) == default_mask.shape
+    assert image.shape[0] == image.shape[1] >= expected_size
 
 
 def test_fplot_wordcloud_with_mask(load_sample_df):
@@ -62,9 +66,13 @@ def test_aplot_wordcloud(load_sample_df):
 
     assert result_ax is not None
     assert ax is result_ax
+    fig.canvas.draw()
+    expected_size = int(
+        max(ax.get_window_extent().width, ax.get_window_extent().height)
+    )
     image = result_ax.images[0].get_array()
     assert image is not None
-    assert image.shape[0] > 0 and image.shape[1] > 0
+    assert image.shape[0] == image.shape[1] >= expected_size
 
 
 def test_create_circular_mask():

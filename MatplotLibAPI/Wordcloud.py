@@ -187,20 +187,17 @@ def _plot_words(
 
     canvas.draw()
     ax_bbox = ax.get_window_extent()
-    resolved_mask = create_circular_mask() if mask is None else np.asarray(mask)
-    if resolved_mask is not None and resolved_mask.ndim != 2:
+
+    if mask is None:
+        mask_dimension = max(int(ax_bbox.width), int(ax_bbox.height), 1)
+        resolved_mask = create_circular_mask(size=mask_dimension)
+    else:
+        resolved_mask = np.asarray(mask)
+
+    if resolved_mask.ndim != 2:
         raise ValueError("mask must be a 2D array.")
 
-    width = (
-        max(int(ax_bbox.width), 1)
-        if resolved_mask is None
-        else max(int(resolved_mask.shape[1]), 1)
-    )
-    height = (
-        max(int(ax_bbox.height), 1)
-        if resolved_mask is None
-        else max(int(resolved_mask.shape[0]), 1)
-    )
+    height, width = resolved_mask.shape
 
     frequency_map = {
         string_formatter(word): weight for word, weight in zip(words, weights)
