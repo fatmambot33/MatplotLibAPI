@@ -35,7 +35,12 @@ from .Timeserie import TIMESERIE_STYLE_TEMPLATE, aplot_timeserie, fplot_timeseri
 from .Sunburst import fplot_sunburst
 from .Treemap import TREEMAP_STYLE_TEMPLATE, fplot_treemap
 from .Waffle import aplot_waffle, fplot_waffle
-from .Wordcloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
+from .Wordcloud import (
+    WORDCLOUD_STYLE_TEMPLATE,
+    aplot_wordcloud,
+    create_circular_mask,
+    fplot_wordcloud,
+)
 from .accessor import DataFrameAccessor
 
 __all__ = [
@@ -54,6 +59,7 @@ __all__ = [
     "aplot_correlation_matrix",
     "aplot_area",
     "aplot_pie_donut",
+    "create_circular_mask",
     "aplot_waffle",
     "fplot_bubble",
     "fplot_network",
