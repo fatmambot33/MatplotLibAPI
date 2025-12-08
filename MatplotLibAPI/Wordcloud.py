@@ -235,7 +235,7 @@ def aplot_wordcloud(
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
     random_state: Optional[int] = None,
-    ax: Optional[Axes | np.ndarray[Any]] = None,
+    ax: Optional[Axes | np.ndarray[Any, np.dtype[Any]]] = None,
     mask: Optional[np.ndarray] = None,
 ) -> Axes:
     """Plot a word cloud on the provided axes.
