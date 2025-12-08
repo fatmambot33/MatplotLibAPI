@@ -31,12 +31,12 @@ jobs:
 
     - name: Run style checks
       run: |
-        pydocstyle MatplotLibAPI
+        pydocstyle .
         black --check .
 
     - name: Run static type analysis
       run: |
-        pyright MatplotLibAPI
+        pyright .
 
     - name: Run tests with coverage
       run: |
