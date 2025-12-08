@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Generator
 
 import pandas as pd
 import pytest
@@ -28,7 +28,7 @@ def sample_data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
 @pytest.fixture(scope="session")
 def load_sample_df(
     sample_data_dir: Path,
-) -> Callable[[str, Any], pd.DataFrame]:
+) -> Callable[..., pd.DataFrame]:
     """Return a loader that reads generated sample CSVs into dataframes."""
 
     def _loader(filename: str, **kwargs: Any) -> pd.DataFrame:
@@ -38,7 +38,7 @@ def load_sample_df(
 
 
 @pytest.fixture(autouse=True)
-def close_matplotlib_figures() -> None:
+def close_matplotlib_figures() -> Generator[None, None, None]:
     """Close any matplotlib figures created during a test."""
 
     yield
