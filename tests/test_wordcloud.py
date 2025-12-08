@@ -63,6 +63,8 @@ def test_aplot_wordcloud(load_sample_df):
 
     df = load_sample_df("wordcloud.csv")
     fig, ax = plt.subplots()
+    fig = cast(Figure, fig)
+    ax = cast(Axes, ax)
 
     result_ax = aplot_wordcloud(
         ax=ax,
