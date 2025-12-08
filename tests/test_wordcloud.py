@@ -1,6 +1,9 @@
 """Tests for word cloud visualizations."""
 
+from typing import cast
+
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import numpy as np
 
@@ -16,15 +19,21 @@ def test_fplot_wordcloud(load_sample_df):
 
     df = load_sample_df("wordcloud.csv")
 
-    fig = fplot_wordcloud(
-        pd_df=df, text_column="country", weight_column="population", random_state=42
+    fig = cast(
+        Figure,
+        fplot_wordcloud(
+            pd_df=df, text_column="country", weight_column="population", random_state=42
+        ),
     )
 
-    assert isinstance(fig, Figure)
-    default_mask = create_circular_mask(size=300)
-    image = fig.axes[0].images[0].get_array()
+    fig.canvas.draw()
+    ax = cast(Axes, fig.axes[0])
+    expected_size = int(
+        max(ax.get_window_extent().width, ax.get_window_extent().height)
+    )
+    image = ax.images[0].get_array()
     assert image is not None
-    assert tuple(image.shape[:2]) == default_mask.shape
+    assert image.shape[0] == image.shape[1] >= expected_size
 
 
 def test_fplot_wordcloud_with_mask(load_sample_df):
@@ -33,15 +42,18 @@ def test_fplot_wordcloud_with_mask(load_sample_df):
     df = load_sample_df("wordcloud.csv")
     mask = create_circular_mask(size=200)
 
-    fig = fplot_wordcloud(
-        pd_df=df,
-        text_column="country",
-        weight_column="population",
-        random_state=0,
-        mask=mask,
+    fig = cast(
+        Figure,
+        fplot_wordcloud(
+            pd_df=df,
+            text_column="country",
+            weight_column="population",
+            random_state=0,
+            mask=mask,
+        ),
     )
 
-    image = fig.axes[0].images[0].get_array()
+    image = cast(Axes, fig.axes[0]).images[0].get_array()
     assert image is not None
     assert tuple(image.shape[:2]) == mask.shape
 
@@ -51,6 +63,8 @@ def test_aplot_wordcloud(load_sample_df):
 
     df = load_sample_df("wordcloud.csv")
     fig, ax = plt.subplots()
+    fig = cast(Figure, fig)
+    ax = cast(Axes, ax)
 
     result_ax = aplot_wordcloud(
         ax=ax,
@@ -62,9 +76,13 @@ def test_aplot_wordcloud(load_sample_df):
 
     assert result_ax is not None
     assert ax is result_ax
+    fig.canvas.draw()
+    expected_size = int(
+        max(ax.get_window_extent().width, ax.get_window_extent().height)
+    )
     image = result_ax.images[0].get_array()
     assert image is not None
-    assert image.shape[0] > 0 and image.shape[1] > 0
+    assert image.shape[0] == image.shape[1] >= expected_size
 
 
 def test_create_circular_mask():
