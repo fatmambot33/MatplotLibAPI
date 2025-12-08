@@ -97,7 +97,7 @@ def generate_treemap_data():
     }
     df = pd.DataFrame(data)
     # For treemap, we need a path-like structure. We will create it here.
-    df["path"] = df["parent"] + "/" + df["location"]
+    df["path"] = df["parent"].str.cat(df["location"], sep="/")
     df["path"] = df["path"].str.lstrip("/")
     df.to_csv("data/treemap.csv", index=False)
 
@@ -169,7 +169,6 @@ def generate_wordcloud_data():
 
 def generate_bar_data():
     """Generate and save sample data for bar and stacked bar charts."""
-
     data = {
         "product": ["Gadget", "Gadget", "Gadget", "Widget", "Widget", "Widget"],
         "region": ["North", "South", "West", "North", "South", "West"],
@@ -181,7 +180,6 @@ def generate_bar_data():
 
 def generate_histogram_data():
     """Generate and save sample data for histogram and KDE plots."""
-
     data = {
         "waiting_time_minutes": [
             5,
@@ -212,7 +210,6 @@ def generate_histogram_data():
 
 def generate_box_violin_data():
     """Generate and save sample data for box and violin plots."""
-
     data = {
         "department": [
             "Engineering",
@@ -243,7 +240,6 @@ def generate_box_violin_data():
 
 def generate_heatmap_and_correlation_data():
     """Generate and save sample data for heatmaps and correlation matrices."""
-
     data = {
         "month": ["Jan", "Jan", "Feb", "Feb", "Mar", "Mar", "Apr", "Apr"],
         "channel": [
@@ -269,7 +265,6 @@ def generate_heatmap_and_correlation_data():
 
 def generate_area_data():
     """Generate and save sample data for area charts."""
-
     data = {
         "quarter": ["Q1", "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q4"],
         "segment": [
@@ -290,7 +285,6 @@ def generate_area_data():
 
 def generate_pie_waffle_data():
     """Generate and save sample data for pie, donut, and waffle charts."""
-
     data = {
         "device": ["Desktop", "Mobile", "Tablet", "Other"],
         "sessions": [5200, 8900, 1300, 600],
@@ -302,7 +296,6 @@ def generate_pie_waffle_data():
 
 def generate_sankey_data():
     """Generate and save sample data for Sankey diagrams."""
-
     data = {
         "source": ["Homepage", "Homepage", "Landing Page", "Landing Page", "Cart"],
         "target": ["Landing Page", "Product", "Product", "Signup", "Checkout"],
