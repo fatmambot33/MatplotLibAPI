@@ -33,10 +33,12 @@ def aplot_box_violin(
     validate_dataframe(pd_df, cols=cols)
     plot_ax = _get_axis(ax)
 
+    common_kwargs = {"data": pd_df, "x": by, "y": column, "palette": style.palette}
+
     if violin:
-        sns.violinplot(data=pd_df, x=by, y=column, palette=style.palette, ax=plot_ax)
+        sns.violinplot(**common_kwargs, hue=by, legend=False, ax=plot_ax)
     else:
-        sns.boxplot(data=pd_df, x=by, y=column, palette=style.palette, ax=plot_ax)
+        sns.boxplot(**common_kwargs, hue=by, legend=False, ax=plot_ax)
 
     plot_ax.set_facecolor(style.background_color)
     plot_ax.set_ylabel(string_formatter(column))
