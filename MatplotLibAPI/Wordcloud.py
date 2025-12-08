@@ -25,33 +25,6 @@ WORDCLOUD_STYLE_TEMPLATE = StyleTemplate(
 )
 
 
-def _normalize_weights(weights: Sequence[float], base_size: int) -> np.ndarray:
-    """Normalize weights to a range of font sizes.
-
-    Parameters
-    ----------
-    weights : Sequence[float]
-        Sequence of weights representing word importance.
-    base_size : int
-        Base font size used as the lower bound for scaling.
-
-    Returns
-    -------
-    numpy.ndarray
-        Array of font sizes corresponding to the provided weights.
-    """
-    numeric_weights = np.asarray(weights, dtype=float)
-    if numeric_weights.size == 0:
-        return np.array([], dtype=float)
-    min_weight = numeric_weights.min()
-    max_weight = numeric_weights.max()
-    if min_weight == max_weight:
-        return np.full_like(numeric_weights, fill_value=base_size, dtype=float)
-
-    min_size, max_size = base_size, base_size * 4
-    return np.interp(numeric_weights, (min_weight, max_weight), (min_size, max_size))
-
-
 def _filter_stopwords(
     words: Iterable[str], stopwords: Optional[Iterable[str]]
 ) -> np.ndarray:
@@ -185,15 +158,16 @@ def _plot_words(
     frequency_map = {
         string_formatter(word): weight for word, weight in zip(words, weights)
     }
+    min_font_size = style.font_mapping[min(style.font_mapping.keys())]
+    max_font_size = style.font_mapping[max(style.font_mapping.keys())]
 
-    font_sizes = _normalize_weights(weights, base_size=style.font_size)
     wc = WordCloud(
         width=width,
         height=height,
         background_color=style.background_color,
         colormap=colormaps.get_cmap(style.palette),
-        min_font_size=int(font_sizes.min(initial=style.font_size)),
-        max_font_size=int(font_sizes.max(initial=style.font_size * 4)),
+        min_font_size=min_font_size,
+        max_font_size=max_font_size,
         random_state=random_state,
     ).generate_from_frequencies(frequency_map)
 
