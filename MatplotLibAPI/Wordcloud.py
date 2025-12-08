@@ -235,7 +235,7 @@ def aplot_wordcloud(
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
     random_state: Optional[int] = None,
-    ax: Optional[Axes] = None,
+    ax: Optional[Axes | np.ndarray[Any]] = None,
     mask: Optional[np.ndarray] = None,
 ) -> Axes:
     """Plot a word cloud on the provided axes.
@@ -258,7 +258,7 @@ def aplot_wordcloud(
         Words to exclude from the visualization. Defaults to ``None``.
     random_state : int, optional
         Seed for word placement. Defaults to ``None``.
-    ax : matplotlib.axes.Axes, optional
+    ax : matplotlib.axes.Axes or numpy.ndarray, optional
         Axes to draw on. Defaults to ``None`` which uses the current axes.
     mask : numpy.ndarray, optional
         Two-dimensional mask array defining the drawable region of the word cloud.
@@ -273,9 +273,15 @@ def aplot_wordcloud(
     ------
     AttributeError
         If required columns are missing from the DataFrame.
+    TypeError
+        If ``ax`` is not a ``matplotlib.axes.Axes`` instance.
     """
     if ax is None:
         ax = cast(Axes, plt.gca())
+    elif isinstance(ax, np.ndarray):
+        raise TypeError("ax must be a single matplotlib Axes instance, not an array.")
+    elif not isinstance(ax, Axes):
+        raise TypeError("ax must be a matplotlib Axes instance.")
 
     words, weights = _prepare_word_frequencies(
         pd_df=pd_df,
