@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 from matplotlib.table import Table
 
-from .StyleTemplate import StyleTemplate, string_formatter, validate_dataframe
+from .StyleTemplate import StyleTemplate, string_formatter, validate_dataframe, FIG_SIZE
 
 TABLE_STYLE_TEMPLATE = StyleTemplate(
     background_color="black", fig_border="darkgrey", font_color="white", palette="magma"
@@ -172,7 +172,7 @@ def fplot_table(
     max_values: int = 20,
     sort_by: Optional[str] = None,
     ascending: bool = False,
-    figsize: Tuple[float, float] = (19.2, 10.8),
+    figsize: Tuple[float, float] = FIG_SIZE,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
@@ -195,7 +195,7 @@ def fplot_table(
     ascending : bool, optional
         Sort order for the data, by default ``False``.
     figsize : tuple of float, optional
-        Size of the created figure, by default ``(19.2, 10.8)``.
+        Size of the created figure, by default ``FIG_SIZE``.
 
     Returns
     -------

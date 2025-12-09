@@ -32,6 +32,7 @@ from .Network import (
 from .Pie import aplot_pie_donut, fplot_pie_donut
 from .Sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
 from .StyleTemplate import (
+    FIG_SIZE,
     AREA_STYLE_TEMPLATE,
     DISTRIBUTION_STYLE_TEMPLATE,
     PIE_STYLE_TEMPLATE,
@@ -210,7 +211,7 @@ class DataFrameAccessor:
         ascending: bool = False,
         hline: bool = False,
         vline: bool = False,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
         save_path: Optional[str] = None,
         savefig_kwargs: Optional[Dict[str, Any]] = None,
     ) -> Figure:
@@ -243,7 +244,7 @@ class DataFrameAccessor:
         vline : bool, optional
             If True, draw a vertical line at the mean of x-values. The default is `False`.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -386,7 +387,7 @@ class DataFrameAccessor:
         stacked: bool = False,
         title: Optional[str] = None,
         style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot bar or stacked bar charts on a new figure.
 
@@ -405,7 +406,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``DISTRIBUTION_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -471,7 +472,7 @@ class DataFrameAccessor:
         kde: bool = True,
         title: Optional[str] = None,
         style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a histogram with an optional KDE on a new figure.
 
@@ -488,7 +489,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``DISTRIBUTION_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -553,7 +554,7 @@ class DataFrameAccessor:
         violin: bool = False,
         title: Optional[str] = None,
         style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot box or violin charts on a new figure.
 
@@ -570,7 +571,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``DISTRIBUTION_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -635,7 +636,7 @@ class DataFrameAccessor:
         value: str,
         title: Optional[str] = None,
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a heatmap on a new figure.
 
@@ -652,7 +653,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``HEATMAP_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -712,7 +713,7 @@ class DataFrameAccessor:
         method: CorrelationMethod = "pearson",
         title: Optional[str] = None,
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a correlation matrix heatmap on a new figure.
 
@@ -727,7 +728,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``HEATMAP_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -796,7 +797,7 @@ class DataFrameAccessor:
         stacked: bool = True,
         title: Optional[str] = None,
         style: StyleTemplate = AREA_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot an area chart on a new figure.
 
@@ -815,7 +816,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``AREA_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -881,7 +882,7 @@ class DataFrameAccessor:
         donut: bool = False,
         title: Optional[str] = None,
         style: StyleTemplate = PIE_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot pie or donut charts on a new figure.
 
@@ -898,7 +899,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``PIE_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -963,7 +964,7 @@ class DataFrameAccessor:
         rows: int = 10,
         title: Optional[str] = None,
         style: StyleTemplate = PIE_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot waffle charts on a new figure.
 
@@ -980,7 +981,7 @@ class DataFrameAccessor:
         style : StyleTemplate, optional
             Styling template. The default is ``PIE_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -1087,7 +1088,7 @@ class DataFrameAccessor:
         max_values: int = 20,
         sort_by: Optional[str] = None,
         ascending: bool = False,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a table of the DataFrame's data on a new figure.
 
@@ -1106,7 +1107,7 @@ class DataFrameAccessor:
         ascending : bool, optional
             Sort order. The default is `False`.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -1192,7 +1193,7 @@ class DataFrameAccessor:
         sort_by: Optional[str] = None,
         ascending: bool = False,
         std: bool = False,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a time series on a new figure.
 
@@ -1217,7 +1218,7 @@ class DataFrameAccessor:
         std : bool, optional
             If True, plot the standard deviation. The default is `False`.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -1296,7 +1297,7 @@ class DataFrameAccessor:
         max_words: int = 50,
         stopwords: Optional[List[str]] = None,
         random_state: Optional[int] = None,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a word cloud on a new figure.
 
@@ -1317,7 +1318,7 @@ class DataFrameAccessor:
         random_state : int, optional
             Seed for word placement. The default is ``None``.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -1447,7 +1448,7 @@ class DataFrameAccessor:
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_list: Optional[List] = None,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a network graph on a new figure.
 
@@ -1470,7 +1471,7 @@ class DataFrameAccessor:
         node_list : list, optional
             List of nodes to include. If None, all nodes are used.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -1500,7 +1501,7 @@ class DataFrameAccessor:
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_list: Optional[List] = None,
-        figsize: Tuple[float, float] = (19.2, 10.8),
+        figsize: Tuple[float, float] = FIG_SIZE,
         n_cols: Optional[int] = None,
     ) -> Figure:
         """Plot network components on a new figure.
@@ -1524,7 +1525,7 @@ class DataFrameAccessor:
         node_list : list, optional
             List of nodes to include. If None, all nodes are used.
         figsize : tuple[float, float], optional
-            Figure size. The default is (19.2, 10.8).
+            Figure size. The default is FIG_SIZE.
         n_cols : int, optional
             Number of columns for arranging component subplots.
 

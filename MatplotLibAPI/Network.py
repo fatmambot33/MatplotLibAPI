@@ -14,6 +14,7 @@ from matplotlib.figure import Figure
 
 from .StyleTemplate import (
     NETWORK_STYLE_TEMPLATE,
+    FIG_SIZE,
     StyleTemplate,
     format_func,
     string_formatter,
@@ -614,7 +615,7 @@ def compute_network_grid(
     n_components = len(connected_components)
     n_cols = int(np.ceil(np.sqrt(n_components)))
     n_rows = int(np.ceil(n_components / n_cols))
-    fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=(19.2, 10.8))
+    fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=FIG_SIZE)
     fig = cast(Figure, fig)
     fig.patch.set_facecolor(style.background_color)
     if not isinstance(axes_grid, np.ndarray):
@@ -806,7 +807,7 @@ def fplot_network(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     node_list: Optional[List] = None,
-    figsize: Tuple[float, float] = (19.2, 10.8),
+    figsize: Tuple[float, float] = FIG_SIZE,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
@@ -833,7 +834,7 @@ def fplot_network(
     node_list : list, optional
         Nodes to include.
     figsize : tuple[float, float], optional
-        Size of the created figure. The default is (19.2, 10.8).
+        Size of the created figure. The default is FIG_SIZE.
 
     Returns
     -------
@@ -870,7 +871,7 @@ def fplot_network_components(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     node_list: Optional[List] = None,
-    figsize: Tuple[float, float] = (19.2, 10.8),
+    figsize: Tuple[float, float] = FIG_SIZE,
     n_cols: Optional[int] = None,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
@@ -898,7 +899,7 @@ def fplot_network_components(
     node_list : list, optional
         Nodes to include.
     figsize : tuple[float, float], optional
-        Size of the created figure. The default is (19.2, 10.8).
+        Size of the created figure. The default is FIG_SIZE.
     n_cols : int, optional
         Number of columns for subplots. If None, it's inferred.
 

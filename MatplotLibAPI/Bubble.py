@@ -15,6 +15,7 @@ from matplotlib.ticker import NullLocator
 
 from .StyleTemplate import (
     BUBBLE_STYLE_TEMPLATE,
+    FIG_SIZE,
     MAX_RESULTS,
     StyleTemplate,
     bmk_formatter,
@@ -373,7 +374,7 @@ def fplot_bubble(
     ascending: bool = False,
     hline: bool = False,
     vline: bool = False,
-    figsize: Tuple[float, float] = (19.2, 10.8),
+    figsize: Tuple[float, float] = FIG_SIZE,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
@@ -408,7 +409,7 @@ def fplot_bubble(
     vline : bool, optional
         Draw vertical line at mean x. The default is `False`.
     figsize : tuple[float, float], optional
-        Size of the figure. The default is (19.2, 10.8).
+        Size of the figure. The default is FIG_SIZE.
 
     Returns
     -------

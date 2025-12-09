@@ -9,7 +9,7 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
-from .Bubble import BUBBLE_STYLE_TEMPLATE, aplot_bubble
+from .Bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
 from .StyleTemplate import StyleTemplate, validate_dataframe
 from .Table import aplot_table
 from .Treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap
@@ -29,7 +29,7 @@ def plot_composite_bubble(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     table_rows: int = 10,
-    figsize: Tuple[float, float] = (19.2, 10.8),
+    figsize: Tuple[float, float] = FIG_SIZE,
 ) -> Figure:
     """Plot a composite bubble chart with summary tables.
 
@@ -62,7 +62,7 @@ def plot_composite_bubble(
     table_rows : int, optional
         Number of rows to display in the tables. The default is 10.
     figsize : tuple[float, float], optional
-        Size of the created figure. The default is (19.2, 10.8).
+        Size of the created figure. The default is FIG_SIZE.
 
     Returns
     -------

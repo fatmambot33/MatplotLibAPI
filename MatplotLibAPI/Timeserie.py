@@ -10,6 +10,7 @@ from matplotlib.figure import Figure
 
 from .StyleTemplate import (
     TIMESERIE_STYLE_TEMPLATE,
+    FIG_SIZE,
     StyleTemplate,
     bmk_formatter,
     format_func,
@@ -269,7 +270,7 @@ def fplot_timeserie(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     std: bool = False,
-    figsize: Tuple[float, float] = (19.2, 10.8),
+    figsize: Tuple[float, float] = FIG_SIZE,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
@@ -298,7 +299,7 @@ def fplot_timeserie(
     std : bool, optional
         Whether to plot rolling standard deviation. The default is `False`.
     figsize : tuple[float, float], optional
-        Size of the created figure. The default is (19.2, 10.8).
+        Size of the created figure. The default is FIG_SIZE.
 
     Returns
     -------
