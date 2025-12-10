@@ -88,7 +88,8 @@ def _prepare_word_frequencies(
     else:
         weight_col = cast(str, weight_column)
         freq_series = cast(pd.Series, pd_df.groupby(text_column)[weight_col].sum())
-        freq_series = freq_series[freq_series > 0].sort_values(ascending=False)
+        freq_series = cast(pd.Series, freq_series[freq_series > 0])
+        freq_series = freq_series.sort_values(ascending=False)
         if freq_series.empty:
             freq_series = pd_df[text_column].value_counts()
 
