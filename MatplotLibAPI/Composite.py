@@ -7,6 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
 from .Bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
