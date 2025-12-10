@@ -47,7 +47,8 @@ def test_plot_wordcloud_network_handles_zero_weights() -> None:
 
     assert wordcloud_ax.images, "Word cloud should render even when weights are zero."
     assert not any(
-        isinstance(collection, PathCollection) for collection in wordcloud_ax.collections
+        isinstance(collection, PathCollection)
+        for collection in wordcloud_ax.collections
     ), "Word cloud subplot should not contain network node collections."
     assert any(
         isinstance(collection, PathCollection) for collection in network_ax.collections
