@@ -412,9 +412,12 @@ class NetworkGraph:
             ax = cast(Axes, plt.gca())
 
         isolated_nodes = list(nx.isolates(self._nx_graph))
-        graph = NetworkGraph(self._nx_graph.copy())
+        graph_nx = self._nx_graph
         if isolated_nodes:
-            graph._nx_graph.remove_nodes_from(isolated_nodes)
+            graph_nx = graph_nx.copy()
+            graph_nx.remove_nodes_from(isolated_nodes)
+
+        graph = self if graph_nx is self._nx_graph else NetworkGraph(graph_nx)
 
         if graph._nx_graph.number_of_nodes() == 0:
             ax.set_axis_off()
