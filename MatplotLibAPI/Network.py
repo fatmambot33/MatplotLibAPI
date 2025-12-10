@@ -411,7 +411,25 @@ class NetworkGraph:
         if ax is None:
             ax = cast(Axes, plt.gca())
 
-        node_sizes, edge_widths, font_sizes = self.layout(
+        isolated_nodes = list(nx.isolates(self._nx_graph))
+        graph_nx = self._nx_graph
+        if isolated_nodes:
+            # Avoid mutating the user-provided graph when pruning display-only
+            # isolates so the underlying data remains unchanged after plotting.
+            graph_nx = graph_nx.copy()
+            graph_nx.remove_nodes_from(isolated_nodes)
+
+        graph = self if graph_nx is self._nx_graph else NetworkGraph(graph_nx)
+
+        if graph._nx_graph.number_of_nodes() == 0:
+            ax.set_axis_off()
+            if title:
+                ax.set_title(
+                    title, color=style.font_color, fontsize=style.font_size * 2
+                )
+            return ax
+
+        node_sizes, edge_widths, font_sizes = graph.layout(
             min_node_size=DEFAULT["MIN_NODE_SIZE"] // 5,
             max_node_size=DEFAULT["MAX_NODE_SIZE"],
             max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
@@ -419,11 +437,11 @@ class NetworkGraph:
             max_font_size=style.font_mapping.get(4, DEFAULT["MAX_FONT_SIZE"]),
             weight=weight,
         )
-        pos = nx.spring_layout(self._nx_graph, k=1)
+        pos = nx.spring_layout(graph._nx_graph, k=1)
         # nodes
         node_sizes_int = [int(size) for size in node_sizes]
         nx.draw_networkx_nodes(
-            self._nx_graph,
+            graph._nx_graph,
             pos,
             ax=ax,
             node_size=cast(Any, node_sizes_int),
@@ -432,7 +450,7 @@ class NetworkGraph:
         )
         # edges
         nx.draw_networkx_edges(
-            self._nx_graph,
+            graph._nx_graph,
             pos,
             ax=ax,
             edge_color=style.font_color,
@@ -442,7 +460,7 @@ class NetworkGraph:
         # labels
         for font_size, nodes in font_sizes.items():
             nx.draw_networkx_labels(
-                self._nx_graph,
+                graph._nx_graph,
                 pos,
                 ax=ax,
                 font_size=font_size,
@@ -767,6 +785,20 @@ def aplot_network_components(
     graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
+
+    if not connected_components:
+        if axes is not None:
+            for ax in axes.flatten():
+                ax.set_axis_off()
+        return
+
+    isolated_nodes = list(nx.isolates(graph._nx_graph))
+    if isolated_nodes:
+        # Keep the caller's graph intact while dropping isolates purely for
+        # visualization.
+        graph = NetworkGraph(graph._nx_graph.copy())
+        graph._nx_graph.remove_nodes_from(isolated_nodes)
+        connected_components = list(nx.connected_components(graph._nx_graph))
 
     if not connected_components:
         if axes is not None:
