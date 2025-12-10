@@ -254,7 +254,6 @@ def plot_wordcloud_network(
     Figure
         Matplotlib figure containing the word cloud on top and network below.
     """
-
     validate_dataframe(nodes_df, cols=[text_column], sort_by=node_weight)
     validate_dataframe(edges_df, cols=[source, target, edge_weight], sort_by=None)
 
