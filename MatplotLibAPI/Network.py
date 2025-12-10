@@ -1,6 +1,5 @@
 """Network chart plotting helpers."""
 
-import logging
 from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
 
@@ -16,7 +15,6 @@ from .StyleTemplate import (
     NETWORK_STYLE_TEMPLATE,
     FIG_SIZE,
     StyleTemplate,
-    format_func,
     string_formatter,
     validate_dataframe,
 )

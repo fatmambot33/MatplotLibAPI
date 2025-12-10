@@ -6,11 +6,13 @@ from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, cast
 
 from matplotlib.transforms import Bbox
 import numpy as np
+from numpy.typing import NDArray
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure, SubFigure
+from matplotlib.backend_bases import FigureCanvasBase
 from wordcloud import WordCloud
 
 from .StyleTemplate import (
@@ -98,14 +100,19 @@ def _prepare_word_frequencies(
     weights_: np.ndarray[Tuple[int], np.dtype[Any]] = freq_series.to_numpy(dtype=float)
 
     words: np.ndarray[Tuple[Any], np.dtype[Any]] = _filter_stopwords(words_, stopwords)
-    mask: np.ndarray[Tuple[Any], np.dtype[np.bool[bool]]] = np.isin(freq_series.index, words)
+    mask: np.ndarray[Tuple[Any], np.dtype[np.bool[bool]]] = np.isin(
+        freq_series.index, words
+    )
     weights: np.ndarray[Tuple[Any], np.dtype[Any]] = weights_[mask]
 
-    sorted_indices: np.ndarray[Tuple[Any], np.dtype[np.signedinteger[np._32Bit | np._64Bit]]] = np.argsort(weights)[::-1]
-    words = words[sorted_indices][:max_words].tolist()
-    weights = weights[sorted_indices][:max_words].tolist()
+    sorted_indices: NDArray[np.intp] = np.argsort(weights)[::-1]
+    sorted_words: np.ndarray = words[sorted_indices][:max_words]
+    sorted_weights: np.ndarray = weights[sorted_indices][:max_words]
 
-    return words, weights
+    words_list: list[str] = sorted_words.tolist()
+    weights_list: list[float] = sorted_weights.tolist()
+
+    return words_list, weights_list
 
 
 def create_circular_mask(size: int = 300, radius: Optional[int] = None) -> np.ndarray:
@@ -181,11 +188,11 @@ def _plot_words(
             ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
         return ax
 
-    fig_obj: Figure | plt.SubFigure | None = ax.get_figure()
+    fig_obj: Figure | SubFigure | None = ax.get_figure()
     if not isinstance(fig_obj, Figure):
         raise RuntimeError("Axes is not associated with a Figure.")
 
-    canvas: plt.FigureCanvasBase = fig_obj.canvas
+    canvas: FigureCanvasBase = fig_obj.canvas
     if canvas is None:
         raise RuntimeError("Figure does not have an attached canvas.")
 
@@ -194,9 +201,9 @@ def _plot_words(
 
     if mask is None:
         mask_dimension: int = max(int(ax_bbox.width), int(ax_bbox.height), 1)
-        resolved_mask: np.ndarray[Tuple[Any], np.dtype[Any]] = create_circular_mask(size=mask_dimension)
+        resolved_mask: NDArray[np.uint8] = create_circular_mask(size=mask_dimension)
     else:
-        resolved_mask: np.ndarray[Tuple[Any], np.dtype[Any]] = np.asarray(mask)
+        resolved_mask: NDArray[np.uint8] = np.asarray(mask, dtype=np.uint8)
 
     if resolved_mask.ndim != 2:
         raise ValueError("mask must be a 2D array.")
@@ -206,8 +213,8 @@ def _plot_words(
     frequency_map: Dict[str, float] = {
         string_formatter(word): weight for word, weight in zip(words, weights)
     }
-"""     min_font_size = int(style.font_mapping[min(style.font_mapping.keys())]/2) """
-    max_font_size = int(style.font_mapping[max(style.font_mapping.keys())]*20)
+
+    max_font_size = int(style.font_mapping[max(style.font_mapping.keys())] * 20)
 
     wc: WordCloud = WordCloud(
         width=width,
@@ -218,7 +225,7 @@ def _plot_words(
         # max_font_size=max_font_size,
         random_state=random_state,
         mask=resolved_mask,
-    ).generate_from_frequencies(frequency_map,max_font_size=max_font_size)
+    ).generate_from_frequencies(frequency_map, max_font_size=max_font_size)
 
     ax.imshow(wc.to_array(), interpolation="bilinear")
 
