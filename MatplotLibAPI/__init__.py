@@ -4,7 +4,11 @@ from .Area import aplot_area, fplot_area
 from .Bar import aplot_bar, fplot_bar
 from .BoxViolin import aplot_box_violin, fplot_box_violin
 from .Bubble import BUBBLE_STYLE_TEMPLATE, aplot_bubble, fplot_bubble
-from .Composite import plot_composite_bubble, plot_composite_treemap
+from .Composite import (
+    plot_composite_bubble,
+    plot_composite_treemap,
+    plot_wordcloud_network,
+)
 from .Heatmap import (
     HEATMAP_STYLE_TEMPLATE,
     aplot_correlation_matrix,
@@ -80,5 +84,6 @@ __all__ = [
     "fplot_sankey",
     "plot_composite_bubble",
     "plot_composite_treemap",
+    "plot_wordcloud_network",
     "prepare_network_graph",
 ]
