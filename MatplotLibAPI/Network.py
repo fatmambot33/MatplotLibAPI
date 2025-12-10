@@ -421,7 +421,9 @@ class NetworkGraph:
         if graph._nx_graph.number_of_nodes() == 0:
             ax.set_axis_off()
             if title:
-                ax.set_title(title, color=style.font_color, fontsize=style.font_size * 2)
+                ax.set_title(
+                    title, color=style.font_color, fontsize=style.font_size * 2
+                )
             return ax
 
         node_sizes, edge_widths, font_sizes = graph.layout(
