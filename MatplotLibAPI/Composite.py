@@ -5,8 +5,8 @@ from typing import Dict, Iterable, Optional, Tuple, cast
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.graph_objects as go
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
 from .Bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
@@ -257,11 +257,16 @@ def plot_wordcloud_network(
     validate_dataframe(nodes_df, cols=[text_column], sort_by=node_weight)
     validate_dataframe(edges_df, cols=[source, target, edge_weight], sort_by=None)
 
-    fig = cast(Figure, plt.figure(figsize=figsize))
+    fig_raw, axes_raw = plt.subplots(
+        2,
+        1,
+        figsize=figsize,
+        gridspec_kw={"height_ratios": [1, 2]},
+    )
+    fig = cast(Figure, fig_raw)
+    wordcloud_ax, network_ax = cast(Tuple[Axes, Axes], axes_raw)
     fig.patch.set_facecolor(wordcloud_style.background_color)
-    grid = GridSpec(2, 1, height_ratios=[1, 2])
 
-    wordcloud_ax = fig.add_subplot(grid[0, 0])
     aplot_wordcloud(
         pd_df=nodes_df,
         text_column=text_column,
@@ -273,7 +278,6 @@ def plot_wordcloud_network(
         ax=wordcloud_ax,
     )
 
-    network_ax = fig.add_subplot(grid[1, 0])
     aplot_network(
         pd_df=edges_df,
         source=source,
