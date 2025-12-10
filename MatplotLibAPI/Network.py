@@ -414,6 +414,8 @@ class NetworkGraph:
         isolated_nodes = list(nx.isolates(self._nx_graph))
         graph_nx = self._nx_graph
         if isolated_nodes:
+            # Avoid mutating the user-provided graph when pruning display-only
+            # isolates so the underlying data remains unchanged after plotting.
             graph_nx = graph_nx.copy()
             graph_nx.remove_nodes_from(isolated_nodes)
 
@@ -792,6 +794,8 @@ def aplot_network_components(
 
     isolated_nodes = list(nx.isolates(graph._nx_graph))
     if isolated_nodes:
+        # Keep the caller's graph intact while dropping isolates purely for
+        # visualization.
         graph = NetworkGraph(graph._nx_graph.copy())
         graph._nx_graph.remove_nodes_from(isolated_nodes)
         connected_components = list(nx.connected_components(graph._nx_graph))
