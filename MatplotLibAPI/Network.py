@@ -700,12 +700,22 @@ def prepare_network_graph(
     -------
     NetworkGraph
         The prepared `NetworkGraph` object.
+
+    Raises
+    ------
+    ValueError
+        If ``node_df`` is provided but none of its nodes appear as sources or
+        targets in ``pd_df``.
     """
     filtered_node_df = _sanitize_node_dataframe(node_df, pd_df, source, target)
-    if filtered_node_df is not None and not filtered_node_df.empty:
+    if node_df is not None:
+        if filtered_node_df is None or filtered_node_df.empty:
+            raise ValueError(
+                "node_df must include at least one node present as a source or target."
+            )
+        allowed_nodes = set(filtered_node_df["node"])
         df = pd_df.loc[
-            (pd_df[source].isin(filtered_node_df["node"]))
-            | (pd_df[target].isin(filtered_node_df["node"]))
+            pd_df[source].isin(allowed_nodes) & pd_df[target].isin(allowed_nodes)
         ]
     else:
         df = pd_df
@@ -718,7 +728,9 @@ def prepare_network_graph(
     if filtered_node_df is not None and not filtered_node_df.empty:
         node_weights = {
             node: weight_value
-            for node, weight_value in filtered_node_df.set_index("node")["weight"].items()
+            for node, weight_value in filtered_node_df.set_index("node")[
+                "weight"
+            ].items()
             if node in graph._nx_graph.nodes
         }
         nx.set_node_attributes(graph._nx_graph, node_weights, name=weight)
@@ -968,15 +980,23 @@ def fplot_network_components(
     -------
     Figure
         Matplotlib figure displaying component plots.
+
+    Raises
+    ------
+    ValueError
+        If ``node_df`` is provided but none of its nodes appear as sources or
+        targets in ``pd_df``.
     """
     # First, get the graph and components to determine the layout
     df = pd_df.copy()
     filtered_node_df = _sanitize_node_dataframe(node_df, df, source, target)
-    if filtered_node_df is not None and not filtered_node_df.empty:
-        df = df.loc[
-            (df[source].isin(filtered_node_df["node"]))
-            | (df[target].isin(filtered_node_df["node"]))
-        ]
+    if node_df is not None:
+        if filtered_node_df is None or filtered_node_df.empty:
+            raise ValueError(
+                "node_df must include at least one node present as a source or target."
+            )
+        allowed_nodes = set(filtered_node_df["node"])
+        df = df.loc[df[source].isin(allowed_nodes) & df[target].isin(allowed_nodes)]
 
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
     graph = NetworkGraph.from_pandas_edgelist(
