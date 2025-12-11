@@ -457,7 +457,6 @@ class NetworkGraph:
         dict[Any, np.ndarray]
             Mapping of nodes to their layout coordinates.
         """
-
         layout_k = DEFAULT["SPRING_LAYOUT_K"] if k is None else k
         return nx.spring_layout(self._nx_graph, k=layout_k, seed=seed)
 
