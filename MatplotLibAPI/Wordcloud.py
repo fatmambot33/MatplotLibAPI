@@ -18,6 +18,7 @@ from wordcloud import WordCloud
 from .StyleTemplate import (
     FIG_SIZE,
     MAX_RESULTS,
+    TITLE_SCALE_FACTOR,
     WORDCLOUD_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
@@ -181,7 +182,11 @@ def _plot_words(
 
     if not words:
         if title:
-            ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
+            ax.set_title(
+                title,
+                color=style.font_color,
+                fontsize=style.font_size * TITLE_SCALE_FACTOR * 0.75,
+            )
         return ax
 
     fig_raw = ax.figure
@@ -227,7 +232,11 @@ def _plot_words(
     ax.imshow(wc.to_array(), interpolation="bilinear")
 
     if title:
-        ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
+        ax.set_title(
+            title,
+            color=style.font_color,
+            fontsize=style.font_size * TITLE_SCALE_FACTOR * 0.75,
+        )
     return ax
 
 

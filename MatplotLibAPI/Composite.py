@@ -11,8 +11,13 @@ from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
 from .Bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
-from .Network import NETWORK_STYLE_TEMPLATE, aplot_network
-from .StyleTemplate import MAX_RESULTS, StyleTemplate, validate_dataframe
+from .Network import aplot_network
+from .StyleTemplate import (
+    MAX_RESULTS,
+    TITLE_SCALE_FACTOR,
+    StyleTemplate,
+    validate_dataframe,
+)
 from .Table import aplot_table
 from .Treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap
 from .Wordcloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud
@@ -123,7 +128,10 @@ def plot_composite_bubble(
         max_values=table_rows,
         style=style,
     )
-    fig.tight_layout()
+    if title:
+        fig.tight_layout(rect=(0, 0, 1, 0.95))
+    else:
+        fig.tight_layout()
     return fig
 
 
@@ -206,12 +214,12 @@ def plot_wordcloud_network(
     source: str = "source",
     target: str = "target",
     edge_weight: str = "weight",
-    wordcloud_title: Optional[str] = None,
-    network_title: Optional[str] = None,
-    wordcloud_style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
-    network_style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
+    title: Optional[str] = None,
+    style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+    wordcloud_style: Optional[StyleTemplate] = None,
+    network_style: Optional[StyleTemplate] = None,
     figsize: Tuple[float, float] = FIG_SIZE,
 ) -> Figure:
     """Plot a word cloud above a network graph.
@@ -233,20 +241,22 @@ def plot_wordcloud_network(
         Column in ``edges_df`` containing target nodes. The default is ``"target"``.
     edge_weight : str, optional
         Column in ``edges_df`` containing edge weights. The default is ``"weight"``.
-    wordcloud_title : str, optional
-        Title for the word cloud subplot. The default is ``None``.
-    network_title : str, optional
-        Title for the network subplot. The default is ``None``.
-    wordcloud_style : StyleTemplate, optional
-        Style configuration for the word cloud. The default is
-        ``WORDCLOUD_STYLE_TEMPLATE``.
-    network_style : StyleTemplate, optional
-        Style configuration for the network graph. The default is
-        ``NETWORK_STYLE_TEMPLATE``.
     max_words : int, optional
         Maximum number of words to include in the word cloud. The default is ``50``.
     stopwords : Iterable[str], optional
         Stopwords to exclude from the word cloud. The default is ``None``.
+    title : str, optional
+        Title for the composite figure. The default is ``None``.
+    style : StyleTemplate, optional
+        Shared style configuration applied to the composite figure and used for
+        subplots when specialized styles are not provided. The default is
+        ``WORDCLOUD_STYLE_TEMPLATE``.
+    wordcloud_style : StyleTemplate, optional
+        Optional style configuration for the word cloud subplot. When ``None``
+        the shared ``style`` is used. The default is ``None``.
+    network_style : StyleTemplate, optional
+        Optional style configuration for the network subplot. When ``None`` the
+        shared ``style`` is used. The default is ``None``.
     figsize : tuple[float, float], optional
         Size of the composite figure. The default is ``FIG_SIZE``.
 
@@ -262,17 +272,28 @@ def plot_wordcloud_network(
         2,
         1,
         figsize=figsize,
-        gridspec_kw={"height_ratios": [1, 2]},
+        gridspec_kw={"height_ratios": [1, 1]},
     )
     fig = cast(Figure, fig_raw)
     wordcloud_ax, network_ax = cast(Tuple[Axes, Axes], axes_raw)
-    fig.patch.set_facecolor(wordcloud_style.background_color)
+
+    wordcloud_style = wordcloud_style or style
+    network_style = network_style or style
+
+    fig.patch.set_facecolor(style.background_color)
+    if title:
+        fig.suptitle(
+            title,
+            color=style.font_color,
+            fontsize=style.font_size * TITLE_SCALE_FACTOR,
+            fontname=style.font_name,
+        )
 
     aplot_wordcloud(
         pd_df=nodes_df,
         text_column=text_column,
         weight_column=node_weight,
-        title=wordcloud_title,
+        title=None,
         style=wordcloud_style,
         max_words=max_words,
         stopwords=stopwords,
@@ -284,10 +305,13 @@ def plot_wordcloud_network(
         source=source,
         target=target,
         weight=edge_weight,
-        title=network_title,
+        title=None,
         style=network_style,
         ax=network_ax,
     )
 
-    fig.tight_layout()
+    if title:
+        fig.tight_layout(rect=(0, 0, 1, 0.95))
+    else:
+        fig.tight_layout()
     return fig
