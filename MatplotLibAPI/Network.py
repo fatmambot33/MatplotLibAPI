@@ -553,10 +553,16 @@ class NetworkGraph:
             min_node_size=DEFAULT["MIN_NODE_SIZE"] // 5,
             max_node_size=DEFAULT["MAX_NODE_SIZE"],
             max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
-            min_font_size=
-                mapped_min_font_size if mapped_min_font_size is not None else DEFAULT["MIN_FONT_SIZE"],
-            max_font_size=
-                mapped_max_font_size if mapped_max_font_size is not None else DEFAULT["MAX_FONT_SIZE"],
+            min_font_size=(
+                mapped_min_font_size
+                if mapped_min_font_size is not None
+                else DEFAULT["MIN_FONT_SIZE"]
+            ),
+            max_font_size=(
+                mapped_max_font_size
+                if mapped_max_font_size is not None
+                else DEFAULT["MAX_FONT_SIZE"]
+            ),
             weight=weight,
         )
         pos = graph.compute_positions(seed=layout_seed)
