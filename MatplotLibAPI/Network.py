@@ -202,6 +202,36 @@ class EdgeView(nx.classes.reportviews.EdgeView):
         return [(edge[0], edge[1]) for edge in filtered_edges]
 
 
+def _sanitize_node_dataframe(
+    node_df: Optional[pd.DataFrame], pd_df: pd.DataFrame, source: str, target: str
+) -> Optional[pd.DataFrame]:
+    """Return a copy of ``node_df`` limited to nodes present in the edge list.
+
+    Parameters
+    ----------
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns.
+    pd_df : pd.DataFrame
+        Edge DataFrame containing source and target columns.
+    source : str
+        Column name for source nodes.
+    target : str
+        Column name for target nodes.
+
+    Returns
+    -------
+    pd.DataFrame, optional
+        Filtered ``node_df`` with only nodes that appear as sources or targets.
+    """
+    if node_df is None:
+        return None
+
+    validate_dataframe(node_df, cols=["node", "weight"])
+    filtered_df = node_df.copy()
+    nodes_in_edges = set(pd_df[source]).union(pd_df[target])
+    return filtered_df.loc[filtered_df["node"].isin(nodes_in_edges)]
+
+
 class NetworkGraph:
     """Custom graph class based on NetworkX's ``Graph``.
 
@@ -635,16 +665,17 @@ def prepare_network_graph(
     target: str,
     weight: str,
     sort_by: Optional[str],
-    node_list: Optional[List],
+    node_df: Optional[pd.DataFrame],
 ) -> NetworkGraph:
     """Prepare a NetworkGraph for plotting from a pandas DataFrame.
 
     This function takes a DataFrame and prepares it for network visualization by:
-    1. Filtering the DataFrame to include only the nodes in `node_list` (if provided).
+    1. Filtering the DataFrame to include only the nodes in ``node_df`` (if provided).
     2. Validating the DataFrame to ensure it has the required columns.
     3. Creating a `NetworkGraph` from the edge list.
     4. Extracting the k-core of the graph (k=2) to focus on the main structure.
-    5. Calculating node weights based on the sum of their top k edge weights.
+    5. Applying node weights provided in ``node_df`` or calculating them from
+       the top-k edge weights.
     6. Trimming the graph to keep only the top k edges per node.
 
     Parameters
@@ -659,18 +690,22 @@ def prepare_network_graph(
         Column name for edge weights.
     sort_by : str, optional
         Column to sort the DataFrame by before processing.
-    node_list : list, optional
-        A list of nodes to include in the graph. If provided, the DataFrame
-        will be filtered to include only edges connected to these nodes.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns. If provided, the
+        DataFrame will be filtered to include only edges connected to these
+        nodes, and their provided weights will be used instead of calculated
+        values.
 
     Returns
     -------
     NetworkGraph
         The prepared `NetworkGraph` object.
     """
-    if node_list:
+    filtered_node_df = _sanitize_node_dataframe(node_df, pd_df, source, target)
+    if filtered_node_df is not None and not filtered_node_df.empty:
         df = pd_df.loc[
-            (pd_df["source"].isin(node_list)) | (pd_df["target"].isin(node_list))
+            (pd_df[source].isin(filtered_node_df["node"]))
+            | (pd_df[target].isin(filtered_node_df["node"]))
         ]
     else:
         df = pd_df
@@ -680,7 +715,15 @@ def prepare_network_graph(
         df, source=source, target=target, weight=weight
     )
     graph = graph.get_core_subgraph(k=2)
-    graph.calculate_node_weights_from_edges(weight=weight, k=10)
+    if filtered_node_df is not None and not filtered_node_df.empty:
+        node_weights = {
+            node: weight_value
+            for node, weight_value in filtered_node_df.set_index("node")["weight"].items()
+            if node in graph._nx_graph.nodes
+        }
+        nx.set_node_attributes(graph._nx_graph, node_weights, name=weight)
+    else:
+        graph.calculate_node_weights_from_edges(weight=weight, k=10)
     graph = graph.trim_edges(weight=weight, top_k_per_node=5)
     return graph
 
@@ -694,7 +737,7 @@ def aplot_network(
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     sort_by: Optional[str] = None,
     ascending: bool = False,
-    node_list: Optional[List] = None,
+    node_df: Optional[pd.DataFrame] = None,
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot a network graph on the provided axes.
@@ -717,8 +760,8 @@ def aplot_network(
         Column used to sort the data.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
-    node_list : list, optional
-        Nodes to include.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns to include.
     ax : Axes, optional
         Axes to draw on.
 
@@ -727,7 +770,7 @@ def aplot_network(
     Axes
         Matplotlib axes with the plotted network.
     """
-    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
+    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
     return graph.plot_network(title=title, style=style, weight=weight, ax=ax)
 
 
@@ -740,7 +783,7 @@ def aplot_network_components(
     title: Optional[str] = None,
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     sort_by: Optional[str] = None,
-    node_list: Optional[List] = None,
+    node_df: Optional[pd.DataFrame] = None,
     ascending: bool = False,
 ) -> None:
     """Plot network components separately on multiple axes.
@@ -761,14 +804,14 @@ def aplot_network_components(
         Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     sort_by : str, optional
         Column used to sort the data.
-    node_list : list, optional
-        Nodes to include.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns to include.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
     axes : np.ndarray
         Existing axes to draw on.
     """
-    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_list)
+    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
 
@@ -824,7 +867,7 @@ def fplot_network(
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     sort_by: Optional[str] = None,
     ascending: bool = False,
-    node_list: Optional[List] = None,
+    node_df: Optional[pd.DataFrame] = None,
     figsize: Tuple[float, float] = FIG_SIZE,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
@@ -849,8 +892,8 @@ def fplot_network(
         Column used to sort the data.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
-    node_list : list, optional
-        Nodes to include.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns to include.
     figsize : tuple[float, float], optional
         Size of the created figure. The default is FIG_SIZE.
 
@@ -871,7 +914,7 @@ def fplot_network(
         style=style,
         sort_by=sort_by,
         ascending=ascending,
-        node_list=node_list,
+        node_df=node_df,
         ax=ax,
     )
     if save_path:
@@ -888,7 +931,7 @@ def fplot_network_components(
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     sort_by: Optional[str] = None,
     ascending: bool = False,
-    node_list: Optional[List] = None,
+    node_df: Optional[pd.DataFrame] = None,
     figsize: Tuple[float, float] = FIG_SIZE,
     n_cols: Optional[int] = None,
     save_path: Optional[str] = None,
@@ -914,8 +957,8 @@ def fplot_network_components(
         Column used to sort the data.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
-    node_list : list, optional
-        Nodes to include.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns to include.
     figsize : tuple[float, float], optional
         Size of the created figure. The default is FIG_SIZE.
     n_cols : int, optional
@@ -928,8 +971,12 @@ def fplot_network_components(
     """
     # First, get the graph and components to determine the layout
     df = pd_df.copy()
-    if node_list:
-        df = df.loc[(df["source"].isin(node_list)) | (df["target"].isin(node_list))]
+    filtered_node_df = _sanitize_node_dataframe(node_df, df, source, target)
+    if filtered_node_df is not None and not filtered_node_df.empty:
+        df = df.loc[
+            (df[source].isin(filtered_node_df["node"]))
+            | (df[target].isin(filtered_node_df["node"]))
+        ]
 
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
     graph = NetworkGraph.from_pandas_edgelist(
@@ -961,7 +1008,7 @@ def fplot_network_components(
         style=style,
         sort_by=sort_by,
         ascending=ascending,
-        node_list=node_list,
+        node_df=filtered_node_df,
         axes=axes,
     )
 
