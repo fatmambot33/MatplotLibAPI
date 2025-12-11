@@ -12,7 +12,12 @@ from plotly.subplots import make_subplots
 
 from .Bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
 from .Network import aplot_network
-from .StyleTemplate import MAX_RESULTS, StyleTemplate, validate_dataframe
+from .StyleTemplate import (
+    MAX_RESULTS,
+    TITLE_SCALE_FACTOR,
+    StyleTemplate,
+    validate_dataframe,
+)
 from .Table import aplot_table
 from .Treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap
 from .Wordcloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud
@@ -280,7 +285,7 @@ def plot_wordcloud_network(
         fig.suptitle(
             title,
             color=style.font_color,
-            fontsize=style.font_size * 2,
+            fontsize=style.font_size * TITLE_SCALE_FACTOR,
             fontname=style.font_name,
         )
 

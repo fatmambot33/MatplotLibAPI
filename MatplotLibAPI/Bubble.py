@@ -17,6 +17,7 @@ from .StyleTemplate import (
     BUBBLE_STYLE_TEMPLATE,
     FIG_SIZE,
     MAX_RESULTS,
+    TITLE_SCALE_FACTOR,
     StyleTemplate,
     format_func,
     generate_ticks,
@@ -352,7 +353,11 @@ def aplot_bubble(
     _draw_bubble_labels(ax, plot_df, label, x, y, style, format_funcs)
 
     if title:
-        ax.set_title(title, color=style.font_color, fontsize=style.font_size * 2)
+        ax.set_title(
+            title,
+            color=style.font_color,
+            fontsize=style.font_size * TITLE_SCALE_FACTOR,
+        )
 
     return ax
 

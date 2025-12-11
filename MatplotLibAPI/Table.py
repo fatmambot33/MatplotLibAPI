@@ -8,7 +8,13 @@ from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 from matplotlib.table import Table
 
-from .StyleTemplate import StyleTemplate, string_formatter, validate_dataframe, FIG_SIZE
+from .StyleTemplate import (
+    FIG_SIZE,
+    TITLE_SCALE_FACTOR,
+    StyleTemplate,
+    string_formatter,
+    validate_dataframe,
+)
 
 TABLE_STYLE_TEMPLATE = StyleTemplate(
     background_color="black", fig_border="darkgrey", font_color="white", palette="magma"
@@ -159,7 +165,11 @@ def aplot_table(
     ax.set_axis_off()
     ax.grid(False)
     if title:
-        ax.set_title(title, color=style.font_color, fontsize=style.font_size * 2)
+        ax.set_title(
+            title,
+            color=style.font_color,
+            fontsize=style.font_size * TITLE_SCALE_FACTOR,
+        )
         ax.title.set_position((0.5, 1.05))
     return ax
 

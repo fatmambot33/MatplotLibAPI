@@ -14,6 +14,7 @@ from matplotlib.figure import Figure
 from .StyleTemplate import (
     NETWORK_STYLE_TEMPLATE,
     FIG_SIZE,
+    TITLE_SCALE_FACTOR,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
@@ -421,7 +422,9 @@ class NetworkGraph:
             ax.set_axis_off()
             if title:
                 ax.set_title(
-                    title, color=style.font_color, fontsize=style.font_size * 2
+                    title,
+                    color=style.font_color,
+                    fontsize=style.font_size * TITLE_SCALE_FACTOR,
                 )
             return ax
 
@@ -465,7 +468,11 @@ class NetworkGraph:
             )
         ax.set_facecolor(style.background_color)
         if title:
-            ax.set_title(title, color=style.font_color, fontsize=style.font_size * 2)
+            ax.set_title(
+                title,
+                color=style.font_color,
+                fontsize=style.font_size * TITLE_SCALE_FACTOR,
+            )
         ax.set_axis_off()
 
         return ax
@@ -959,7 +966,11 @@ def fplot_network_components(
     )
 
     if title:
-        fig.suptitle(title, color=style.font_color, fontsize=style.font_size * 2.5)
+        fig.suptitle(
+            title,
+            color=style.font_color,
+            fontsize=style.font_size * TITLE_SCALE_FACTOR * 1.25,
+        )
 
     plt.tight_layout(rect=(0, 0.03, 1, 0.95))
 
