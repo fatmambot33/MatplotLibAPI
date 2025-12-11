@@ -228,7 +228,7 @@ def _sanitize_node_dataframe(
 
     validate_dataframe(node_df, cols=["node", "weight"])
     filtered_df = node_df.copy()
-    nodes_in_edges = set(pd_df[source]).union(pd_df[target])
+    nodes_in_edges = list(set(pd_df[source]).union(pd_df[target]))
     return filtered_df.loc[filtered_df["node"].isin(nodes_in_edges)]
 
 
@@ -713,7 +713,7 @@ def prepare_network_graph(
             raise ValueError(
                 "node_df must include at least one node present as a source or target."
             )
-        allowed_nodes = set(filtered_node_df["node"])
+        allowed_nodes = filtered_node_df["node"].tolist()
         df = pd_df.loc[
             pd_df[source].isin(allowed_nodes) & pd_df[target].isin(allowed_nodes)
         ]
@@ -995,7 +995,7 @@ def fplot_network_components(
             raise ValueError(
                 "node_df must include at least one node present as a source or target."
             )
-        allowed_nodes = set(filtered_node_df["node"])
+        allowed_nodes = filtered_node_df["node"].tolist()
         df = df.loc[df[source].isin(allowed_nodes) & df[target].isin(allowed_nodes)]
 
     validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
