@@ -187,10 +187,11 @@ def _plot_words(
             ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
         return ax
 
-    fig_obj: Figure | SubFigure = ax.figure
-    if not isinstance(fig_obj, (Figure, SubFigure)):
+    fig_raw = ax.figure
+    if not isinstance(fig_raw, (Figure, SubFigure)):
         raise RuntimeError("Axes is not associated with a Figure.")
 
+    fig_obj: Figure | SubFigure = fig_raw
     canvas: FigureCanvasBase = fig_obj.canvas
     if canvas is None:
         raise RuntimeError("Figure does not have an attached canvas.")
