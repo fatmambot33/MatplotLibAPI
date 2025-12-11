@@ -112,7 +112,7 @@ def _prepare_word_frequencies(
     return sorted_words, sorted_weights
 
 
-def create_circular_mask(size: int = 300, radius: Optional[int] = None) -> np.ndarray:
+def _create_circular_mask(size: int = 300, radius: Optional[int] = None) -> np.ndarray:
     """Construct a binary mask with a circular opening for a word cloud.
 
     Parameters
@@ -203,7 +203,7 @@ def _plot_words(
 
     if mask is None:
         mask_dimension: int = max(int(ax_bbox.width), int(ax_bbox.height), 1)
-        resolved_mask: NDArray[np.uint8] = create_circular_mask(size=mask_dimension)
+        resolved_mask: NDArray[np.uint8] = _create_circular_mask(size=mask_dimension)
     else:
         resolved_mask: NDArray[np.uint8] = np.asarray(mask, dtype=np.uint8)
 

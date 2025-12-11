@@ -36,7 +36,7 @@ DEFAULT = {
 WEIGHT_PERCENTILES = np.arange(10, 100, 10)
 
 
-def softmax(x: Iterable[float]) -> np.ndarray:
+def _softmax(x: Iterable[float]) -> np.ndarray:
     """Compute softmax values for array ``x``.
 
     Parameters
@@ -55,7 +55,7 @@ def softmax(x: Iterable[float]) -> np.ndarray:
     return exp_shifted / exp_shifted.sum()
 
 
-def scale_weights(
+def _scale_weights(
     weights: Iterable[float],
     scale_min: float = 0,
     scale_max: float = 1,
@@ -221,7 +221,10 @@ class EdgeView(nx.classes.reportviews.EdgeView):
 
 
 def _sanitize_node_dataframe(
-    node_df: Optional[pd.DataFrame], pd_df: pd.DataFrame, source: str, target: str
+    node_df: Optional[pd.DataFrame],
+    edge_df: pd.DataFrame,
+    edge_source_col: str,
+    edge_target_col: str,
 ) -> Optional[pd.DataFrame]:
     """Return a copy of ``node_df`` limited to nodes present in the edge list.
 
@@ -229,25 +232,25 @@ def _sanitize_node_dataframe(
     ----------
     node_df : pd.DataFrame, optional
         DataFrame containing ``node`` and ``weight`` columns.
-    pd_df : pd.DataFrame
+    edge_df : pd.DataFrame
         Edge DataFrame containing source and target columns.
-    source : str
-        Column name for source nodes.
-    target : str
-        Column name for target nodes.
+    edge_source_col : str
+        Column name for source edgess.
+    edge_target_col: str
+        Column name for target edges.
 
     Returns
     -------
-    pd.DataFrame, optional
+    pd.DataFrame
         Filtered ``node_df`` with only nodes that appear as sources or targets.
     """
     if node_df is None:
         return None
 
     validate_dataframe(node_df, cols=["node", "weight"])
-    filtered_df = node_df.copy()
-    nodes_in_edges = list(set(pd_df[source]).union(pd_df[target]))
-    return filtered_df.loc[filtered_df["node"].isin(nodes_in_edges)]
+    filtered_node_df = node_df.copy()
+    nodes_in_edges = list(set(edge_df[edge_source_col]).union(edge_df[edge_target_col]))
+    return filtered_node_df.loc[filtered_node_df["node"].isin(nodes_in_edges)]
 
 
 class NetworkGraph:
@@ -320,6 +323,61 @@ class NetworkGraph:
         """Return the number of edges in the graph."""
         return self._nx_graph.number_of_edges()
 
+    @property
+    def density(self) -> float:
+        """Return the density of the graph."""
+        return nx.density(self._nx_graph)
+
+    @property
+    def is_connected(self) -> bool:
+        """Return whether the graph is connected."""
+        return nx.is_connected(self._nx_graph)
+
+    @property
+    def average_clustering(self) -> float:
+        """Return the average clustering coefficient of the graph."""
+        return nx.average_clustering(self._nx_graph)
+
+    @property
+    def diameter(self) -> int:
+        """Return the diameter of the graph."""
+        return nx.diameter(self._nx_graph)
+
+    @property
+    def radius(self) -> int:
+        """Return the radius of the graph."""
+        return nx.radius(self._nx_graph)
+
+    @property
+    def center(self) -> List[Any]:
+        """Return the center nodes of the graph."""
+        return nx.center(self._nx_graph)
+
+    @property
+    def periphery(self) -> List[Any]:
+        """Return the periphery nodes of the graph."""
+        return nx.periphery(self._nx_graph)
+
+    @property
+    def average_shortest_path_length(self) -> float:
+        """Return the average shortest path length of the graph."""
+        return nx.average_shortest_path_length(self._nx_graph)
+
+    @property
+    def transitivity(self) -> float:
+        """Return the transitivity of the graph."""
+        return nx.transitivity(self._nx_graph)
+
+    @property
+    def clustering_coefficients(self) -> Dict[Any, float]:
+        """Return the clustering coefficients of the graph."""
+        return nx.clustering(self._nx_graph)  # pyright: ignore[reportReturnType]
+
+    @property
+    def degree_assortativity_coefficient(self) -> float:
+        """Return the degree assortativity coefficient of the graph."""
+        return nx.degree_assortativity_coefficient(self._nx_graph)
+
     def edge_subgraph(self, edges: Iterable) -> "NetworkGraph":
         """Return a subgraph containing only the specified edges.
 
@@ -373,7 +431,7 @@ class NetworkGraph:
             if node_weights
             else None
         )
-        node_size = scale_weights(
+        node_size = _scale_weights(
             weights=node_weights,
             scale_max=max_node_size,
             scale_min=min_node_size,
@@ -382,13 +440,13 @@ class NetworkGraph:
 
         # Normalize and scale edges' weights within the desired range of edge widths
         edge_weights = [data.get(weight, 1) for _, _, data in self.edges(data=True)]
-        edges_width = scale_weights(weights=edge_weights, scale_max=max_edge_width)
+        edges_width = _scale_weights(weights=edge_weights, scale_max=max_edge_width)
 
         # Scale the normalized node weights within the desired range of font sizes
         node_size_dict = dict(
             zip(
                 self.nodes,
-                scale_weights(
+                _scale_weights(
                     weights=node_weights,
                     scale_max=max_font_size,
                     scale_min=min_font_size,
@@ -432,10 +490,13 @@ class NetworkGraph:
             node_list = self.nodes.sort("weight")[: DEFAULT["MAX_NODES"]]
         core_subgraph_nodes = list(self.k_core(k=min_degree).nodes)
         node_list = [node for node in node_list if node in core_subgraph_nodes]
-
-        subgraph = NetworkGraph(nx.subgraph(self._nx_graph, nbunch=node_list))
-        edges = subgraph.top_k_edges(attribute="weight", k=top_k_edges_per_node).keys()
-        subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
+        _subgraph = nx.subgraph(self._nx_graph, node_list)
+        subgraph = NetworkGraph(_subgraph)
+        if top_k_edges_per_node > 0:
+            edges = subgraph.top_k_edges(
+                attribute="weight", k=top_k_edges_per_node
+            ).keys()
+            subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
         return subgraph
 
     def compute_positions(
@@ -496,7 +557,7 @@ class NetworkGraph:
 
         return NetworkGraph(nx.subgraph(self._nx_graph, component_nodes).copy())
 
-    def plot_network(
+    def aplot_network(
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
@@ -606,6 +667,106 @@ class NetworkGraph:
 
         return ax
 
+    def fplot_network(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        weight: str = "weight",
+    ) -> Figure:
+        """Plot the graph using node and edge weights.
+
+        Parameters
+        ----------
+        title : str, optional
+            Plot title.
+        style : StyleTemplate, optional
+            Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+        weight : str, optional
+            Edge attribute used for weighting. The default is "weight".
+        Returns
+        -------
+        Figure
+            Matplotlib figure with the plotted network.
+        """
+        fig, ax = plt.subplots(figsize=FIG_SIZE)
+        fig = cast(Figure, fig)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot_network(title=title, style=style, weight=weight, ax=ax)
+        return fig
+
+    def aplot_connected_components(
+        self,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+    ) -> Axes:
+        """Plot all connected components of the graph.
+
+        Parameters
+        ----------
+        style : StyleTemplate, optional
+            Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+        layout_seed : int, optional
+            Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+
+        Returns
+        -------
+        Axes
+            Matplotlib axes with the plotted network.
+        """
+        sns.set_palette(style.palette)
+        ax = cast(Axes, plt.gca())
+        ax.set_facecolor(style.background_color)
+
+        isolated_nodes = list(nx.isolates(self._nx_graph))
+        graph_nx = self._nx_graph
+        if isolated_nodes:
+            graph_nx = graph_nx.copy()
+            graph_nx.remove_nodes_from(isolated_nodes)
+
+        graph = self if graph_nx is self._nx_graph else NetworkGraph(graph_nx)
+
+        if graph._nx_graph.number_of_nodes() == 0:
+            ax.set_axis_off()
+            return ax
+
+        for component in nx.connected_components(graph._nx_graph):
+            subgraph = NetworkGraph(nx.subgraph(graph._nx_graph, component))
+            subgraph.aplot_network(
+                style=style,
+                ax=ax,
+                layout_seed=layout_seed,
+            )
+
+        return ax
+
+    def fplot_connected_components(
+        self,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+    ) -> Figure:
+        """Plot all connected components of the graph.
+
+        Parameters
+        ----------
+        style : StyleTemplate, optional
+            Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+        layout_seed : int, optional
+            Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure with the plotted network.
+        """
+        fig, ax = plt.subplots(figsize=FIG_SIZE)
+        fig = cast(Figure, fig)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot_connected_components(
+            style=style,
+            layout_seed=layout_seed,
+        )
+        return fig
+
     def k_core(self, k: int = 2) -> "NetworkGraph":
         """Return the k-core of the graph.
 
@@ -714,9 +875,20 @@ class NetworkGraph:
         edges_to_keep = self.top_k_edges(attribute=weight, k=top_k_per_node)
         return self.edge_subgraph(edges=edges_to_keep)
 
+    def set_node_attributes(self, attributes: Dict[Any, Dict[str, Any]]):
+        """Set multiple node attributes from a dictionary.
+
+        Parameters
+        ----------
+        attributes : dict[Any, dict[str, Any]]
+            Mapping of node identifiers to their attribute dictionaries.
+        """
+        for node, attrs in attributes.items():
+            nx.set_node_attributes(self._nx_graph, {node: attrs})
+
     @staticmethod
     def from_pandas_edgelist(
-        df: pd.DataFrame,
+        edges_df: pd.DataFrame,
         source: str = "source",
         target: str = "target",
         weight: str = "weight",
@@ -725,7 +897,7 @@ class NetworkGraph:
 
         Parameters
         ----------
-        df : pd.DataFrame
+        edges_df : pd.DataFrame
             DataFrame containing edge data.
         source : str, optional
             Column name for source nodes. The default is "source".
@@ -740,12 +912,155 @@ class NetworkGraph:
             Initialized network graph.
         """
         network_G = nx.from_pandas_edgelist(
-            df, source=source, target=target, edge_attr=weight
+            edges_df, source=source, target=target, edge_attr=weight
         )
         return NetworkGraph(network_G)
 
+    @staticmethod
+    def _sanitize_node_dataframe(
+        node_df: pd.DataFrame,
+        edge_df: pd.DataFrame,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+    ) -> pd.DataFrame:
+        """Return a copy of ``node_df`` limited to nodes present in the edge list.
 
-def compute_network_grid(
+        Parameters
+        ----------
+        node_df : pd.DataFrame, optional
+            DataFrame containing ``node`` and ``weight`` columns.
+        edge_df : pd.DataFrame
+            Edge DataFrame containing source and target columns.
+        edge_source_col : str
+            Column name for source edgess.
+        edge_target_col: str
+            Column name for target edges.
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered ``node_df`` with only nodes that appear as sources or targets.
+        """
+        validate_dataframe(node_df, cols=[node_col, node_weight_col])
+        filtered_node_df = node_df.copy()
+        nodes_in_edges = list(
+            set(edge_df[edge_source_col]).union(edge_df[edge_target_col])
+        )
+        return filtered_node_df.loc[filtered_node_df[node_col].isin(nodes_in_edges)]
+
+    @staticmethod
+    def _sanitize_edge_dataframe(
+        node_df: pd.DataFrame,
+        edge_df: pd.DataFrame,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
+    ) -> pd.DataFrame:
+        """Return a sanitized copy of the edge DataFrame.
+
+        Parameters
+        ----------
+        edge_df : pd.DataFrame
+            Edge DataFrame containing source and target columns.
+        source : str, optional
+            Column name for source nodes. The default is "source".
+        target : str, optional
+            Column name for target nodes. The default is "target".
+        weight : str, optional
+            Column name for edge weights. The default is "weight".
+
+        Returns
+        -------
+        pd.DataFrame
+            Sanitized edge DataFrame.
+        """
+        validate_dataframe(
+            edge_df, cols=[edge_source_col, edge_target_col, edge_weight_col]
+        )
+        validate_dataframe(node_df, cols=[node_col, node_weight_col])
+        allowed_nodes = node_df[node_col].tolist()
+        edge_df = edge_df.loc[
+            edge_df[edge_source_col].isin(allowed_nodes)
+            & edge_df[edge_target_col].isin(allowed_nodes)
+        ]
+        return edge_df
+
+    @staticmethod
+    def build_from_dataframes(
+        node_df: pd.DataFrame,
+        edge_df: pd.DataFrame,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
+    ) -> "NetworkGraph":
+        """Build a NetworkGraph from a pandas DataFrame.
+
+        Parameters
+        ----------
+        pd_df : pd.DataFrame
+            DataFrame containing the edge list.
+        source : str, optional
+            Column name for source nodes. The default is "source".
+        target : str, optional
+            Column name for target nodes. The default is "target".
+        weight : str, optional
+            Column name for edge weights. The default is "weight".
+        sort_by : str, optional
+            Column to sort the DataFrame by before processing.
+        node_df : pd.DataFrame, optional
+            DataFrame containing ``node`` and ``weight`` columns.
+
+        Returns
+        -------
+        NetworkGraph
+            The prepared `NetworkGraph` object.
+        """
+        if node_df is not None:
+            node_df = NetworkGraph._sanitize_node_dataframe(
+                node_df,
+                edge_df=edge_df,
+                node_col=node_col,
+                node_weight_col=node_weight_col,
+                edge_source_col=edge_source_col,
+                edge_target_col=edge_target_col,
+            )
+            edge_df = NetworkGraph._sanitize_edge_dataframe(
+                node_df,
+                edge_df=edge_df,
+                node_col=node_col,
+                node_weight_col=node_weight_col,
+                edge_source_col=edge_source_col,
+                edge_target_col=edge_target_col,
+                edge_weight_col=edge_weight_col,
+            )
+        graph = NetworkGraph.from_pandas_edgelist(
+            edge_df,
+            source=edge_source_col,
+            target=edge_target_col,
+            weight=edge_weight_col,
+        )
+        if node_df is None or node_df.empty:
+            graph.calculate_node_weights_from_edges(weight=edge_weight_col, k=10)
+        else:
+            node_weights = {
+                node: {"weight": weight_value}
+                for node, weight_value in node_df.set_index(node_col)[
+                    node_weight_col
+                ].items()
+                if node in graph._nx_graph.nodes
+            }
+            graph.set_node_attributes(node_weights)
+
+        return graph
+
+
+def _compute_network_grid(
     connected_components: List[set], style: StyleTemplate
 ) -> Tuple[Figure, np.ndarray]:
     """Compute the grid layout for network component subplots.
@@ -775,7 +1090,7 @@ def compute_network_grid(
     return fig, axes
 
 
-def prepare_network_graph(
+def _prepare_network_graph(
     pd_df: pd.DataFrame,
     source: str,
     target: str,
@@ -898,8 +1213,8 @@ def aplot_network(
     Axes
         Matplotlib axes with the plotted network.
     """
-    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
-    return graph.plot_network(title=title, style=style, weight=weight, ax=ax)
+    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
+    return graph.aplot_network(title=title, style=style, weight=weight, ax=ax)
 
 
 def aplot_network_node(
@@ -955,10 +1270,10 @@ def aplot_network_node(
     ValueError
         If ``node`` is not present in the prepared graph.
     """
-    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
+    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
     component_graph = graph.get_component_subgraph(node)
     resolved_title = title if title is not None else string_formatter(node)
-    return component_graph.plot_network(
+    return component_graph.aplot_network(
         title=resolved_title,
         style=style,
         weight=weight,
@@ -1004,7 +1319,7 @@ def aplot_network_components(
     axes : np.ndarray
         Existing axes to draw on.
     """
-    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
+    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
 
     connected_components = list(nx.connected_components(graph._nx_graph))
 
@@ -1030,14 +1345,14 @@ def aplot_network_components(
 
     local_axes = axes
     if local_axes is None:
-        fig, local_axes = compute_network_grid(connected_components, style)
+        fig, local_axes = _compute_network_grid(connected_components, style)
 
     i = -1
     for i, component in enumerate(connected_components):
         if i < len(local_axes):
             if len(component) > 5:
                 component_graph = graph.subgraph(node_list=list(component))
-                component_graph.plot_network(
+                component_graph.aplot_network(
                     title=f"{title}::{i}" if title else str(i),
                     style=style,
                     weight=weight,

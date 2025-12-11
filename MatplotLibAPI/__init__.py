@@ -25,7 +25,6 @@ from .Network import (
     fplot_network_node,
     fplot_network_components,
     fplot_network,
-    prepare_network_graph,
 )
 from .Pie import aplot_pie_donut, fplot_pie_donut
 from .Sankey import fplot_sankey
@@ -44,7 +43,6 @@ from .Waffle import aplot_waffle, fplot_waffle
 from .Wordcloud import (
     WORDCLOUD_STYLE_TEMPLATE,
     aplot_wordcloud,
-    create_circular_mask,
     fplot_wordcloud,
 )
 from .accessor import DataFrameAccessor
@@ -66,7 +64,6 @@ __all__ = [
     "aplot_correlation_matrix",
     "aplot_area",
     "aplot_pie_donut",
-    "create_circular_mask",
     "aplot_waffle",
     "fplot_bubble",
     "fplot_network",
@@ -89,5 +86,4 @@ __all__ = [
     "plot_composite_bubble",
     "plot_composite_treemap",
     "plot_wordcloud_network",
-    "prepare_network_graph",
 ]

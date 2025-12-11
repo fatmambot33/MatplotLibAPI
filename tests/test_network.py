@@ -14,8 +14,8 @@ from MatplotLibAPI.Network import (
     WEIGHT_PERCENTILES,
     aplot_network_node,
     fplot_network_node,
-    scale_weights,
-    softmax,
+    _scale_weights,
+    _softmax,
 )
 from MatplotLibAPI.StyleTemplate import StyleTemplate, TITLE_SCALE_FACTOR
 
@@ -49,7 +49,7 @@ def test_softmax_matches_expected_probabilities():
 
     values = [0.0, 1.0, 2.0]
 
-    result = softmax(values)
+    result = _softmax(values)
     expected = np.exp(np.array(values) - np.max(values))
     expected = expected / expected.sum()
 
@@ -59,7 +59,7 @@ def test_softmax_matches_expected_probabilities():
 def test_scale_weights_empty_handles_gracefully():
     """Return an empty list when no weights are provided."""
 
-    assert scale_weights([]) == []
+    assert _scale_weights([]) == []
 
 
 def test_layout_handles_graph_without_edges():
@@ -104,8 +104,8 @@ def test_scale_weights_respects_precomputed_deciles():
     weights = [1.0, 2.0, 3.0, 4.0]
     deciles = np.percentile(np.array(weights), WEIGHT_PERCENTILES)
 
-    expected = scale_weights(weights)
-    assert scale_weights(weights, deciles=deciles) == expected
+    expected = _scale_weights(weights)
+    assert _scale_weights(weights, deciles=deciles) == expected
 
 
 def test_compute_positions_is_reproducible_with_seed():

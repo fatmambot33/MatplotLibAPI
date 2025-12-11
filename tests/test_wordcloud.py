@@ -9,7 +9,7 @@ import numpy as np
 
 from MatplotLibAPI.Wordcloud import (
     aplot_wordcloud,
-    create_circular_mask,
+    _create_circular_mask,
     fplot_wordcloud,
 )
 
@@ -40,7 +40,7 @@ def test_fplot_wordcloud_with_mask(load_sample_df):
     """Render a word cloud using a circular mask to constrain placement."""
 
     df = load_sample_df("wordcloud.csv")
-    mask = create_circular_mask(size=200)
+    mask = _create_circular_mask(size=200)
 
     fig = cast(
         Figure,
@@ -88,7 +88,7 @@ def test_aplot_wordcloud(load_sample_df):
 def test_create_circular_mask():
     """Verify circular mask generation."""
 
-    mask = create_circular_mask(size=100, radius=40)
+    mask = _create_circular_mask(size=100, radius=40)
     assert mask.shape == (100, 100)
     assert mask.dtype == np.uint8
     assert np.sum(mask == 0) > 0
