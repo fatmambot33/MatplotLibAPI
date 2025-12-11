@@ -209,12 +209,12 @@ def plot_wordcloud_network(
     source: str = "source",
     target: str = "target",
     edge_weight: str = "weight",
+    max_words: int = MAX_RESULTS,
+    stopwords: Optional[Iterable[str]] = None,
     title: Optional[str] = None,
     style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
     wordcloud_style: Optional[StyleTemplate] = None,
     network_style: Optional[StyleTemplate] = None,
-    max_words: int = MAX_RESULTS,
-    stopwords: Optional[Iterable[str]] = None,
     figsize: Tuple[float, float] = FIG_SIZE,
 ) -> Figure:
     """Plot a word cloud above a network graph.
@@ -236,6 +236,10 @@ def plot_wordcloud_network(
         Column in ``edges_df`` containing target nodes. The default is ``"target"``.
     edge_weight : str, optional
         Column in ``edges_df`` containing edge weights. The default is ``"weight"``.
+    max_words : int, optional
+        Maximum number of words to include in the word cloud. The default is ``50``.
+    stopwords : Iterable[str], optional
+        Stopwords to exclude from the word cloud. The default is ``None``.
     title : str, optional
         Title for the composite figure. The default is ``None``.
     style : StyleTemplate, optional
@@ -248,10 +252,6 @@ def plot_wordcloud_network(
     network_style : StyleTemplate, optional
         Optional style configuration for the network subplot. When ``None`` the
         shared ``style`` is used. The default is ``None``.
-    max_words : int, optional
-        Maximum number of words to include in the word cloud. The default is ``50``.
-    stopwords : Iterable[str], optional
-        Stopwords to exclude from the word cloud. The default is ``None``.
     figsize : tuple[float, float], optional
         Size of the composite figure. The default is ``FIG_SIZE``.
 
