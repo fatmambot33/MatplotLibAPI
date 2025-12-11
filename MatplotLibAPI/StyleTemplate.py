@@ -1,5 +1,6 @@
 """Common style utilities and formatters for plotting."""
 
+import math
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Union, cast
 
@@ -123,19 +124,23 @@ class StyleTemplate:
 
     @property
     def font_mapping(self) -> Dict[int, int]:
-        """Map font levels to adjusted font sizes.
+        """Compute progressive font sizes based on the base font.
+
+        The mapping spans five emphasis levels, centered around ``font_size``.
+        Each step is scaled to 15% of the base font (minimum step of 1) and
+        clamped to a size of at least 1 point to avoid non-readable values for
+        very small fonts.
 
         Returns
         -------
         dict[int, int]
-            Level to font size mapping.
+            Level-to-font-size mapping where keys increase with size.
         """
+        base_size = max(int(self.font_size), 1)
+        step = max(int(math.ceil(base_size * 0.15)), 1)
         return {
-            0: self.font_size - 3,
-            1: self.font_size - 1,
-            2: self.font_size,
-            3: self.font_size + 1,
-            4: self.font_size + 3,
+            idx: max(base_size + offset * step, 1)
+            for idx, offset in enumerate(range(-2, 3))
         }
 
 
