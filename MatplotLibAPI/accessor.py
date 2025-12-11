@@ -1346,7 +1346,7 @@ class DataFrameAccessor:
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         sort_by: Optional[str] = None,
         ascending: bool = False,
-        node_list: Optional[List] = None,
+        node_df: Optional[pd.DataFrame] = None,
         ax: Optional[Axes] = None,
     ) -> Axes:
         """Plot a network graph on a Matplotlib axes.
@@ -1367,8 +1367,8 @@ class DataFrameAccessor:
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
-        node_list : list, optional
-            List of nodes to include. If None, all nodes are used.
+        node_df : pd.DataFrame, optional
+            DataFrame containing ``node`` and ``weight`` columns for weighting.
         ax : Axes, optional
             Matplotlib axes to plot on. If None, uses the current axes.
 
@@ -1386,7 +1386,7 @@ class DataFrameAccessor:
             style=style,
             sort_by=sort_by,
             ascending=ascending,
-            node_list=node_list,
+            node_df=node_df,
             ax=ax,
         )
 
@@ -1399,7 +1399,7 @@ class DataFrameAccessor:
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         sort_by: Optional[str] = None,
         ascending: bool = False,
-        node_list: Optional[List] = None,
+        node_df: Optional[pd.DataFrame] = None,
         axes: Optional[np.ndarray] = None,
     ) -> None:
         """Plot connected components of a network graph on multiple axes.
@@ -1420,8 +1420,8 @@ class DataFrameAccessor:
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
-        node_list : list, optional
-            List of nodes to include. If None, all nodes are used.
+        node_df : pd.DataFrame, optional
+            DataFrame containing ``node`` and ``weight`` columns for weighting.
         axes : np.ndarray, optional
             Numpy array of Matplotlib axes to plot on. If None, new axes are created.
         """
@@ -1434,7 +1434,7 @@ class DataFrameAccessor:
             style=style,
             sort_by=sort_by,
             ascending=ascending,
-            node_list=node_list,
+            node_df=node_df,
             axes=axes,
         )
 
@@ -1447,7 +1447,7 @@ class DataFrameAccessor:
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         sort_by: Optional[str] = None,
         ascending: bool = False,
-        node_list: Optional[List] = None,
+        node_df: Optional[pd.DataFrame] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a network graph on a new figure.
@@ -1468,8 +1468,8 @@ class DataFrameAccessor:
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
-        node_list : list, optional
-            List of nodes to include. If None, all nodes are used.
+        node_df : pd.DataFrame, optional
+            DataFrame containing ``node`` and ``weight`` columns for weighting.
         figsize : tuple[float, float], optional
             Figure size. The default is FIG_SIZE.
 
@@ -1487,7 +1487,7 @@ class DataFrameAccessor:
             style=style,
             sort_by=sort_by,
             ascending=ascending,
-            node_list=node_list,
+            node_df=node_df,
             figsize=figsize,
         )
 
@@ -1500,7 +1500,7 @@ class DataFrameAccessor:
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         sort_by: Optional[str] = None,
         ascending: bool = False,
-        node_list: Optional[List] = None,
+        node_df: Optional[pd.DataFrame] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
         n_cols: Optional[int] = None,
     ) -> Figure:
@@ -1522,8 +1522,8 @@ class DataFrameAccessor:
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
-        node_list : list, optional
-            List of nodes to include. If None, all nodes are used.
+        node_df : pd.DataFrame, optional
+            DataFrame containing ``node`` and ``weight`` columns for weighting.
         figsize : tuple[float, float], optional
             Figure size. The default is FIG_SIZE.
         n_cols : int, optional
@@ -1543,7 +1543,7 @@ class DataFrameAccessor:
             style=style,
             sort_by=sort_by,
             ascending=ascending,
-            node_list=node_list,
+            node_df=node_df,
             figsize=figsize,
             n_cols=n_cols,
         )
