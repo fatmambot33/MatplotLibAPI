@@ -412,8 +412,6 @@ class NetworkGraph:
         isolated_nodes = list(nx.isolates(self._nx_graph))
         graph_nx = self._nx_graph
         if isolated_nodes:
-            # Avoid mutating the user-provided graph when pruning display-only
-            # isolates so the underlying data remains unchanged after plotting.
             graph_nx = graph_nx.copy()
             graph_nx.remove_nodes_from(isolated_nodes)
 
@@ -471,23 +469,6 @@ class NetworkGraph:
         ax.set_axis_off()
 
         return ax
-
-    def plot_network_components(self, *args: Any, **kwargs: Any) -> List:
-        """Plot network components.
-
-        .. deprecated:: 0.1.0
-          `plot_network_components` will be removed in a future version.
-          Use `fplot_network_components` instead.
-        """
-        import warnings
-
-        warnings.warn(
-            "`plot_network_components` is deprecated and will be removed in a future version. "
-            "Please use `fplot_network_components`.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return []
 
     def get_core_subgraph(self, k: int = 2) -> "NetworkGraph":
         """Return the k-core of the graph.

@@ -286,19 +286,12 @@ TABLE_STYLE_TEMPLATE = StyleTemplate()
 TREEMAP_STYLE_TEMPLATE = StyleTemplate()
 
 PIVOTBARS_STYLE_TEMPLATE = StyleTemplate(
-    background_color="black",
-    fig_border="darkgrey",
-    font_color="white",
-    palette="magma",
     format_funcs=cast(
         Dict[str, Optional[FormatterFunc]],
         {"y": percent_formatter, "label": string_formatter},
     ),
 )
 PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
-    background_color="white",
-    fig_border="lightgrey",
-    palette="viridis",
     format_funcs=cast(
         Dict[str, Optional[FormatterFunc]],
         {"y": percent_formatter, "label": string_formatter},
@@ -306,9 +299,11 @@ PIVOTLINES_STYLE_TEMPLATE = StyleTemplate(
 )
 
 NETWORK_STYLE_TEMPLATE = StyleTemplate()
-DISTRIBUTION_STYLE_TEMPLATE = StyleTemplate(palette="magma")
-HEATMAP_STYLE_TEMPLATE = StyleTemplate(palette="viridis")
-AREA_STYLE_TEMPLATE = StyleTemplate(palette="crest")
-PIE_STYLE_TEMPLATE = StyleTemplate(palette="Set2")
+DISTRIBUTION_STYLE_TEMPLATE = StyleTemplate()
+HEATMAP_STYLE_TEMPLATE = StyleTemplate()
+AREA_STYLE_TEMPLATE = StyleTemplate()
+PIE_STYLE_TEMPLATE = StyleTemplate()
 SANKEY_STYLE_TEMPLATE = StyleTemplate()
+WORDCLOUD_STYLE_TEMPLATE = StyleTemplate()
+
 # endregion

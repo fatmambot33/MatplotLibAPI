@@ -18,13 +18,10 @@ from wordcloud import WordCloud
 from .StyleTemplate import (
     FIG_SIZE,
     MAX_RESULTS,
+    WORDCLOUD_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
-)
-
-WORDCLOUD_STYLE_TEMPLATE = StyleTemplate(
-    background_color="black", font_color="white", palette="plasma"
 )
 
 
