@@ -72,5 +72,7 @@ def test_plot_wordcloud_network_uses_title_scale_factor() -> None:
         style=style,
     )
 
-    assert fig._suptitle is not None
-    assert fig._suptitle.get_fontsize() == style.font_size * TITLE_SCALE_FACTOR
+    suptitle = getattr(fig, "_suptitle", None)
+
+    assert suptitle is not None
+    assert suptitle.get_fontsize() == style.font_size * TITLE_SCALE_FACTOR

@@ -45,6 +45,8 @@ def test_network_components_title_respects_scale_factor(load_sample_df):
         style=style,
     )
 
-    assert fig._suptitle is not None
+    suptitle = getattr(fig, "_suptitle", None)
     expected_size = style.font_size * TITLE_SCALE_FACTOR * 1.25
-    assert fig._suptitle.get_fontsize() == expected_size
+
+    assert suptitle is not None
+    assert suptitle.get_fontsize() == expected_size
