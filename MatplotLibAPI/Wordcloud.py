@@ -11,7 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
+from matplotlib.backend_bases import FigureCanvasBase
+from matplotlib.figure import Figure, SubFigure
 from numpy.typing import NDArray
 from wordcloud import WordCloud
 
