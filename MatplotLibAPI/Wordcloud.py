@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, cast
 
-from matplotlib.transforms import Bbox
+from matplotlib.transforms import BboxBase
 import numpy as np
 from numpy.typing import NDArray
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from numpy.typing import NDArray
+from matplotlib.backend_bases import FigureCanvasBase
+from matplotlib.figure import Figure, SubFigure
 from wordcloud import WordCloud
 
 from .StyleTemplate import (
@@ -187,16 +187,17 @@ def _plot_words(
             ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
         return ax
 
-    fig_obj: Figure | SubFigure | None = ax.get_figure()
-    if not isinstance(fig_obj, Figure):
+    fig_raw = ax.figure
+    if not isinstance(fig_raw, (Figure, SubFigure)):
         raise RuntimeError("Axes is not associated with a Figure.")
 
+    fig_obj: Figure | SubFigure = fig_raw
     canvas: FigureCanvasBase = fig_obj.canvas
     if canvas is None:
         raise RuntimeError("Figure does not have an attached canvas.")
 
     canvas.draw()
-    ax_bbox: Bbox = ax.get_window_extent()
+    ax_bbox: BboxBase = ax.get_window_extent()
 
     if mask is None:
         mask_dimension: int = max(int(ax_bbox.width), int(ax_bbox.height), 1)
