@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colormaps
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from numpy.typing import NDArray
 from wordcloud import WordCloud
 
 from .StyleTemplate import (
@@ -27,7 +28,7 @@ WORDCLOUD_STYLE_TEMPLATE = StyleTemplate(
 
 def _filter_stopwords(
     words: Iterable[str], stopwords: Optional[Iterable[str]]
-) -> np.ndarray:
+) -> NDArray[np.str_]:
     """Remove stopwords from a sequence of words.
 
     Parameters
@@ -88,20 +89,29 @@ def _prepare_word_frequencies(
     else:
         weight_col = cast(str, weight_column)
         freq_series = cast(pd.Series, pd_df.groupby(text_column)[weight_col].sum())
+        freq_series = cast(pd.Series, freq_series[freq_series > 0])
         freq_series = freq_series.sort_values(ascending=False)
+        if freq_series.empty:
+            freq_series = pd_df[text_column].value_counts()
 
-    words = freq_series.index.to_numpy()
-    weights = freq_series.to_numpy(dtype=float)
+    words: NDArray[np.str_] = np.asarray(freq_series.index.to_numpy())
+    weights: NDArray[np.float64] = np.asarray(
+        freq_series.to_numpy(dtype=float), dtype=np.float64
+    )
 
-    words = _filter_stopwords(words, stopwords)
-    mask = np.isin(freq_series.index, words)
-    weights = weights[mask]
+    filtered_words = _filter_stopwords(words, stopwords)
+    mask: NDArray[np.bool_] = np.asarray(
+        np.isin(freq_series.index, filtered_words), dtype=bool
+    )
+    filtered_weights: NDArray[np.float64] = np.asarray(
+        weights[mask], dtype=np.float64
+    )
 
-    sorted_indices = np.argsort(weights)[::-1]
-    words = words[sorted_indices][:max_words].tolist()
-    weights = weights[sorted_indices][:max_words].tolist()
+    sorted_indices = np.argsort(filtered_weights)[::-1]
+    sorted_words = filtered_words[sorted_indices][:max_words].tolist()
+    sorted_weights = filtered_weights[sorted_indices][:max_words].tolist()
 
-    return words, weights
+    return sorted_words, sorted_weights
 
 
 def create_circular_mask(size: int = 300, radius: Optional[int] = None) -> np.ndarray:
