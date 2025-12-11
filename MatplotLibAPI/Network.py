@@ -29,7 +29,11 @@ DEFAULT = {
     "GRAPH_SCALE": 2,
     "MAX_FONT_SIZE": 20,
     "MIN_FONT_SIZE": 8,
+    "SPRING_LAYOUT_K": 1.0,
+    "SPRING_LAYOUT_SEED": 42,
 }
+
+WEIGHT_PERCENTILES = np.arange(10, 100, 10)
 
 
 def softmax(x: Iterable[float]) -> np.ndarray:
@@ -46,11 +50,16 @@ def softmax(x: Iterable[float]) -> np.ndarray:
         Softmax-transformed values.
     """
     x_arr = np.array(x)
-    return np.exp(x_arr - np.max(x_arr)) / np.exp(x_arr - np.max(x_arr)).sum()
+    shifted = x_arr - np.max(x_arr)
+    exp_shifted = np.exp(shifted)
+    return exp_shifted / exp_shifted.sum()
 
 
 def scale_weights(
-    weights: Iterable[float], scale_min: float = 0, scale_max: float = 1
+    weights: Iterable[float],
+    scale_min: float = 0,
+    scale_max: float = 1,
+    deciles: Optional[np.ndarray] = None,
 ) -> List[float]:
     """Scale weights into deciles within the given range.
 
@@ -62,16 +71,25 @@ def scale_weights(
         Minimum of the output range. The default is 0.
     scale_max : float, optional
         Maximum of the output range. The default is 1.
+    deciles : np.ndarray, optional
+        Precomputed percentile breakpoints to reuse. The default is ``None``.
 
     Returns
     -------
     list[float]
-        Scaled weights.
+        Scaled weights or an empty list when ``weights`` is empty.
     """
     weights_arr = np.array(weights)
-    deciles = np.percentile(weights_arr, [10, 20, 30, 40, 50, 60, 70, 80, 90])
-    outs = np.searchsorted(deciles, weights_arr)
-    return [out * (scale_max - scale_min) / len(deciles) + scale_min for out in outs]
+    if weights_arr.size == 0:
+        return []
+
+    percentiles = (
+        np.percentile(weights_arr, WEIGHT_PERCENTILES) if deciles is None else deciles
+    )
+    outs = np.searchsorted(percentiles, weights_arr)
+    return [
+        out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs
+    ]
 
 
 class NodeView(nx.classes.reportviews.NodeView):
@@ -350,8 +368,16 @@ class NetworkGraph:
         """
         # Normalize and scale nodes' weights within the desired range of edge widths
         node_weights = [data.get(weight, 1) for node, data in self.nodes(data=True)]
+        node_deciles = (
+            np.percentile(np.array(node_weights), WEIGHT_PERCENTILES)
+            if node_weights
+            else None
+        )
         node_size = scale_weights(
-            weights=node_weights, scale_max=max_node_size, scale_min=min_node_size
+            weights=node_weights,
+            scale_max=max_node_size,
+            scale_min=min_node_size,
+            deciles=node_deciles,
         )
 
         # Normalize and scale edges' weights within the desired range of edge widths
@@ -366,6 +392,7 @@ class NetworkGraph:
                     weights=node_weights,
                     scale_max=max_font_size,
                     scale_min=min_font_size,
+                    deciles=node_deciles,
                 ),
             )
         )
@@ -411,12 +438,71 @@ class NetworkGraph:
         subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
         return subgraph
 
+    def compute_positions(
+        self,
+        k: Optional[float] = None,
+        seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+    ) -> Dict[Any, np.ndarray]:
+        """Return spring layout positions for the graph.
+
+        Parameters
+        ----------
+        k : float, optional
+            Optimal distance between nodes. The default is ``DEFAULT["SPRING_LAYOUT_K"]``.
+        seed : int, optional
+            Seed for reproducible layouts. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+
+        Returns
+        -------
+        dict[Any, np.ndarray]
+            Mapping of nodes to their layout coordinates.
+        """
+        layout_k = DEFAULT["SPRING_LAYOUT_K"] if k is None else k
+        return nx.spring_layout(self._nx_graph, k=layout_k, seed=seed)
+
+    def get_component_subgraph(self, node: Any) -> "NetworkGraph":
+        """Return the connected component containing ``node``.
+
+        Parameters
+        ----------
+        node : Any
+            Node identifier to anchor the component selection.
+
+        Returns
+        -------
+        NetworkGraph
+            Subgraph made of the nodes in the same connected component as
+            ``node``.
+
+        Raises
+        ------
+        ValueError
+            If ``node`` is not present in the graph.
+        """
+        if node not in self._nx_graph:
+            raise ValueError(f"Node {node!r} is not present in the graph.")
+
+        component_nodes = next(
+            (
+                component
+                for component in nx.connected_components(self._nx_graph)
+                if node in component
+            ),
+            None,
+        )
+
+        if component_nodes is None:
+            return NetworkGraph(nx.Graph())
+
+        return NetworkGraph(nx.subgraph(self._nx_graph, component_nodes).copy())
+
     def plot_network(
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         weight: str = "weight",
         ax: Optional[Axes] = None,
+        layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Axes:
         """Plot the graph using node and edge weights.
 
@@ -430,6 +516,8 @@ class NetworkGraph:
             Edge attribute used for weighting. The default is "weight".
         ax : Axes, optional
             Axes to draw on.
+        layout_seed : int, optional
+            Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
@@ -458,15 +546,26 @@ class NetworkGraph:
                 )
             return ax
 
+        mapped_min_font_size = style.font_mapping.get(0)
+        mapped_max_font_size = style.font_mapping.get(4)
+
         node_sizes, edge_widths, font_sizes = graph.layout(
             min_node_size=DEFAULT["MIN_NODE_SIZE"] // 5,
             max_node_size=DEFAULT["MAX_NODE_SIZE"],
             max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
-            min_font_size=style.font_mapping.get(0, DEFAULT["MIN_FONT_SIZE"]),
-            max_font_size=style.font_mapping.get(4, DEFAULT["MAX_FONT_SIZE"]),
+            min_font_size=(
+                mapped_min_font_size
+                if mapped_min_font_size is not None
+                else DEFAULT["MIN_FONT_SIZE"]
+            ),
+            max_font_size=(
+                mapped_max_font_size
+                if mapped_max_font_size is not None
+                else DEFAULT["MAX_FONT_SIZE"]
+            ),
             weight=weight,
         )
-        pos = nx.spring_layout(graph._nx_graph, k=1)
+        pos = graph.compute_positions(seed=layout_seed)
         # nodes
         node_sizes_int = [int(size) for size in node_sizes]
         nx.draw_networkx_nodes(
@@ -786,6 +885,71 @@ def aplot_network(
     return graph.plot_network(title=title, style=style, weight=weight, ax=ax)
 
 
+def aplot_network_node(
+    pd_df: pd.DataFrame,
+    node: Any,
+    source: str = "source",
+    target: str = "target",
+    weight: str = "weight",
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    node_df: Optional[pd.DataFrame] = None,
+    ax: Optional[Axes] = None,
+    layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+) -> Axes:
+    """Plot the connected component containing ``node`` on the provided axes.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing edge data.
+    node : Any
+        Node identifier whose component should be visualized.
+    source : str, optional
+        Column name for source nodes. The default is "source".
+    target : str, optional
+        Column name for target nodes. The default is "target".
+    weight : str, optional
+        Column name for edge weights. The default is "weight".
+    title : str, optional
+        Plot title. If ``None``, defaults to the node identifier.
+    style : StyleTemplate, optional
+        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+    sort_by : str, optional
+        Column used to sort the data.
+    ascending : bool, optional
+        Sort order for the data. The default is `False`.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns to include.
+    ax : Axes, optional
+        Axes to draw on.
+    layout_seed : int, optional
+        Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+
+    Returns
+    -------
+    Axes
+        Matplotlib axes with the plotted component.
+
+    Raises
+    ------
+    ValueError
+        If ``node`` is not present in the prepared graph.
+    """
+    graph = prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
+    component_graph = graph.get_component_subgraph(node)
+    resolved_title = title if title is not None else string_formatter(node)
+    return component_graph.plot_network(
+        title=resolved_title,
+        style=style,
+        weight=weight,
+        ax=ax,
+        layout_seed=layout_seed,
+    )
+
+
 def aplot_network_components(
     pd_df: pd.DataFrame,
     axes: Optional[np.ndarray],
@@ -928,6 +1092,87 @@ def fplot_network(
         ascending=ascending,
         node_df=node_df,
         ax=ax,
+    )
+    if save_path:
+        fig.savefig(save_path, **(savefig_kwargs or {}))
+    return fig
+
+
+def fplot_network_node(
+    pd_df: pd.DataFrame,
+    node: Any,
+    source: str = "source",
+    target: str = "target",
+    weight: str = "weight",
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    node_df: Optional[pd.DataFrame] = None,
+    figsize: Tuple[float, float] = FIG_SIZE,
+    save_path: Optional[str] = None,
+    savefig_kwargs: Optional[Dict[str, Any]] = None,
+    layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+) -> Figure:
+    """Return a figure with the component containing ``node``.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing edge data.
+    node : Any
+        Node identifier whose component should be visualized.
+    source : str, optional
+        Column name for source nodes. The default is "source".
+    target : str, optional
+        Column name for target nodes. The default is "target".
+    weight : str, optional
+        Column name for edge weights. The default is "weight".
+    title : str, optional
+        Plot title. If ``None``, defaults to the node identifier.
+    style : StyleTemplate, optional
+        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+    sort_by : str, optional
+        Column used to sort the data.
+    ascending : bool, optional
+        Sort order for the data. The default is `False`.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns to include.
+    figsize : tuple[float, float], optional
+        Size of the created figure. The default is FIG_SIZE.
+    save_path : str, optional
+        File path to save the figure. The default is ``None``.
+    savefig_kwargs : dict[str, Any], optional
+        Extra keyword arguments forwarded to ``Figure.savefig``. The default is ``None``.
+    layout_seed : int, optional
+        Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+
+    Returns
+    -------
+    Figure
+        Matplotlib figure with the component plot.
+
+    Raises
+    ------
+    ValueError
+        If ``node`` is not present in the prepared graph.
+    """
+    fig = cast(Figure, plt.figure(figsize=figsize))
+    fig.patch.set_facecolor(style.background_color)
+    ax = fig.add_subplot()
+    ax = aplot_network_node(
+        pd_df,
+        node=node,
+        source=source,
+        target=target,
+        weight=weight,
+        title=title,
+        style=style,
+        sort_by=sort_by,
+        ascending=ascending,
+        node_df=node_df,
+        ax=ax,
+        layout_seed=layout_seed,
     )
     if save_path:
         fig.savefig(save_path, **(savefig_kwargs or {}))
