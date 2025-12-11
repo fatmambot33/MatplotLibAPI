@@ -29,7 +29,11 @@ DEFAULT = {
     "GRAPH_SCALE": 2,
     "MAX_FONT_SIZE": 20,
     "MIN_FONT_SIZE": 8,
+    "SPRING_LAYOUT_K": 1.0,
+    "SPRING_LAYOUT_SEED": 42,
 }
+
+WEIGHT_PERCENTILES = np.arange(10, 100, 10)
 
 
 def softmax(x: Iterable[float]) -> np.ndarray:
@@ -46,11 +50,16 @@ def softmax(x: Iterable[float]) -> np.ndarray:
         Softmax-transformed values.
     """
     x_arr = np.array(x)
-    return np.exp(x_arr - np.max(x_arr)) / np.exp(x_arr - np.max(x_arr)).sum()
+    shifted = x_arr - np.max(x_arr)
+    exp_shifted = np.exp(shifted)
+    return exp_shifted / exp_shifted.sum()
 
 
 def scale_weights(
-    weights: Iterable[float], scale_min: float = 0, scale_max: float = 1
+    weights: Iterable[float],
+    scale_min: float = 0,
+    scale_max: float = 1,
+    deciles: Optional[np.ndarray] = None,
 ) -> List[float]:
     """Scale weights into deciles within the given range.
 
@@ -62,16 +71,25 @@ def scale_weights(
         Minimum of the output range. The default is 0.
     scale_max : float, optional
         Maximum of the output range. The default is 1.
+    deciles : np.ndarray, optional
+        Precomputed percentile breakpoints to reuse. The default is ``None``.
 
     Returns
     -------
     list[float]
-        Scaled weights.
+        Scaled weights or an empty list when ``weights`` is empty.
     """
     weights_arr = np.array(weights)
-    deciles = np.percentile(weights_arr, [10, 20, 30, 40, 50, 60, 70, 80, 90])
-    outs = np.searchsorted(deciles, weights_arr)
-    return [out * (scale_max - scale_min) / len(deciles) + scale_min for out in outs]
+    if weights_arr.size == 0:
+        return []
+
+    percentiles = (
+        np.percentile(weights_arr, WEIGHT_PERCENTILES)
+        if deciles is None
+        else deciles
+    )
+    outs = np.searchsorted(percentiles, weights_arr)
+    return [out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs]
 
 
 class NodeView(nx.classes.reportviews.NodeView):
@@ -350,8 +368,16 @@ class NetworkGraph:
         """
         # Normalize and scale nodes' weights within the desired range of edge widths
         node_weights = [data.get(weight, 1) for node, data in self.nodes(data=True)]
+        node_deciles = (
+            np.percentile(np.array(node_weights), WEIGHT_PERCENTILES)
+            if node_weights
+            else None
+        )
         node_size = scale_weights(
-            weights=node_weights, scale_max=max_node_size, scale_min=min_node_size
+            weights=node_weights,
+            scale_max=max_node_size,
+            scale_min=min_node_size,
+            deciles=node_deciles,
         )
 
         # Normalize and scale edges' weights within the desired range of edge widths
@@ -366,6 +392,7 @@ class NetworkGraph:
                     weights=node_weights,
                     scale_max=max_font_size,
                     scale_min=min_font_size,
+                    deciles=node_deciles,
                 ),
             )
         )
@@ -411,12 +438,36 @@ class NetworkGraph:
         subgraph = subgraph.edge_subgraph(list(edges)[:max_edges])
         return subgraph
 
+    def compute_positions(
+        self,
+        k: Optional[float] = None,
+        seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+    ) -> Dict[Any, np.ndarray]:
+        """Return spring layout positions for the graph.
+
+        Parameters
+        ----------
+        k : float, optional
+            Optimal distance between nodes. The default is ``DEFAULT["SPRING_LAYOUT_K"]``.
+        seed : int, optional
+            Seed for reproducible layouts. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+
+        Returns
+        -------
+        dict[Any, np.ndarray]
+            Mapping of nodes to their layout coordinates.
+        """
+
+        layout_k = DEFAULT["SPRING_LAYOUT_K"] if k is None else k
+        return nx.spring_layout(self._nx_graph, k=layout_k, seed=seed)
+
     def plot_network(
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         weight: str = "weight",
         ax: Optional[Axes] = None,
+        layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Axes:
         """Plot the graph using node and edge weights.
 
@@ -430,6 +481,8 @@ class NetworkGraph:
             Edge attribute used for weighting. The default is "weight".
         ax : Axes, optional
             Axes to draw on.
+        layout_seed : int, optional
+            Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
@@ -466,7 +519,7 @@ class NetworkGraph:
             max_font_size=style.font_mapping.get(4, DEFAULT["MAX_FONT_SIZE"]),
             weight=weight,
         )
-        pos = nx.spring_layout(graph._nx_graph, k=1)
+        pos = graph.compute_positions(seed=layout_seed)
         # nodes
         node_sizes_int = [int(size) for size in node_sizes]
         nx.draw_networkx_nodes(
