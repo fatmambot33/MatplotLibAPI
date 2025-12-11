@@ -11,8 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure, SubFigure
-from matplotlib.backend_bases import FigureCanvasBase
+from matplotlib.figure import Figure
+from numpy.typing import NDArray
 from wordcloud import WordCloud
 
 from .StyleTemplate import (
@@ -30,7 +30,7 @@ WORDCLOUD_STYLE_TEMPLATE = StyleTemplate(
 
 def _filter_stopwords(
     words: Iterable[str], stopwords: Optional[Iterable[str]]
-) -> np.ndarray:
+) -> NDArray[np.str_]:
     """Remove stopwords from a sequence of words.
 
     Parameters
@@ -96,23 +96,22 @@ def _prepare_word_frequencies(
         if freq_series.empty:
             freq_series = pd_df[text_column].value_counts()
 
-    words_: np.ndarray[Tuple[int], np.dtype[Any]] = freq_series.index.to_numpy()
-    weights_: np.ndarray[Tuple[int], np.dtype[Any]] = freq_series.to_numpy(dtype=float)
-
-    words: np.ndarray[Tuple[Any], np.dtype[Any]] = _filter_stopwords(words_, stopwords)
-    mask: np.ndarray[Tuple[Any], np.dtype[np.bool[bool]]] = np.isin(
-        freq_series.index, words
+    words: NDArray[np.str_] = np.asarray(freq_series.index.to_numpy())
+    weights: NDArray[np.float64] = np.asarray(
+        freq_series.to_numpy(dtype=float), dtype=np.float64
     )
-    weights: np.ndarray[Tuple[Any], np.dtype[Any]] = weights_[mask]
 
-    sorted_indices: NDArray[np.intp] = np.argsort(weights)[::-1]
-    sorted_words: np.ndarray = words[sorted_indices][:max_words]
-    sorted_weights: np.ndarray = weights[sorted_indices][:max_words]
+    filtered_words = _filter_stopwords(words, stopwords)
+    mask: NDArray[np.bool_] = np.asarray(
+        np.isin(freq_series.index, filtered_words), dtype=bool
+    )
+    filtered_weights: NDArray[np.float64] = np.asarray(weights[mask], dtype=np.float64)
 
-    words_list: list[str] = sorted_words.tolist()
-    weights_list: list[float] = sorted_weights.tolist()
+    sorted_indices = np.argsort(filtered_weights)[::-1]
+    sorted_words = filtered_words[sorted_indices][:max_words].tolist()
+    sorted_weights = filtered_weights[sorted_indices][:max_words].tolist()
 
-    return words_list, weights_list
+    return sorted_words, sorted_weights
 
 
 def create_circular_mask(size: int = 300, radius: Optional[int] = None) -> np.ndarray:
