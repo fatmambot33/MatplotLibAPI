@@ -1,13 +1,19 @@
 """Tests for network visualizations."""
 
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import networkx as nx
 import numpy as np
+import pandas as pd
+import pytest
 
 import MatplotLibAPI
 from MatplotLibAPI.Network import (
     NetworkGraph,
     WEIGHT_PERCENTILES,
+    aplot_network_node,
+    fplot_network_node,
     scale_weights,
     softmax,
 )
@@ -120,3 +126,50 @@ def test_compute_positions_is_reproducible_with_seed():
         not np.allclose(seeded_positions[node], different_seed_positions[node])
         for node in seeded_positions
     )
+
+
+def test_aplot_network_node_limits_to_component(monkeypatch):
+    """Plot only the component containing the requested node."""
+
+    df = pd.DataFrame(
+        {
+            "source": ["a", "b", "c", "x", "y", "z"],
+            "target": ["b", "c", "a", "y", "z", "x"],
+            "weight": [1, 1, 1, 2, 2, 2],
+        }
+    )
+
+    captured_nodes = []
+
+    def fake_plot(self, *args, **kwargs):  # type: ignore[override]
+        captured_nodes.append(set(self._nx_graph.nodes))
+        return plt.gca()
+
+    monkeypatch.setattr(NetworkGraph, "plot_network", fake_plot)
+
+    aplot_network_node(df, node="a")
+
+    assert captured_nodes and captured_nodes[0] == {"a", "b", "c"}
+
+
+def test_fplot_network_node_returns_figure(load_sample_df):
+    """Return a Matplotlib figure when plotting a node component."""
+
+    df = load_sample_df("network.csv")
+
+    fig = fplot_network_node(
+        df, node="New York", source="city_a", target="city_b", weight="distance_km"
+    )
+
+    assert isinstance(fig, Figure)
+
+
+def test_aplot_network_node_raises_for_missing_node(load_sample_df):
+    """Raise a ValueError when the requested node is absent from the graph."""
+
+    df = load_sample_df("network.csv")
+
+    with pytest.raises(ValueError):
+        aplot_network_node(
+            df, node="Atlantis", source="city_a", target="city_b", weight="distance_km"
+        )
