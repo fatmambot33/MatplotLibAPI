@@ -103,9 +103,7 @@ def _prepare_word_frequencies(
     mask: NDArray[np.bool_] = np.asarray(
         np.isin(freq_series.index, filtered_words), dtype=bool
     )
-    filtered_weights: NDArray[np.float64] = np.asarray(
-        weights[mask], dtype=np.float64
-    )
+    filtered_weights: NDArray[np.float64] = np.asarray(weights[mask], dtype=np.float64)
 
     sorted_indices = np.argsort(filtered_weights)[::-1]
     sorted_words = filtered_words[sorted_indices][:max_words].tolist()
