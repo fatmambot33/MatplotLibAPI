@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, cast
 
+from matplotlib.transforms import Bbox
 import numpy as np
+from numpy.typing import NDArray
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
@@ -46,7 +48,7 @@ def _filter_stopwords(
     if stopwords is None:
         return np.array(list(words))
 
-    stop_set = {word.lower() for word in stopwords}
+    stop_set: set[str] = {word.lower() for word in stopwords}
     return np.array([word for word in words if word.lower() not in stop_set])
 
 
@@ -87,7 +89,7 @@ def _prepare_word_frequencies(
     if weight_column is None:
         freq_series: pd.Series = pd_df[text_column].value_counts()
     else:
-        weight_col = cast(str, weight_column)
+        weight_col: str = cast(str, weight_column)
         freq_series = cast(pd.Series, pd_df.groupby(text_column)[weight_col].sum())
         freq_series = cast(pd.Series, freq_series[freq_series > 0])
         freq_series = freq_series.sort_values(ascending=False)
@@ -136,11 +138,11 @@ def create_circular_mask(size: int = 300, radius: Optional[int] = None) -> np.nd
     if size <= 0:
         raise ValueError("size must be a positive integer.")
 
-    resolved_radius = radius if radius is not None else size // 2
+    resolved_radius: int = radius if radius is not None else size // 2
     if resolved_radius <= 0:
         raise ValueError("radius must be a positive integer.")
 
-    center = (size - 1) / 2
+    center: float = (size - 1) / 2
     x, y = np.ogrid[:size, :size]
     mask_region = (x - center) ** 2 + (y - center) ** 2 > resolved_radius**2
     return 255 * mask_region.astype(np.uint8)
@@ -185,44 +187,44 @@ def _plot_words(
             ax.set_title(title, color=style.font_color, fontsize=style.font_size * 1.5)
         return ax
 
-    fig_obj = ax.get_figure()
+    fig_obj: Figure | SubFigure | None = ax.get_figure()
     if not isinstance(fig_obj, Figure):
         raise RuntimeError("Axes is not associated with a Figure.")
 
-    canvas = fig_obj.canvas
+    canvas: FigureCanvasBase = fig_obj.canvas
     if canvas is None:
         raise RuntimeError("Figure does not have an attached canvas.")
 
     canvas.draw()
-    ax_bbox = ax.get_window_extent()
+    ax_bbox: Bbox = ax.get_window_extent()
 
     if mask is None:
-        mask_dimension = max(int(ax_bbox.width), int(ax_bbox.height), 1)
-        resolved_mask = create_circular_mask(size=mask_dimension)
+        mask_dimension: int = max(int(ax_bbox.width), int(ax_bbox.height), 1)
+        resolved_mask: NDArray[np.uint8] = create_circular_mask(size=mask_dimension)
     else:
-        resolved_mask = np.asarray(mask)
+        resolved_mask: NDArray[np.uint8] = np.asarray(mask, dtype=np.uint8)
 
     if resolved_mask.ndim != 2:
         raise ValueError("mask must be a 2D array.")
 
     height, width = resolved_mask.shape
 
-    frequency_map = {
+    frequency_map: Dict[str, float] = {
         string_formatter(word): weight for word, weight in zip(words, weights)
     }
-    min_font_size = style.font_mapping[min(style.font_mapping.keys())]
-    max_font_size = style.font_mapping[max(style.font_mapping.keys())]
 
-    wc = WordCloud(
+    max_font_size = int(style.font_mapping[max(style.font_mapping.keys())] * 20)
+
+    wc: WordCloud = WordCloud(
         width=width,
         height=height,
         background_color=style.background_color,
         colormap=colormaps.get_cmap(style.palette),
-        min_font_size=min_font_size,
-        max_font_size=max_font_size,
+        # min_font_size=min_font_size,
+        # max_font_size=max_font_size,
         random_state=random_state,
         mask=resolved_mask,
-    ).generate_from_frequencies(frequency_map)
+    ).generate_from_frequencies(frequency_map, max_font_size=max_font_size)
 
     ax.imshow(wc.to_array(), interpolation="bilinear")
 
@@ -357,8 +359,8 @@ def fplot_wordcloud(
         If required columns are missing from the DataFrame.
     """
     fig_raw, ax_raw = plt.subplots(figsize=figsize)
-    fig = cast(Figure, fig_raw)
-    ax = cast(Axes, ax_raw)
+    fig: Figure = cast(Figure, fig_raw)
+    ax: Axes = cast(Axes, ax_raw)
 
     _plot_words(
         ax,
