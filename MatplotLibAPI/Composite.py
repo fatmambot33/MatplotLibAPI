@@ -267,7 +267,7 @@ def plot_wordcloud_network(
         2,
         1,
         figsize=figsize,
-        gridspec_kw={"height_ratios": [1, 2]},
+        gridspec_kw={"height_ratios": [1, 1]},
     )
     fig = cast(Figure, fig_raw)
     wordcloud_ax, network_ax = cast(Tuple[Axes, Axes], axes_raw)
@@ -280,7 +280,7 @@ def plot_wordcloud_network(
         fig.suptitle(
             title,
             color=style.font_color,
-            fontsize=style.font_size,
+            fontsize=style.font_size * 2,
             fontname=style.font_name,
         )
 
