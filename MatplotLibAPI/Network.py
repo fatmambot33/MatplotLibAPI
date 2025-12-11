@@ -84,12 +84,12 @@ def scale_weights(
         return []
 
     percentiles = (
-        np.percentile(weights_arr, WEIGHT_PERCENTILES)
-        if deciles is None
-        else deciles
+        np.percentile(weights_arr, WEIGHT_PERCENTILES) if deciles is None else deciles
     )
     outs = np.searchsorted(percentiles, weights_arr)
-    return [out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs]
+    return [
+        out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs
+    ]
 
 
 class NodeView(nx.classes.reportviews.NodeView):
@@ -483,7 +483,11 @@ class NetworkGraph:
             raise ValueError(f"Node {node!r} is not present in the graph.")
 
         component_nodes = next(
-            (component for component in nx.connected_components(self._nx_graph) if node in component),
+            (
+                component
+                for component in nx.connected_components(self._nx_graph)
+                if node in component
+            ),
             None,
         )
 
