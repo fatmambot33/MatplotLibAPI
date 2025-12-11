@@ -430,7 +430,7 @@ class NetworkGraph:
         """
         if node_list is None:
             node_list = self.nodes.sort("weight")[: DEFAULT["MAX_NODES"]]
-        core_subgraph_nodes = list(self.get_core_subgraph(k=min_degree).nodes)
+        core_subgraph_nodes = list(self.k_core(k=min_degree).nodes)
         node_list = [node for node in node_list if node in core_subgraph_nodes]
 
         subgraph = NetworkGraph(nx.subgraph(self._nx_graph, nbunch=node_list))
@@ -606,7 +606,7 @@ class NetworkGraph:
 
         return ax
 
-    def get_core_subgraph(self, k: int = 2) -> "NetworkGraph":
+    def k_core(self, k: int = 2) -> "NetworkGraph":
         """Return the k-core of the graph.
 
         The k-core is a subgraph containing only nodes with degree >= k.
@@ -623,6 +623,23 @@ class NetworkGraph:
         """
         core_graph = nx.k_core(self._nx_graph, k=k)
         return NetworkGraph(core_graph)
+
+    def get_core_subgraph(self) -> "NetworkGraph":
+        """Return the k-core of the graph.
+
+        The k-core is a subgraph containing only nodes with degree >= k.
+
+        Parameters
+        ----------
+        k : int, optional
+            The minimum degree for nodes in the core. The default is 2.
+
+        Returns
+        -------
+        NetworkGraph
+            The k-core subgraph.
+        """
+        return self.k_core(k=2)
 
     def top_k_edges(
         self, attribute: str, reverse: bool = True, k: int = 5
@@ -823,7 +840,7 @@ def prepare_network_graph(
     graph = NetworkGraph.from_pandas_edgelist(
         df, source=source, target=target, weight=weight
     )
-    graph = graph.get_core_subgraph(k=2)
+    graph = graph.get_core_subgraph()
     if filtered_node_df is not None and not filtered_node_df.empty:
         node_weights = {
             node: weight_value
@@ -1247,7 +1264,6 @@ def fplot_network_components(
     graph = NetworkGraph.from_pandas_edgelist(
         df, source=source, target=target, weight=weight
     )
-    graph = graph.get_core_subgraph(k=2)
     connected_components = list(nx.connected_components(graph._nx_graph))
 
     n_components = len(connected_components)
