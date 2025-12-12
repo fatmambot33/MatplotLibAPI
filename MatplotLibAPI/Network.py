@@ -20,7 +20,7 @@ from .StyleTemplate import (
     validate_dataframe,
 )
 
-DEFAULT = {
+_DEFAULT = {
     "MAX_EDGES": 100,
     "MAX_NODES": 30,
     "MIN_NODE_SIZE": 100,
@@ -33,11 +33,24 @@ DEFAULT = {
     "SPRING_LAYOUT_SEED": 42,
 }
 
-WEIGHT_PERCENTILES = np.arange(10, 100, 10)
+_WEIGHT_PERCENTILES = np.arange(10, 100, 10)
+
+__all__ = [
+    "NETWORK_STYLE_TEMPLATE",
+    "NetworkGraph",
+    "aplot_network",
+    "aplot_network_node",
+    "aplot_network_components",
+    "fplot_network",
+    "fplot_network_node",
+    "fplot_network_components",
+]
 
 
 def _softmax(x: Iterable[float]) -> np.ndarray:
-    """Compute softmax values for array ``x``.
+    """Private helper to compute softmax values for array ``x``.
+
+    Not part of the public API; used internally for edge weight scaling.
 
     Parameters
     ----------
@@ -61,7 +74,10 @@ def _scale_weights(
     scale_max: float = 1,
     deciles: Optional[np.ndarray] = None,
 ) -> List[float]:
-    """Scale weights into deciles within the given range.
+    """Private helper to scale weights into deciles within the given range.
+
+    This helper is internal to plotting utilities and is not part of the
+    supported public interface.
 
     Parameters
     ----------
@@ -84,7 +100,7 @@ def _scale_weights(
         return []
 
     percentiles = (
-        np.percentile(weights_arr, WEIGHT_PERCENTILES) if deciles is None else deciles
+        np.percentile(weights_arr, _WEIGHT_PERCENTILES) if deciles is None else deciles
     )
     outs = np.searchsorted(percentiles, weights_arr)
     return [
@@ -226,7 +242,9 @@ def _sanitize_node_dataframe(
     edge_source_col: str,
     edge_target_col: str,
 ) -> Optional[pd.DataFrame]:
-    """Return a copy of ``node_df`` limited to nodes present in the edge list.
+    """Private helper returning ``node_df`` rows present in the edge list.
+
+    Intended for internal use when preparing plotting data.
 
     Parameters
     ----------
@@ -235,8 +253,8 @@ def _sanitize_node_dataframe(
     edge_df : pd.DataFrame
         Edge DataFrame containing source and target columns.
     edge_source_col : str
-        Column name for source edgess.
-    edge_target_col: str
+        Column name for source edges.
+    edge_target_col : str
         Column name for target edges.
 
     Returns
@@ -258,10 +276,36 @@ class NetworkGraph:
 
     Methods
     -------
-    sort
-        Return nodes sorted by the specified attribute.
-    filter
-        Return nodes where ``attribute`` equals ``value``.
+    compute_positions
+        Return node positions computed with a spring layout.
+    layout
+        Return scaled node sizes, edge widths, and grouped font sizes.
+    aplot_network
+        Plot the graph on a provided axis.
+    fplot_network
+        Plot the graph and return a new figure.
+    aplot_connected_components
+        Plot each connected component on a shared axis.
+    fplot_connected_components
+        Plot each connected component on a new figure.
+    get_component_subgraph
+        Return the subgraph containing the specified node.
+    k_core
+        Return the k-core of the graph.
+    get_core_subgraph
+        Return the 2-core of the graph.
+    top_k_edges
+        Return the top edges for each node based on an attribute.
+    calculate_node_weights_from_edges
+        Populate node weights by summing top edge weights.
+    trim_edges
+        Create a subgraph that retains the top edges per node.
+    set_node_attributes
+        Set multiple node attributes from a mapping.
+    from_pandas_edgelist
+        Build a graph from a pandas edge list.
+    build_from_dataframes
+        Construct a graph from node and edge DataFrames with validation.
     """
 
     _nx_graph: nx.Graph
@@ -395,11 +439,11 @@ class NetworkGraph:
 
     def layout(
         self,
-        max_node_size: int = DEFAULT["MAX_NODE_SIZE"],
-        min_node_size: int = DEFAULT["MIN_NODE_SIZE"],
-        max_edge_width: int = DEFAULT["MAX_EDGE_WIDTH"],
-        max_font_size: int = DEFAULT["MAX_FONT_SIZE"],
-        min_font_size: int = DEFAULT["MIN_FONT_SIZE"],
+        max_node_size: int = _DEFAULT["MAX_NODE_SIZE"],
+        min_node_size: int = _DEFAULT["MIN_NODE_SIZE"],
+        max_edge_width: int = _DEFAULT["MAX_EDGE_WIDTH"],
+        max_font_size: int = _DEFAULT["MAX_FONT_SIZE"],
+        min_font_size: int = _DEFAULT["MIN_FONT_SIZE"],
         weight: str = "weight",
     ) -> Tuple[List[float], List[float], Dict[int, List[str]]]:
         """Calculate node, edge and font sizes based on weights.
@@ -407,15 +451,15 @@ class NetworkGraph:
         Parameters
         ----------
         max_node_size : int, optional
-            Upper bound for node size. The default is `DEFAULT["MAX_NODE_SIZE"]`.
+            Upper bound for node size. The default is `_DEFAULT["MAX_NODE_SIZE"]`.
         min_node_size : int, optional
-            Lower bound for node size. The default is `DEFAULT["MIN_NODE_SIZE"]`.
+            Lower bound for node size. The default is `_DEFAULT["MIN_NODE_SIZE"]`.
         max_edge_width : int, optional
-            Upper bound for edge width. The default is `DEFAULT["MAX_EDGE_WIDTH"]`.
+            Upper bound for edge width. The default is `_DEFAULT["MAX_EDGE_WIDTH"]`.
         max_font_size : int, optional
-            Upper bound for font size. The default is `DEFAULT["MAX_FONT_SIZE"]`.
+            Upper bound for font size. The default is `_DEFAULT["MAX_FONT_SIZE"]`.
         min_font_size : int, optional
-            Lower bound for font size. The default is `DEFAULT["MIN_FONT_SIZE"]`.
+            Lower bound for font size. The default is `_DEFAULT["MIN_FONT_SIZE"]`.
         weight : str, optional
             Node attribute used for weighting. The default is "weight".
 
@@ -427,7 +471,7 @@ class NetworkGraph:
         # Normalize and scale nodes' weights within the desired range of edge widths
         node_weights = [data.get(weight, 1) for node, data in self.nodes(data=True)]
         node_deciles = (
-            np.percentile(np.array(node_weights), WEIGHT_PERCENTILES)
+            np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
             if node_weights
             else None
         )
@@ -464,7 +508,7 @@ class NetworkGraph:
     def subgraph(
         self,
         node_list: Optional[List[str]] = None,
-        max_edges: int = DEFAULT["MAX_EDGES"],
+        max_edges: int = _DEFAULT["MAX_EDGES"],
         min_degree: int = 2,
         top_k_edges_per_node: int = 5,
     ) -> "NetworkGraph":
@@ -475,7 +519,7 @@ class NetworkGraph:
         node_list : list[str], optional
             Nodes to include.
         max_edges : int, optional
-            Maximum edges to retain. The default is `DEFAULT["MAX_EDGES"]`.
+            Maximum edges to retain. The default is `_DEFAULT["MAX_EDGES"]`.
         min_degree : int, optional
             Minimum degree for nodes in the core subgraph. The default is 2.
         top_k_edges_per_node : int, optional
@@ -487,7 +531,7 @@ class NetworkGraph:
             Trimmed subgraph.
         """
         if node_list is None:
-            node_list = self.nodes.sort("weight")[: DEFAULT["MAX_NODES"]]
+            node_list = self.nodes.sort("weight")[: _DEFAULT["MAX_NODES"]]
         core_subgraph_nodes = list(self.k_core(k=min_degree).nodes)
         node_list = [node for node in node_list if node in core_subgraph_nodes]
         _subgraph = nx.subgraph(self._nx_graph, node_list)
@@ -502,23 +546,23 @@ class NetworkGraph:
     def compute_positions(
         self,
         k: Optional[float] = None,
-        seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+        seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Dict[Any, np.ndarray]:
         """Return spring layout positions for the graph.
 
         Parameters
         ----------
         k : float, optional
-            Optimal distance between nodes. The default is ``DEFAULT["SPRING_LAYOUT_K"]``.
+            Optimal distance between nodes. The default is ``_DEFAULT["SPRING_LAYOUT_K"]``.
         seed : int, optional
-            Seed for reproducible layouts. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+            Seed for reproducible layouts. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
         dict[Any, np.ndarray]
             Mapping of nodes to their layout coordinates.
         """
-        layout_k = DEFAULT["SPRING_LAYOUT_K"] if k is None else k
+        layout_k = _DEFAULT["SPRING_LAYOUT_K"] if k is None else k
         return nx.spring_layout(self._nx_graph, k=layout_k, seed=seed)
 
     def get_component_subgraph(self, node: Any) -> "NetworkGraph":
@@ -563,7 +607,7 @@ class NetworkGraph:
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         weight: str = "weight",
         ax: Optional[Axes] = None,
-        layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Axes:
         """Plot the graph using node and edge weights.
 
@@ -578,7 +622,7 @@ class NetworkGraph:
         ax : Axes, optional
             Axes to draw on.
         layout_seed : int, optional
-            Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+            Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
@@ -611,18 +655,18 @@ class NetworkGraph:
         mapped_max_font_size = style.font_mapping.get(4)
 
         node_sizes, edge_widths, font_sizes = graph.layout(
-            min_node_size=DEFAULT["MIN_NODE_SIZE"] // 5,
-            max_node_size=DEFAULT["MAX_NODE_SIZE"],
-            max_edge_width=DEFAULT["MAX_EDGE_WIDTH"],
+            min_node_size=_DEFAULT["MIN_NODE_SIZE"] // 5,
+            max_node_size=_DEFAULT["MAX_NODE_SIZE"],
+            max_edge_width=_DEFAULT["MAX_EDGE_WIDTH"],
             min_font_size=(
                 mapped_min_font_size
                 if mapped_min_font_size is not None
-                else DEFAULT["MIN_FONT_SIZE"]
+                else _DEFAULT["MIN_FONT_SIZE"]
             ),
             max_font_size=(
                 mapped_max_font_size
                 if mapped_max_font_size is not None
-                else DEFAULT["MAX_FONT_SIZE"]
+                else _DEFAULT["MAX_FONT_SIZE"]
             ),
             weight=weight,
         )
@@ -690,6 +734,7 @@ class NetworkGraph:
         """
         fig, ax = plt.subplots(figsize=FIG_SIZE)
         fig = cast(Figure, fig)
+        ax = cast(Axes, ax)
         fig.patch.set_facecolor(style.background_color)
         self.aplot_network(title=title, style=style, weight=weight, ax=ax)
         return fig
@@ -697,7 +742,7 @@ class NetworkGraph:
     def aplot_connected_components(
         self,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Axes:
         """Plot all connected components of the graph.
 
@@ -706,7 +751,7 @@ class NetworkGraph:
         style : StyleTemplate, optional
             Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
         layout_seed : int, optional
-            Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+            Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
@@ -742,7 +787,7 @@ class NetworkGraph:
     def fplot_connected_components(
         self,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Figure:
         """Plot all connected components of the graph.
 
@@ -751,7 +796,7 @@ class NetworkGraph:
         style : StyleTemplate, optional
             Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
         layout_seed : int, optional
-            Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+            Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
@@ -786,19 +831,12 @@ class NetworkGraph:
         return NetworkGraph(core_graph)
 
     def get_core_subgraph(self) -> "NetworkGraph":
-        """Return the k-core of the graph.
-
-        The k-core is a subgraph containing only nodes with degree >= k.
-
-        Parameters
-        ----------
-        k : int, optional
-            The minimum degree for nodes in the core. The default is 2.
+        """Return the 2-core of the graph.
 
         Returns
         -------
         NetworkGraph
-            The k-core subgraph.
+            The k-core subgraph with minimum degree 2.
         """
         return self.k_core(k=2)
 
@@ -925,18 +963,24 @@ class NetworkGraph:
         edge_source_col: str = "source",
         edge_target_col: str = "target",
     ) -> pd.DataFrame:
-        """Return a copy of ``node_df`` limited to nodes present in the edge list.
+        """Private helper returning ``node_df`` rows present in the edge list.
+
+        This method supports internal builders and is not part of the public API.
 
         Parameters
         ----------
-        node_df : pd.DataFrame, optional
+        node_df : pd.DataFrame
             DataFrame containing ``node`` and ``weight`` columns.
         edge_df : pd.DataFrame
             Edge DataFrame containing source and target columns.
-        edge_source_col : str
-            Column name for source edgess.
-        edge_target_col: str
-            Column name for target edges.
+        node_col : str, optional
+            Column name for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column name for node weights. The default is "weight".
+        edge_source_col : str, optional
+            Column name for source edges. The default is "source".
+        edge_target_col : str, optional
+            Column name for target edges. The default is "target".
 
         Returns
         -------
@@ -960,23 +1004,32 @@ class NetworkGraph:
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
     ) -> pd.DataFrame:
-        """Return a sanitized copy of the edge DataFrame.
+        """Private helper returning a sanitized copy of the edge DataFrame.
+
+        Intended for internal validation when building graphs from dataframes.
 
         Parameters
         ----------
+        node_df : pd.DataFrame
+            DataFrame containing node identifiers and weights.
         edge_df : pd.DataFrame
             Edge DataFrame containing source and target columns.
-        source : str, optional
+        node_col : str, optional
+            Column name for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column name for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column name for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column name for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column name for edge weights. The default is "weight".
 
         Returns
         -------
         pd.DataFrame
-            Sanitized edge DataFrame.
+            Sanitized edge DataFrame containing only edges whose nodes appear
+            in ``node_df``.
         """
         validate_dataframe(
             edge_df, cols=[edge_source_col, edge_target_col, edge_weight_col]
@@ -999,27 +1052,30 @@ class NetworkGraph:
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
     ) -> "NetworkGraph":
-        """Build a NetworkGraph from a pandas DataFrame.
+        """Build a NetworkGraph from node and edge DataFrames.
 
         Parameters
         ----------
-        pd_df : pd.DataFrame
+        node_df : pd.DataFrame
+            DataFrame containing node identifiers and weights.
+        edge_df : pd.DataFrame
             DataFrame containing the edge list.
-        source : str, optional
+        node_col : str, optional
+            Column name for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column name for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column name for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column name for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column name for edge weights. The default is "weight".
-        sort_by : str, optional
-            Column to sort the DataFrame by before processing.
-        node_df : pd.DataFrame, optional
-            DataFrame containing ``node`` and ``weight`` columns.
 
         Returns
         -------
         NetworkGraph
-            The prepared `NetworkGraph` object.
+            Prepared ``NetworkGraph`` instance with node weights set and edges
+            filtered to nodes present in ``node_df``.
         """
         if node_df is not None:
             node_df = NetworkGraph._sanitize_node_dataframe(
@@ -1229,7 +1285,7 @@ def aplot_network_node(
     ascending: bool = False,
     node_df: Optional[pd.DataFrame] = None,
     ax: Optional[Axes] = None,
-    layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
 ) -> Axes:
     """Plot the connected component containing ``node`` on the provided axes.
 
@@ -1258,7 +1314,7 @@ def aplot_network_node(
     ax : Axes, optional
         Axes to draw on.
     layout_seed : int, optional
-        Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+        Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
     Returns
     -------
@@ -1444,7 +1500,7 @@ def fplot_network_node(
     figsize: Tuple[float, float] = FIG_SIZE,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
-    layout_seed: Optional[int] = DEFAULT["SPRING_LAYOUT_SEED"],
+    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
 ) -> Figure:
     """Return a figure with the component containing ``node``.
 
@@ -1477,7 +1533,7 @@ def fplot_network_node(
     savefig_kwargs : dict[str, Any], optional
         Extra keyword arguments forwarded to ``Figure.savefig``. The default is ``None``.
     layout_seed : int, optional
-        Seed for the spring layout used to place nodes. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+        Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
     Returns
     -------

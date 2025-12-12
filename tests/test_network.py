@@ -11,7 +11,7 @@ import pytest
 import MatplotLibAPI
 from MatplotLibAPI.Network import (
     NetworkGraph,
-    WEIGHT_PERCENTILES,
+    _WEIGHT_PERCENTILES,
     aplot_network_node,
     fplot_network_node,
     _scale_weights,
@@ -102,7 +102,7 @@ def test_scale_weights_respects_precomputed_deciles():
     """Reuse provided deciles to produce consistent scaling across calls."""
 
     weights = [1.0, 2.0, 3.0, 4.0]
-    deciles = np.percentile(np.array(weights), WEIGHT_PERCENTILES)
+    deciles = np.percentile(np.array(weights), _WEIGHT_PERCENTILES)
 
     expected = _scale_weights(weights)
     assert _scale_weights(weights, deciles=deciles) == expected
@@ -145,7 +145,7 @@ def test_aplot_network_node_limits_to_component(monkeypatch):
         captured_nodes.append(set(self._nx_graph.nodes))
         return plt.gca()
 
-    monkeypatch.setattr(NetworkGraph, "plot_network", fake_plot)
+    monkeypatch.setattr(NetworkGraph, "aplot_network", fake_plot)
 
     aplot_network_node(df, node="a")
 
