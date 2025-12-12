@@ -1345,36 +1345,45 @@ class DataFrameAccessor:
 
     def aplot_network(
         self,
-        source: str = "source",
-        target: str = "target",
-        weight: str = "weight",
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_df: Optional[pd.DataFrame] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        layout_seed: Optional[int] = None,
         ax: Optional[Axes] = None,
     ) -> Axes:
         """Plot a network graph on a Matplotlib axes.
 
         Parameters
         ----------
-        source : str, optional
+        node_col : str, optional
+            Column for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column for edge weights. The default is "weight".
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
         node_df : pd.DataFrame, optional
             DataFrame containing ``node`` and ``weight`` columns for weighting.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        layout_seed : int, optional
+            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
         ax : Axes, optional
             Matplotlib axes to plot on. If None, uses the current axes.
 
@@ -1383,32 +1392,41 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
+        kwargs: Dict[str, Any] = {}
+        if layout_seed is not None:
+            kwargs["layout_seed"] = layout_seed
+
         return aplot_network(
             pd_df=self._obj,
-            source=source,
-            target=target,
-            weight=weight,
-            title=title,
-            style=style,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
             sort_by=sort_by,
             ascending=ascending,
             node_df=node_df,
+            title=title,
+            style=style,
             ax=ax,
+            **kwargs,
         )
 
     def aplot_network_node(
         self,
         node: Any,
-        source: str = "source",
-        target: str = "target",
-        weight: str = "weight",
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_df: Optional[pd.DataFrame] = None,
-        ax: Optional[Axes] = None,
         layout_seed: Optional[int] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        ax: Optional[Axes] = None,
     ) -> Axes:
         """Plot the connected component containing ``node``.
 
@@ -1416,26 +1434,30 @@ class DataFrameAccessor:
         ----------
         node : Any
             Node identifier whose component should be visualized.
-        source : str, optional
+        node_col : str, optional
+            Column for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column for edge weights. The default is "weight".
-        title : str, optional
-            Chart title. Defaults to the formatted node label when ``None``.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
         node_df : pd.DataFrame, optional
             DataFrame containing ``node`` and ``weight`` columns for weighting.
-        ax : Axes, optional
-            Matplotlib axes to plot on. If None, uses the current axes.
         layout_seed : int, optional
             Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
+        title : str, optional
+            Chart title. Defaults to the formatted node label when ``None``.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, uses the current axes.
 
         Returns
         -------
@@ -1447,101 +1469,132 @@ class DataFrameAccessor:
         ValueError
             If ``node`` is not present in the prepared graph.
         """
+        kwargs: Dict[str, Any] = {}
+        if layout_seed is not None:
+            kwargs["layout_seed"] = layout_seed
+
         return aplot_network_node(
             pd_df=self._obj,
             node=node,
-            source=source,
-            target=target,
-            weight=weight,
-            title=title,
-            style=style,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
             sort_by=sort_by,
             ascending=ascending,
             node_df=node_df,
+            title=title,
+            style=style,
             ax=ax,
-            layout_seed=layout_seed,
+            **kwargs,
         )
 
     def aplot_network_components(
         self,
-        source: str = "source",
-        target: str = "target",
-        weight: str = "weight",
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_df: Optional[pd.DataFrame] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        layout_seed: Optional[int] = None,
         axes: Optional[np.ndarray] = None,
     ) -> None:
         """Plot connected components of a network graph on multiple axes.
 
         Parameters
         ----------
-        source : str, optional
+        node_col : str, optional
+            Column for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column for edge weights. The default is "weight".
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
         node_df : pd.DataFrame, optional
             DataFrame containing ``node`` and ``weight`` columns for weighting.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        layout_seed : int, optional
+            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
         axes : np.ndarray, optional
             Numpy array of Matplotlib axes to plot on. If None, new axes are created.
         """
+        kwargs: Dict[str, Any] = {}
+        if layout_seed is not None:
+            kwargs["layout_seed"] = layout_seed
+
         aplot_network_components(
             pd_df=self._obj,
-            source=source,
-            target=target,
-            weight=weight,
-            title=title,
-            style=style,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
             sort_by=sort_by,
             ascending=ascending,
             node_df=node_df,
+            title=title,
+            style=style,
             axes=axes,
+            **kwargs,
         )
 
     def fplot_network(
         self,
-        source: str = "source",
-        target: str = "target",
-        weight: str = "weight",
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_df: Optional[pd.DataFrame] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        layout_seed: Optional[int] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a network graph on a new figure.
 
         Parameters
         ----------
-        source : str, optional
+        node_col : str, optional
+            Column for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column for edge weights. The default is "weight".
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
         node_df : pd.DataFrame, optional
             DataFrame containing ``node`` and ``weight`` columns for weighting.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        layout_seed : int, optional
+            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
         figsize : tuple[float, float], optional
             Figure size. The default is FIG_SIZE.
 
@@ -1550,32 +1603,41 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the plot.
         """
+        kwargs: Dict[str, Any] = {}
+        if layout_seed is not None:
+            kwargs["layout_seed"] = layout_seed
+
         return fplot_network(
             pd_df=self._obj,
-            source=source,
-            target=target,
-            weight=weight,
-            title=title,
-            style=style,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
             sort_by=sort_by,
             ascending=ascending,
             node_df=node_df,
+            title=title,
+            style=style,
             figsize=figsize,
+            **kwargs,
         )
 
     def fplot_network_node(
         self,
         node: Any,
-        source: str = "source",
-        target: str = "target",
-        weight: str = "weight",
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_df: Optional[pd.DataFrame] = None,
-        figsize: Tuple[float, float] = FIG_SIZE,
         layout_seed: Optional[int] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot the connected component containing ``node`` on a new figure.
 
@@ -1583,26 +1645,30 @@ class DataFrameAccessor:
         ----------
         node : Any
             Node identifier whose component should be visualized.
-        source : str, optional
+        node_col : str, optional
+            Column for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column for edge weights. The default is "weight".
-        title : str, optional
-            Chart title. Defaults to the formatted node label when ``None``.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
         node_df : pd.DataFrame, optional
             DataFrame containing ``node`` and ``weight`` columns for weighting.
-        figsize : tuple[float, float], optional
-            Figure size. The default is FIG_SIZE.
         layout_seed : int, optional
             Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
+        title : str, optional
+            Chart title. Defaults to the formatted node label when ``None``.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        figsize : tuple[float, float], optional
+            Figure size. The default is FIG_SIZE.
 
         Returns
         -------
@@ -1614,31 +1680,40 @@ class DataFrameAccessor:
         ValueError
             If ``node`` is not present in the prepared graph.
         """
+        kwargs: Dict[str, Any] = {}
+        if layout_seed is not None:
+            kwargs["layout_seed"] = layout_seed
+
         return fplot_network_node(
             pd_df=self._obj,
             node=node,
-            source=source,
-            target=target,
-            weight=weight,
-            title=title,
-            style=style,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
             sort_by=sort_by,
             ascending=ascending,
             node_df=node_df,
+            title=title,
+            style=style,
             figsize=figsize,
-            layout_seed=layout_seed,
+            **kwargs,
         )
 
     def fplot_network_components(
         self,
-        source: str = "source",
-        target: str = "target",
-        weight: str = "weight",
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
         sort_by: Optional[str] = None,
         ascending: bool = False,
         node_df: Optional[pd.DataFrame] = None,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        layout_seed: Optional[int] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
         n_cols: Optional[int] = None,
     ) -> Figure:
@@ -1646,22 +1721,28 @@ class DataFrameAccessor:
 
         Parameters
         ----------
-        source : str, optional
+        node_col : str, optional
+            Column for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column for node weights. The default is "weight".
+        edge_source_col : str, optional
             Column for source nodes. The default is "source".
-        target : str, optional
+        edge_target_col : str, optional
             Column for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column for edge weights. The default is "weight".
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
         sort_by : str, optional
             Column to sort by.
         ascending : bool, optional
             Sort order. The default is `False`.
         node_df : pd.DataFrame, optional
             DataFrame containing ``node`` and ``weight`` columns for weighting.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        layout_seed : int, optional
+            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
         figsize : tuple[float, float], optional
             Figure size. The default is FIG_SIZE.
         n_cols : int, optional
@@ -1672,18 +1753,25 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with component plots.
         """
+        kwargs: Dict[str, Any] = {}
+        if layout_seed is not None:
+            kwargs["layout_seed"] = layout_seed
+
         return fplot_network_components(
             pd_df=self._obj,
-            source=source,
-            target=target,
-            weight=weight,
-            title=title,
-            style=style,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
             sort_by=sort_by,
             ascending=ascending,
             node_df=node_df,
+            title=title,
+            style=style,
             figsize=figsize,
             n_cols=n_cols,
+            **kwargs,
         )
 
     def fplot_treemap(

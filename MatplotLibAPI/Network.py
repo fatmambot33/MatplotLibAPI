@@ -1,7 +1,7 @@
 """Network chart plotting helpers."""
 
 from collections import defaultdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -239,8 +239,11 @@ class EdgeView(nx.classes.reportviews.EdgeView):
 def _sanitize_node_dataframe(
     node_df: Optional[pd.DataFrame],
     edge_df: pd.DataFrame,
-    edge_source_col: str,
-    edge_target_col: str,
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
 ) -> Optional[pd.DataFrame]:
     """Private helper returning ``node_df`` rows present in the edge list.
 
@@ -252,10 +255,17 @@ def _sanitize_node_dataframe(
         DataFrame containing ``node`` and ``weight`` columns.
     edge_df : pd.DataFrame
         Edge DataFrame containing source and target columns.
-    edge_source_col : str
-        Column name for source edges.
-    edge_target_col : str
-        Column name for target edges.
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
+        Column name for source edges. The default is "source".
+    edge_target_col : str, optional
+        Column name for target edges. The default is "target".
+    edge_weight_col : str, optional
+        Column name for edge weights. The default is "weight". Included to
+        keep signature parity with other sanitization helpers.
 
     Returns
     -------
@@ -265,10 +275,10 @@ def _sanitize_node_dataframe(
     if node_df is None:
         return None
 
-    validate_dataframe(node_df, cols=["node", "weight"])
+    validate_dataframe(node_df, cols=[node_col, node_weight_col])
     filtered_node_df = node_df.copy()
     nodes_in_edges = list(set(edge_df[edge_source_col]).union(edge_df[edge_target_col]))
-    return filtered_node_df.loc[filtered_node_df["node"].isin(nodes_in_edges)]
+    return filtered_node_df.loc[filtered_node_df[node_col].isin(nodes_in_edges)]
 
 
 class NetworkGraph:
@@ -444,7 +454,7 @@ class NetworkGraph:
         max_edge_width: int = _DEFAULT["MAX_EDGE_WIDTH"],
         max_font_size: int = _DEFAULT["MAX_FONT_SIZE"],
         min_font_size: int = _DEFAULT["MIN_FONT_SIZE"],
-        weight: str = "weight",
+        edge_weight_col: str = "weight",
     ) -> Tuple[List[float], List[float], Dict[int, List[str]]]:
         """Calculate node, edge and font sizes based on weights.
 
@@ -460,7 +470,7 @@ class NetworkGraph:
             Upper bound for font size. The default is `_DEFAULT["MAX_FONT_SIZE"]`.
         min_font_size : int, optional
             Lower bound for font size. The default is `_DEFAULT["MIN_FONT_SIZE"]`.
-        weight : str, optional
+        edge_weight_col : str, optional
             Node attribute used for weighting. The default is "weight".
 
         Returns
@@ -469,7 +479,7 @@ class NetworkGraph:
             Node sizes, edge widths and nodes grouped by font size.
         """
         # Normalize and scale nodes' weights within the desired range of edge widths
-        node_weights = [data.get(weight, 1) for node, data in self.nodes(data=True)]
+        node_weights = [data.get(edge_weight_col, 1) for node, data in self.nodes(data=True)]
         node_deciles = (
             np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
             if node_weights
@@ -483,7 +493,9 @@ class NetworkGraph:
         )
 
         # Normalize and scale edges' weights within the desired range of edge widths
-        edge_weights = [data.get(weight, 1) for _, _, data in self.edges(data=True)]
+        edge_weights = [
+            data.get(edge_weight_col, 1) for _, _, data in self.edges(data=True)
+        ]
         edges_width = _scale_weights(weights=edge_weights, scale_max=max_edge_width)
 
         # Scale the normalized node weights within the desired range of font sizes
@@ -605,9 +617,9 @@ class NetworkGraph:
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        weight: str = "weight",
-        ax: Optional[Axes] = None,
+        edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
+        ax: Optional[Axes] = None,
     ) -> Axes:
         """Plot the graph using node and edge weights.
 
@@ -617,12 +629,12 @@ class NetworkGraph:
             Plot title.
         style : StyleTemplate, optional
             Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
-        weight : str, optional
+        edge_weight_col : str, optional
             Edge attribute used for weighting. The default is "weight".
-        ax : Axes, optional
-            Axes to draw on.
         layout_seed : int, optional
             Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
+        ax : Axes, optional
+            Axes to draw on.
 
         Returns
         -------
@@ -668,7 +680,7 @@ class NetworkGraph:
                 if mapped_max_font_size is not None
                 else _DEFAULT["MAX_FONT_SIZE"]
             ),
-            weight=weight,
+            edge_weight_col=edge_weight_col,
         )
         pos = graph.compute_positions(seed=layout_seed)
         # nodes
@@ -715,7 +727,8 @@ class NetworkGraph:
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        weight: str = "weight",
+        edge_weight_col: str = "weight",
+        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Figure:
         """Plot the graph using node and edge weights.
 
@@ -725,8 +738,10 @@ class NetworkGraph:
             Plot title.
         style : StyleTemplate, optional
             Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
-        weight : str, optional
+        edge_weight_col : str, optional
             Edge attribute used for weighting. The default is "weight".
+        layout_seed : int, optional
+            Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
         Returns
         -------
         Figure
@@ -736,65 +751,109 @@ class NetworkGraph:
         fig = cast(Figure, fig)
         ax = cast(Axes, ax)
         fig.patch.set_facecolor(style.background_color)
-        self.aplot_network(title=title, style=style, weight=weight, ax=ax)
+        self.aplot_network(
+            title=title,
+            style=style,
+            edge_weight_col=edge_weight_col,
+            layout_seed=layout_seed,
+            ax=ax,
+        )
         return fig
 
     def aplot_connected_components(
         self,
+        title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
-    ) -> Axes:
+        axes: Optional[np.ndarray] = None,
+    ) -> Union[Axes, np.ndarray]:
         """Plot all connected components of the graph.
 
         Parameters
         ----------
+        title : str, optional
+            Base title for component subplots. When provided, each axis title is
+            suffixed with the component index.
         style : StyleTemplate, optional
             Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+        edge_weight_col : str, optional
+            Edge attribute used for weighting. The default is "weight".
         layout_seed : int, optional
             Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
+        axes : np.ndarray, optional
+            Existing axes to draw each component on. If None, a grid is created
+            based on the number of components.
 
         Returns
         -------
-        Axes
-            Matplotlib axes with the plotted network.
+        Union[Axes, np.ndarray]
+            Matplotlib axes with the plotted network. When ``axes`` is provided
+            or created, the flattened array of axes is returned; otherwise, a
+            single Axes is returned.
         """
         sns.set_palette(style.palette)
-        ax = cast(Axes, plt.gca())
-        ax.set_facecolor(style.background_color)
 
+        graph = self
         isolated_nodes = list(nx.isolates(self._nx_graph))
-        graph_nx = self._nx_graph
         if isolated_nodes:
-            graph_nx = graph_nx.copy()
-            graph_nx.remove_nodes_from(isolated_nodes)
+            graph = NetworkGraph(self._nx_graph.copy())
+            graph._nx_graph.remove_nodes_from(isolated_nodes)
 
-        graph = self if graph_nx is self._nx_graph else NetworkGraph(graph_nx)
+        connected_components = list(nx.connected_components(graph._nx_graph))
 
-        if graph._nx_graph.number_of_nodes() == 0:
-            ax.set_axis_off()
-            return ax
+        local_axes = axes
+        created_axes = False
 
-        for component in nx.connected_components(graph._nx_graph):
-            subgraph = NetworkGraph(nx.subgraph(graph._nx_graph, component))
-            subgraph.aplot_network(
-                style=style,
-                ax=ax,
-                layout_seed=layout_seed,
+        if not connected_components:
+            if local_axes is None:
+                local_axes = np.array([cast(Axes, plt.gca())])
+            for axis in local_axes.flatten():
+                axis.set_facecolor(style.background_color)
+                axis.set_axis_off()
+            return local_axes
+
+        if local_axes is None:
+            _, local_axes = _compute_network_grid(connected_components, style)
+            created_axes = True
+
+        for i, component in enumerate(connected_components):
+            if i >= len(local_axes):
+                break
+            component_graph = NetworkGraph(
+                nx.subgraph(graph._nx_graph, component).copy()
             )
+            component_graph.aplot_network(
+                title=f"{title}::{i}" if title else str(i),
+                style=style,
+                edge_weight_col=edge_weight_col,
+                layout_seed=layout_seed,
+                ax=local_axes[i],
+            )
+            local_axes[i].set_axis_on()
 
-        return ax
+        for axis in local_axes[len(connected_components) :]:
+            axis.set_axis_off()
+
+        return local_axes if created_axes or len(local_axes) > 1 else local_axes[0]
 
     def fplot_connected_components(
         self,
+        title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Figure:
         """Plot all connected components of the graph.
 
         Parameters
         ----------
+        title : str, optional
+            Plot title to apply to the first component axis.
         style : StyleTemplate, optional
             Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+        edge_weight_col : str, optional
+            Edge attribute used for weighting. The default is "weight".
         layout_seed : int, optional
             Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
@@ -807,8 +866,11 @@ class NetworkGraph:
         fig = cast(Figure, fig)
         fig.patch.set_facecolor(style.background_color)
         self.aplot_connected_components(
+            title=title,
             style=style,
+            edge_weight_col=edge_weight_col,
             layout_seed=layout_seed,
+            axes=np.array([ax]),
         )
         return fig
 
@@ -871,17 +933,19 @@ class NetworkGraph:
                 top_list[edge_key] = data[attribute]
         return top_list
 
-    def calculate_node_weights_from_edges(self, weight: str = "weight", k: int = 10):
+    def calculate_node_weights_from_edges(
+        self, edge_weight_col: str = "weight", k: int = 10
+    ):
         """Calculate node weights by summing weights of top k edges.
 
         Parameters
         ----------
-        weight : str, optional
+        edge_weight_col : str, optional
             Edge attribute to use for weighting. The default is "weight".
         k : int, optional
             Number of top edges to consider for each node. The default is 10.
         """
-        edge_aggregates = self.top_k_edges(attribute=weight, k=k)
+        edge_aggregates = self.top_k_edges(attribute=edge_weight_col, k=k)
         node_aggregates = {}
         for (u, v), weight_value in edge_aggregates.items():
             if u not in node_aggregates:
@@ -891,16 +955,18 @@ class NetworkGraph:
             node_aggregates[u] += weight_value
             node_aggregates[v] += weight_value
 
-        nx.set_node_attributes(self._nx_graph, node_aggregates, name=weight)
+        nx.set_node_attributes(
+            self._nx_graph, node_aggregates, name=edge_weight_col
+        )
 
     def trim_edges(
-        self, weight: str = "weight", top_k_per_node: int = 5
+        self, edge_weight_col: str = "weight", top_k_per_node: int = 5
     ) -> "NetworkGraph":
         """Trim the graph to keep only the top k edges per node.
 
         Parameters
         ----------
-        weight : str, optional
+        edge_weight_col : str, optional
             Edge attribute to use for sorting. The default is "weight".
         top_k_per_node : int, optional
             Number of top edges to keep per node. The default is 5.
@@ -910,7 +976,9 @@ class NetworkGraph:
         NetworkGraph
             A new graph containing only the top edges.
         """
-        edges_to_keep = self.top_k_edges(attribute=weight, k=top_k_per_node)
+        edges_to_keep = self.top_k_edges(
+            attribute=edge_weight_col, k=top_k_per_node
+        )
         return self.edge_subgraph(edges=edges_to_keep)
 
     def set_node_attributes(self, attributes: Dict[Any, Dict[str, Any]]):
@@ -929,7 +997,7 @@ class NetworkGraph:
         edges_df: pd.DataFrame,
         source: str = "source",
         target: str = "target",
-        weight: str = "weight",
+        edge_weight_col: str = "weight",
     ) -> "NetworkGraph":
         """Initialize a NetworkGraph from a simple DataFrame.
 
@@ -941,7 +1009,7 @@ class NetworkGraph:
             Column name for source nodes. The default is "source".
         target : str, optional
             Column name for target nodes. The default is "target".
-        weight : str, optional
+        edge_weight_col : str, optional
             Column name for edge weights. The default is "weight".
 
         Returns
@@ -950,7 +1018,7 @@ class NetworkGraph:
             Initialized network graph.
         """
         network_G = nx.from_pandas_edgelist(
-            edges_df, source=source, target=target, edge_attr=weight
+            edges_df, source=source, target=target, edge_attr=edge_weight_col
         )
         return NetworkGraph(network_G)
 
@@ -962,6 +1030,7 @@ class NetworkGraph:
         node_weight_col: str = "weight",
         edge_source_col: str = "source",
         edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
     ) -> pd.DataFrame:
         """Private helper returning ``node_df`` rows present in the edge list.
 
@@ -981,6 +1050,9 @@ class NetworkGraph:
             Column name for source edges. The default is "source".
         edge_target_col : str, optional
             Column name for target edges. The default is "target".
+        edge_weight_col : str, optional
+            Column name for edge weights. The default is "weight". Included for
+            signature parity with other sanitization helpers.
 
         Returns
         -------
@@ -1085,6 +1157,7 @@ class NetworkGraph:
                 node_weight_col=node_weight_col,
                 edge_source_col=edge_source_col,
                 edge_target_col=edge_target_col,
+                edge_weight_col=edge_weight_col,
             )
             edge_df = NetworkGraph._sanitize_edge_dataframe(
                 node_df,
@@ -1099,10 +1172,12 @@ class NetworkGraph:
             edge_df,
             source=edge_source_col,
             target=edge_target_col,
-            weight=edge_weight_col,
+            edge_weight_col=edge_weight_col,
         )
         if node_df is None or node_df.empty:
-            graph.calculate_node_weights_from_edges(weight=edge_weight_col, k=10)
+            graph.calculate_node_weights_from_edges(
+                edge_weight_col=edge_weight_col, k=10
+            )
         else:
             node_weights = {
                 node: {"weight": weight_value}
@@ -1148,11 +1223,13 @@ def _compute_network_grid(
 
 def _prepare_network_graph(
     pd_df: pd.DataFrame,
-    source: str,
-    target: str,
-    weight: str,
-    sort_by: Optional[str],
-    node_df: Optional[pd.DataFrame],
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
+    sort_by: Optional[str] = None,
+    node_df: Optional[pd.DataFrame] = None,
 ) -> NetworkGraph:
     """Prepare a NetworkGraph for plotting from a pandas DataFrame.
 
@@ -1169,12 +1246,16 @@ def _prepare_network_graph(
     ----------
     pd_df : pd.DataFrame
         DataFrame containing the edge list.
-    source : str
-        Column name for source nodes.
-    target : str
-        Column name for target nodes.
-    weight : str
-        Column name for edge weights.
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
+        Column name for source nodes. The default is "source".
+    edge_target_col : str, optional
+        Column name for target nodes. The default is "target".
+    edge_weight_col : str, optional
+        Column name for edge weights. The default is "weight".
     sort_by : str, optional
         Column to sort the DataFrame by before processing.
     node_df : pd.DataFrame, optional
@@ -1194,49 +1275,68 @@ def _prepare_network_graph(
         If ``node_df`` is provided but none of its nodes appear as sources or
         targets in ``pd_df``.
     """
-    filtered_node_df = _sanitize_node_dataframe(node_df, pd_df, source, target)
+    filtered_node_df = _sanitize_node_dataframe(
+        node_df,
+        pd_df,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+    )
     if node_df is not None:
         if filtered_node_df is None or filtered_node_df.empty:
             raise ValueError(
                 "node_df must include at least one node present as a source or target."
             )
-        allowed_nodes = filtered_node_df["node"].tolist()
+        allowed_nodes = filtered_node_df[node_col].tolist()
         df = pd_df.loc[
-            pd_df[source].isin(allowed_nodes) & pd_df[target].isin(allowed_nodes)
+            pd_df[edge_source_col].isin(allowed_nodes)
+            & pd_df[edge_target_col].isin(allowed_nodes)
         ]
     else:
         df = pd_df
-    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
+    validate_dataframe(
+        df, cols=[edge_source_col, edge_target_col, edge_weight_col], sort_by=sort_by
+    )
 
     graph = NetworkGraph.from_pandas_edgelist(
-        df, source=source, target=target, weight=weight
+        df,
+        source=edge_source_col,
+        target=edge_target_col,
+        edge_weight_col=edge_weight_col,
     )
     graph = graph.get_core_subgraph()
     if filtered_node_df is not None and not filtered_node_df.empty:
         node_weights = {
             node: weight_value
-            for node, weight_value in filtered_node_df.set_index("node")[
-                "weight"
+            for node, weight_value in filtered_node_df.set_index(node_col)[
+                node_weight_col
             ].items()
             if node in graph._nx_graph.nodes
         }
-        nx.set_node_attributes(graph._nx_graph, node_weights, name=weight)
+        nx.set_node_attributes(graph._nx_graph, node_weights, name=edge_weight_col)
     else:
-        graph.calculate_node_weights_from_edges(weight=weight, k=10)
-    graph = graph.trim_edges(weight=weight, top_k_per_node=5)
+        graph.calculate_node_weights_from_edges(
+            edge_weight_col=edge_weight_col, k=10
+        )
+    graph = graph.trim_edges(edge_weight_col=edge_weight_col, top_k_per_node=5)
     return graph
 
 
 def aplot_network(
     pd_df: pd.DataFrame,
-    source: str = "source",
-    target: str = "target",
-    weight: str = "weight",
-    title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
     sort_by: Optional[str] = None,
     ascending: bool = False,
     node_df: Optional[pd.DataFrame] = None,
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ax: Optional[Axes] = None,
 ) -> Axes:
     """Plot a network graph on the provided axes.
@@ -1245,22 +1345,28 @@ def aplot_network(
     ----------
     pd_df : pd.DataFrame
         DataFrame containing edge data.
-    source : str, optional
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
         Column name for source nodes. The default is "source".
-    target : str, optional
+    edge_target_col : str, optional
         Column name for target nodes. The default is "target".
-    weight : str, optional
+    edge_weight_col : str, optional
         Column name for edge weights. The default is "weight".
-    title : str, optional
-        Plot title.
-    style : StyleTemplate, optional
-        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     sort_by : str, optional
         Column used to sort the data.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
     node_df : pd.DataFrame, optional
         DataFrame containing ``node`` and ``weight`` columns to include.
+    title : str, optional
+        Plot title.
+    style : StyleTemplate, optional
+        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+    layout_seed : int, optional
+        Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
     ax : Axes, optional
         Axes to draw on.
 
@@ -1269,21 +1375,38 @@ def aplot_network(
     Axes
         Matplotlib axes with the plotted network.
     """
-    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
-    return graph.aplot_network(title=title, style=style, weight=weight, ax=ax)
+    graph = _prepare_network_graph(
+        pd_df,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+        sort_by=sort_by,
+        node_df=node_df,
+    )
+    return graph.aplot_network(
+        title=title,
+        style=style,
+        edge_weight_col=edge_weight_col,
+        layout_seed=layout_seed,
+        ax=ax,
+    )
 
 
 def aplot_network_node(
     pd_df: pd.DataFrame,
     node: Any,
-    source: str = "source",
-    target: str = "target",
-    weight: str = "weight",
-    title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
     sort_by: Optional[str] = None,
     ascending: bool = False,
     node_df: Optional[pd.DataFrame] = None,
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
 ) -> Axes:
@@ -1295,22 +1418,26 @@ def aplot_network_node(
         DataFrame containing edge data.
     node : Any
         Node identifier whose component should be visualized.
-    source : str, optional
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
         Column name for source nodes. The default is "source".
-    target : str, optional
+    edge_target_col : str, optional
         Column name for target nodes. The default is "target".
-    weight : str, optional
+    edge_weight_col : str, optional
         Column name for edge weights. The default is "weight".
-    title : str, optional
-        Plot title. If ``None``, defaults to the node identifier.
-    style : StyleTemplate, optional
-        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     sort_by : str, optional
         Column used to sort the data.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
     node_df : pd.DataFrame, optional
         DataFrame containing ``node`` and ``weight`` columns to include.
+    title : str, optional
+        Plot title. If ``None``, defaults to the node identifier.
+    style : StyleTemplate, optional
+        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     ax : Axes, optional
         Axes to draw on.
     layout_seed : int, optional
@@ -1326,13 +1453,22 @@ def aplot_network_node(
     ValueError
         If ``node`` is not present in the prepared graph.
     """
-    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
+    graph = _prepare_network_graph(
+        pd_df,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+        sort_by=sort_by,
+        node_df=node_df,
+    )
     component_graph = graph.get_component_subgraph(node)
     resolved_title = title if title is not None else string_formatter(node)
     return component_graph.aplot_network(
         title=resolved_title,
         style=style,
-        weight=weight,
+        edge_weight_col=edge_weight_col,
         ax=ax,
         layout_seed=layout_seed,
     )
@@ -1340,15 +1476,18 @@ def aplot_network_node(
 
 def aplot_network_components(
     pd_df: pd.DataFrame,
-    axes: Optional[np.ndarray],
-    source: str = "source",
-    target: str = "target",
-    weight: str = "weight",
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    node_df: Optional[pd.DataFrame] = None,
     title: Optional[str] = None,
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-    sort_by: Optional[str] = None,
-    node_df: Optional[pd.DataFrame] = None,
-    ascending: bool = False,
+    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
+    axes: Optional[np.ndarray] = None,
 ) -> None:
     """Plot network components separately on multiple axes.
 
@@ -1356,82 +1495,63 @@ def aplot_network_components(
     ----------
     pd_df : pd.DataFrame
         DataFrame containing edge data.
-    source : str, optional
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
         Column name for source nodes. The default is "source".
-    target : str, optional
+    edge_target_col : str, optional
         Column name for target nodes. The default is "target".
-    weight : str, optional
+    edge_weight_col : str, optional
         Column name for edge weights. The default is "weight".
+    sort_by : str, optional
+        Column used to sort the data.
+    ascending : bool, optional
+        Sort order for the data. The default is `False`.
+    node_df : pd.DataFrame, optional
+        DataFrame containing ``node`` and ``weight`` columns to include.
     title : str, optional
         Base title for subplots.
     style : StyleTemplate, optional
         Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
-    sort_by : str, optional
-        Column used to sort the data.
-    node_df : pd.DataFrame, optional
-        DataFrame containing ``node`` and ``weight`` columns to include.
-    ascending : bool, optional
-        Sort order for the data. The default is `False`.
+    layout_seed : int, optional
+        Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
     axes : np.ndarray
         Existing axes to draw on.
     """
-    graph = _prepare_network_graph(pd_df, source, target, weight, sort_by, node_df)
-
-    connected_components = list(nx.connected_components(graph._nx_graph))
-
-    if not connected_components:
-        if axes is not None:
-            for ax in axes.flatten():
-                ax.set_axis_off()
-        return
-
-    isolated_nodes = list(nx.isolates(graph._nx_graph))
-    if isolated_nodes:
-        # Keep the caller's graph intact while dropping isolates purely for
-        # visualization.
-        graph = NetworkGraph(graph._nx_graph.copy())
-        graph._nx_graph.remove_nodes_from(isolated_nodes)
-        connected_components = list(nx.connected_components(graph._nx_graph))
-
-    if not connected_components:
-        if axes is not None:
-            for ax in axes.flatten():
-                ax.set_axis_off()
-        return
-
-    local_axes = axes
-    if local_axes is None:
-        fig, local_axes = _compute_network_grid(connected_components, style)
-
-    i = -1
-    for i, component in enumerate(connected_components):
-        if i < len(local_axes):
-            if len(component) > 5:
-                component_graph = graph.subgraph(node_list=list(component))
-                component_graph.aplot_network(
-                    title=f"{title}::{i}" if title else str(i),
-                    style=style,
-                    weight=weight,
-                    ax=local_axes[i],
-                )
-            local_axes[i].set_axis_on()
-        else:
-            break
-
-    for j in range(i + 1, len(local_axes)):
-        local_axes[j].set_axis_off()
+    graph = _prepare_network_graph(
+        pd_df,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+        sort_by=sort_by,
+        node_df=node_df,
+    )
+    graph.aplot_connected_components(
+        title=title,
+        style=style,
+        edge_weight_col=edge_weight_col,
+        layout_seed=layout_seed,
+        axes=axes,
+    )
 
 
 def fplot_network(
     pd_df: pd.DataFrame,
-    source: str = "source",
-    target: str = "target",
-    weight: str = "weight",
-    title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
     sort_by: Optional[str] = None,
     ascending: bool = False,
     node_df: Optional[pd.DataFrame] = None,
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     figsize: Tuple[float, float] = FIG_SIZE,
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
@@ -1442,24 +1562,34 @@ def fplot_network(
     ----------
     pd_df : pd.DataFrame
         DataFrame containing edge data.
-    source : str, optional
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
         Column name for source nodes. The default is "source".
-    target : str, optional
+    edge_target_col : str, optional
         Column name for target nodes. The default is "target".
-    weight : str, optional
+    edge_weight_col : str, optional
         Column name for edge weights. The default is "weight".
-    title : str, optional
-        Plot title.
-    style : StyleTemplate, optional
-        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     sort_by : str, optional
         Column used to sort the data.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
     node_df : pd.DataFrame, optional
         DataFrame containing ``node`` and ``weight`` columns to include.
+    title : str, optional
+        Plot title.
+    style : StyleTemplate, optional
+        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+    layout_seed : int, optional
+        Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
     figsize : tuple[float, float], optional
         Size of the created figure. The default is FIG_SIZE.
+    save_path : str, optional
+        File path to save the figure. The default is ``None``.
+    savefig_kwargs : dict[str, Any], optional
+        Extra keyword arguments forwarded to ``Figure.savefig``. The default is ``None``.
 
     Returns
     -------
@@ -1471,14 +1601,17 @@ def fplot_network(
     ax = fig.add_subplot()
     ax = aplot_network(
         pd_df,
-        source=source,
-        target=target,
-        weight=weight,
-        title=title,
-        style=style,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
         sort_by=sort_by,
         ascending=ascending,
         node_df=node_df,
+        title=title,
+        style=style,
+        layout_seed=layout_seed,
         ax=ax,
     )
     if save_path:
@@ -1489,18 +1622,20 @@ def fplot_network(
 def fplot_network_node(
     pd_df: pd.DataFrame,
     node: Any,
-    source: str = "source",
-    target: str = "target",
-    weight: str = "weight",
-    title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
     sort_by: Optional[str] = None,
     ascending: bool = False,
     node_df: Optional[pd.DataFrame] = None,
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = FIG_SIZE,
+    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
-    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
 ) -> Figure:
     """Return a figure with the component containing ``node``.
 
@@ -1510,16 +1645,16 @@ def fplot_network_node(
         DataFrame containing edge data.
     node : Any
         Node identifier whose component should be visualized.
-    source : str, optional
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
         Column name for source nodes. The default is "source".
-    target : str, optional
+    edge_target_col : str, optional
         Column name for target nodes. The default is "target".
-    weight : str, optional
+    edge_weight_col : str, optional
         Column name for edge weights. The default is "weight".
-    title : str, optional
-        Plot title. If ``None``, defaults to the node identifier.
-    style : StyleTemplate, optional
-        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     sort_by : str, optional
         Column used to sort the data.
     ascending : bool, optional
@@ -1528,6 +1663,10 @@ def fplot_network_node(
         DataFrame containing ``node`` and ``weight`` columns to include.
     figsize : tuple[float, float], optional
         Size of the created figure. The default is FIG_SIZE.
+    title : str, optional
+        Plot title. If ``None``, defaults to the node identifier.
+    style : StyleTemplate, optional
+        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     save_path : str, optional
         File path to save the figure. The default is ``None``.
     savefig_kwargs : dict[str, Any], optional
@@ -1551,14 +1690,16 @@ def fplot_network_node(
     ax = aplot_network_node(
         pd_df,
         node=node,
-        source=source,
-        target=target,
-        weight=weight,
-        title=title,
-        style=style,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
         sort_by=sort_by,
         ascending=ascending,
         node_df=node_df,
+        title=title,
+        style=style,
         ax=ax,
         layout_seed=layout_seed,
     )
@@ -1569,14 +1710,17 @@ def fplot_network_node(
 
 def fplot_network_components(
     pd_df: pd.DataFrame,
-    source: str = "source",
-    target: str = "target",
-    weight: str = "weight",
-    title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
     sort_by: Optional[str] = None,
     ascending: bool = False,
     node_df: Optional[pd.DataFrame] = None,
+    title: Optional[str] = None,
+    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     figsize: Tuple[float, float] = FIG_SIZE,
     n_cols: Optional[int] = None,
     save_path: Optional[str] = None,
@@ -1588,26 +1732,36 @@ def fplot_network_components(
     ----------
     pd_df : pd.DataFrame
         DataFrame containing edge data.
-    source : str, optional
+    node_col : str, optional
+        Column name for node identifiers. The default is "node".
+    node_weight_col : str, optional
+        Column name for node weights. The default is "weight".
+    edge_source_col : str, optional
         Column name for source nodes. The default is "source".
-    target : str, optional
+    edge_target_col : str, optional
         Column name for target nodes. The default is "target".
-    weight : str, optional
+    edge_weight_col : str, optional
         Column name for edge weights. The default is "weight".
-    title : str, optional
-        Plot title.
-    style : StyleTemplate, optional
-        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
     sort_by : str, optional
         Column used to sort the data.
     ascending : bool, optional
         Sort order for the data. The default is `False`.
     node_df : pd.DataFrame, optional
         DataFrame containing ``node`` and ``weight`` columns to include.
+    title : str, optional
+        Plot title.
+    style : StyleTemplate, optional
+        Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
+    layout_seed : int, optional
+        Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
     figsize : tuple[float, float], optional
         Size of the created figure. The default is FIG_SIZE.
     n_cols : int, optional
         Number of columns for subplots. If None, it's inferred.
+    save_path : str, optional
+        File path to save the figure. The default is ``None``.
+    savefig_kwargs : dict[str, Any], optional
+        Extra keyword arguments forwarded to ``Figure.savefig``. The default is ``None``.
 
     Returns
     -------
@@ -1620,47 +1774,44 @@ def fplot_network_components(
         If ``node_df`` is provided but none of its nodes appear as sources or
         targets in ``pd_df``.
     """
-    # First, get the graph and components to determine the layout
-    df = pd_df.copy()
-    filtered_node_df = _sanitize_node_dataframe(node_df, df, source, target)
-    if node_df is not None:
-        if filtered_node_df is None or filtered_node_df.empty:
-            raise ValueError(
-                "node_df must include at least one node present as a source or target."
-            )
-        allowed_nodes = filtered_node_df["node"].tolist()
-        df = df.loc[df[source].isin(allowed_nodes) & df[target].isin(allowed_nodes)]
-
-    validate_dataframe(df, cols=[source, target, weight], sort_by=sort_by)
-    graph = NetworkGraph.from_pandas_edgelist(
-        df, source=source, target=target, weight=weight
+    graph = _prepare_network_graph(
+        pd_df,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+        sort_by=sort_by,
+        node_df=node_df,
     )
-    connected_components = list(nx.connected_components(graph._nx_graph))
 
-    n_components = len(connected_components)
-    if n_cols is None:
-        n_cols = int(np.ceil(np.sqrt(n_components)))
-    n_rows = int(np.ceil(n_components / n_cols))
+    working_graph = graph
+    isolated_nodes = list(nx.isolates(graph._nx_graph))
+    if isolated_nodes:
+        working_graph = NetworkGraph(graph._nx_graph.copy())
+        working_graph._nx_graph.remove_nodes_from(isolated_nodes)
 
-    fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=figsize)
+    connected_components = list(nx.connected_components(working_graph._nx_graph))
+
+    n_components = max(1, len(connected_components))
+    n_cols_local = (
+        int(np.ceil(np.sqrt(n_components))) if n_cols is None else n_cols
+    )
+    n_rows = int(np.ceil(n_components / n_cols_local))
+
+    fig, axes_grid = plt.subplots(n_rows, n_cols_local, figsize=figsize)
     fig = cast(Figure, fig)
     fig.patch.set_facecolor(style.background_color)
-
     if not isinstance(axes_grid, np.ndarray):
         axes = np.array([axes_grid])
     else:
         axes = axes_grid.flatten()
 
-    aplot_network_components(
-        pd_df=pd_df,
-        source=source,
-        target=target,
-        weight=weight,
+    graph.aplot_connected_components(
         title=title,
         style=style,
-        sort_by=sort_by,
-        ascending=ascending,
-        node_df=filtered_node_df,
+        edge_weight_col=edge_weight_col,
+        layout_seed=layout_seed,
         axes=axes,
     )
 

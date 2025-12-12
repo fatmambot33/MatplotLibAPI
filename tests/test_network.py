@@ -26,7 +26,10 @@ def test_fplot_network(load_sample_df):
     df = load_sample_df("network.csv")
 
     fig = MatplotLibAPI.fplot_network(
-        pd_df=df, source="city_a", target="city_b", weight="distance_km"
+        pd_df=df,
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
     )
 
     assert isinstance(fig, Figure)
@@ -38,7 +41,9 @@ def test_accessor_fplot_network_components(load_sample_df):
     df = load_sample_df("network.csv")
 
     fig = df.mpl.fplot_network_components(
-        source="city_a", target="city_b", weight="distance_km"
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
     )
 
     assert isinstance(fig, Figure)
@@ -84,9 +89,9 @@ def test_network_components_title_respects_scale_factor(load_sample_df):
 
     fig = MatplotLibAPI.fplot_network_components(
         pd_df=df,
-        source="city_a",
-        target="city_b",
-        weight="distance_km",
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
         title="Component Title",
         style=style,
     )
@@ -158,7 +163,11 @@ def test_fplot_network_node_returns_figure(load_sample_df):
     df = load_sample_df("network.csv")
 
     fig = fplot_network_node(
-        df, node="New York", source="city_a", target="city_b", weight="distance_km"
+        df,
+        node="New York",
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
     )
 
     assert isinstance(fig, Figure)
@@ -171,5 +180,9 @@ def test_aplot_network_node_raises_for_missing_node(load_sample_df):
 
     with pytest.raises(ValueError):
         aplot_network_node(
-            df, node="Atlantis", source="city_a", target="city_b", weight="distance_km"
+            df,
+            node="Atlantis",
+            edge_source_col="city_a",
+            edge_target_col="city_b",
+            edge_weight_col="distance_km",
         )
