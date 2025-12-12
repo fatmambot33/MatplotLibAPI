@@ -479,7 +479,9 @@ class NetworkGraph:
             Node sizes, edge widths and nodes grouped by font size.
         """
         # Normalize and scale nodes' weights within the desired range of edge widths
-        node_weights = [data.get(edge_weight_col, 1) for node, data in self.nodes(data=True)]
+        node_weights = [
+            data.get(edge_weight_col, 1) for node, data in self.nodes(data=True)
+        ]
         node_deciles = (
             np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
             if node_weights
@@ -955,9 +957,7 @@ class NetworkGraph:
             node_aggregates[u] += weight_value
             node_aggregates[v] += weight_value
 
-        nx.set_node_attributes(
-            self._nx_graph, node_aggregates, name=edge_weight_col
-        )
+        nx.set_node_attributes(self._nx_graph, node_aggregates, name=edge_weight_col)
 
     def trim_edges(
         self, edge_weight_col: str = "weight", top_k_per_node: int = 5
@@ -976,9 +976,7 @@ class NetworkGraph:
         NetworkGraph
             A new graph containing only the top edges.
         """
-        edges_to_keep = self.top_k_edges(
-            attribute=edge_weight_col, k=top_k_per_node
-        )
+        edges_to_keep = self.top_k_edges(attribute=edge_weight_col, k=top_k_per_node)
         return self.edge_subgraph(edges=edges_to_keep)
 
     def set_node_attributes(self, attributes: Dict[Any, Dict[str, Any]]):
@@ -1317,9 +1315,7 @@ def _prepare_network_graph(
         }
         nx.set_node_attributes(graph._nx_graph, node_weights, name=edge_weight_col)
     else:
-        graph.calculate_node_weights_from_edges(
-            edge_weight_col=edge_weight_col, k=10
-        )
+        graph.calculate_node_weights_from_edges(edge_weight_col=edge_weight_col, k=10)
     graph = graph.trim_edges(edge_weight_col=edge_weight_col, top_k_per_node=5)
     return graph
 
@@ -1794,9 +1790,7 @@ def fplot_network_components(
     connected_components = list(nx.connected_components(working_graph._nx_graph))
 
     n_components = max(1, len(connected_components))
-    n_cols_local = (
-        int(np.ceil(np.sqrt(n_components))) if n_cols is None else n_cols
-    )
+    n_cols_local = int(np.ceil(np.sqrt(n_components))) if n_cols is None else n_cols
     n_rows = int(np.ceil(n_components / n_cols_local))
 
     fig, axes_grid = plt.subplots(n_rows, n_cols_local, figsize=figsize)
