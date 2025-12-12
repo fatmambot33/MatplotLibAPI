@@ -60,7 +60,7 @@ pytest -q --cov=MatplotLibAPI --cov-report=term-missing --cov-fail-under=70
 
 Each pull request should include:
 
-1. **Summary** – brief description of the change.
+1. **Summary** – brief description of the change. Mention breaking changes.
 2. **Testing** – commands run and confirmation that the tests passed.
 
 Example PR body:
