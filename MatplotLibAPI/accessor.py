@@ -1435,7 +1435,7 @@ class DataFrameAccessor:
         ax : Axes, optional
             Matplotlib axes to plot on. If None, uses the current axes.
         layout_seed : int, optional
-            Seed forwarded to the spring layout. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
@@ -1602,7 +1602,7 @@ class DataFrameAccessor:
         figsize : tuple[float, float], optional
             Figure size. The default is FIG_SIZE.
         layout_seed : int, optional
-            Seed forwarded to the spring layout. The default is ``DEFAULT["SPRING_LAYOUT_SEED"]``.
+            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
 
         Returns
         -------
