@@ -734,6 +734,7 @@ class NetworkGraph:
         """
         fig, ax = plt.subplots(figsize=FIG_SIZE)
         fig = cast(Figure, fig)
+        ax = cast(Axes, ax)
         fig.patch.set_facecolor(style.background_color)
         self.aplot_network(title=title, style=style, weight=weight, ax=ax)
         return fig
