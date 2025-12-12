@@ -209,11 +209,11 @@ def plot_composite_treemap(
 def plot_wordcloud_network(
     nodes_df: pd.DataFrame,
     edges_df: pd.DataFrame,
-    text_column: str = "node",
-    node_weight: Optional[str] = "weight",
-    source: str = "source",
-    target: str = "target",
-    edge_weight: str = "weight",
+    node_col: str = "node",
+    node_weight_col: str = "weight",
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
     title: Optional[str] = None,
@@ -230,16 +230,16 @@ def plot_wordcloud_network(
         DataFrame containing node labels and optional weights for the word cloud.
     edges_df : pd.DataFrame
         DataFrame containing edge connections for the network plot.
-    text_column : str, optional
+    node_col : str, optional
         Column in ``nodes_df`` containing the node labels. The default is ``"node"``.
-    node_weight : str, optional
+    node_weight_col : str, optional
         Column in ``nodes_df`` containing weights for sizing words. The default is
         ``"weight"``.
-    source : str, optional
+    edge_source_col : str, optional
         Column in ``edges_df`` containing source nodes. The default is ``"source"``.
-    target : str, optional
+    edge_target_col : str, optional
         Column in ``edges_df`` containing target nodes. The default is ``"target"``.
-    edge_weight : str, optional
+    edge_weight_col : str, optional
         Column in ``edges_df`` containing edge weights. The default is ``"weight"``.
     max_words : int, optional
         Maximum number of words to include in the word cloud. The default is ``50``.
@@ -265,8 +265,10 @@ def plot_wordcloud_network(
     Figure
         Matplotlib figure containing the word cloud on top and network below.
     """
-    validate_dataframe(nodes_df, cols=[text_column], sort_by=node_weight)
-    validate_dataframe(edges_df, cols=[source, target, edge_weight], sort_by=None)
+    validate_dataframe(nodes_df, cols=[node_col], sort_by=node_weight_col)
+    validate_dataframe(
+        edges_df, cols=[edge_source_col, edge_target_col, edge_weight_col], sort_by=None
+    )
 
     fig_raw, axes_raw = plt.subplots(
         2,
@@ -291,8 +293,8 @@ def plot_wordcloud_network(
 
     aplot_wordcloud(
         pd_df=nodes_df,
-        text_column=text_column,
-        weight_column=node_weight,
+        text_column=node_col,
+        weight_column=node_weight_col,
         title=None,
         style=wordcloud_style,
         max_words=max_words,
@@ -303,9 +305,11 @@ def plot_wordcloud_network(
     aplot_network(
         pd_df=edges_df,
         node_df=nodes_df,
-        source=source,
-        target=target,
-        weight=edge_weight,
+        node_col=node_col,
+        node_weight_col=node_weight_col,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
         title=None,
         style=network_style,
         ax=network_ax,
