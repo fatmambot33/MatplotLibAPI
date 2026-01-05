@@ -175,7 +175,7 @@ def plot_composite_treemap(
         num_dimensions = len(pd_dfs)
         subplot_titles = [
             f"{title}::{dim.title()}" if title is not None else dim.title()
-            for dim in pd_dfs.keys()
+            for dim in pd_dfs
         ]
         fig = make_subplots(
             rows=num_dimensions,
