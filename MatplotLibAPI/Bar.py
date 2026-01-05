@@ -34,17 +34,14 @@ def aplot_bar(
     validate_dataframe(pd_df, cols=cols)
 
     plot_ax = _get_axis(ax)
-    plot_df = pd_df.copy()
 
     if group:
-        pivot_df = plot_df.pivot_table(
+        pivot_df = pd_df.pivot_table(
             index=category, columns=group, values=value, aggfunc="sum"
         )
         pivot_df.plot(kind="bar", stacked=stacked, ax=plot_ax, alpha=0.85)
     else:
-        sns.barplot(
-            data=plot_df, x=category, y=value, palette=style.palette, ax=plot_ax
-        )
+        sns.barplot(data=pd_df, x=category, y=value, palette=style.palette, ax=plot_ax)
 
     plot_ax.set_facecolor(style.background_color)
     plot_ax.set_xlabel(string_formatter(category))

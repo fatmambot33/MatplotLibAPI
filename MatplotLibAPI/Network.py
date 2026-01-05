@@ -232,8 +232,9 @@ class EdgeView(nx.classes.reportviews.EdgeView):
         list[tuple[Any, Any]]
             Edges matching the condition.
         """
-        filtered_edges = [edge for edge in self if self[edge].get(attribute) == value]
-        return [(edge[0], edge[1]) for edge in filtered_edges]
+        return [
+            (edge[0], edge[1]) for edge in self if self[edge].get(attribute) == value
+        ]
 
 
 def _sanitize_node_dataframe(
