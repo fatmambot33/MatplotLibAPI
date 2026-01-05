@@ -171,8 +171,8 @@ def plot_composite_treemap(
     go.Figure, optional
         Composite treemap figure, or None if no data frames are provided.
     """
-    num_dimensions = len(pd_dfs)
-    if num_dimensions > 0:
+    if pd_dfs:
+        num_dimensions = len(pd_dfs)
         subplot_titles = [
             f"{title}::{dim.title()}" if title is not None else dim.title()
             for dim in pd_dfs.keys()
@@ -181,15 +181,13 @@ def plot_composite_treemap(
             rows=num_dimensions,
             cols=1,
             specs=[
-                [{"type": "treemap"} for _ in range(0, 1)]
-                for _ in range(0, num_dimensions)
+                [{"type": "treemap"} for _ in range(1)] for _ in range(num_dimensions)
             ],
             subplot_titles=subplot_titles,
             vertical_spacing=0.2,
         )
 
-        current_row = 1
-        for path, df in pd_dfs.items():
+        for current_row, (path, df) in enumerate(pd_dfs.items(), start=1):
             trm = aplot_treemap(
                 pd_df=df,
                 path=path,
@@ -201,7 +199,6 @@ def plot_composite_treemap(
                 max_values=max_values,
             )
             fig.add_trace(trm, row=current_row, col=1)
-            current_row += 1
         return fig
     return None
 
