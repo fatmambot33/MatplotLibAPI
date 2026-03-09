@@ -1,4 +1,4 @@
-"""Histogram and KDE plotting helpers."""
+"""Box and violin plot helpers."""
 
 from typing import Any, Dict, Optional, Tuple
 
@@ -7,65 +7,68 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import (
+from .style_template import (
     DISTRIBUTION_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
 )
-from ._visualization_utils import _get_axis, _wrap_aplot
+from .visualization_utils import _get_axis, _wrap_aplot
 
+__all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_box_violin", "fplot_box_violin"]
 
-def aplot_histogram_kde(
+def aplot_box_violin(
     pd_df: pd.DataFrame,
     column: str,
-    bins: int = 20,
-    kde: bool = True,
+    by: Optional[str] = None,
+    violin: bool = False,
     title: Optional[str] = None,
     style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
     **kwargs: Any,
 ) -> Axes:
-    """Plot a histogram with an optional kernel density estimate."""
-    validate_dataframe(pd_df, cols=[column])
+    """Plot box or violin charts to summarize distributions."""
+    cols = [column]
+    if by:
+        cols.append(by)
+    validate_dataframe(pd_df, cols=cols)
     plot_ax = _get_axis(ax)
 
-    sns.histplot(
-        data=pd_df,
-        x=column,
-        bins=bins,
-        kde=kde,
-        color=style.font_color,
-        edgecolor=style.background_color,
-        ax=plot_ax,
-    )
+    common_kwargs = {"data": pd_df, "x": by, "y": column, "palette": style.palette}
+
+    if violin:
+        sns.violinplot(**common_kwargs, hue=by, legend=False, ax=plot_ax)
+    else:
+        sns.boxplot(**common_kwargs, hue=by, legend=False, ax=plot_ax)
+
     plot_ax.set_facecolor(style.background_color)
-    plot_ax.set_xlabel(string_formatter(column))
-    plot_ax.set_ylabel("Frequency")
+    plot_ax.set_ylabel(string_formatter(column))
+    if by:
+        plot_ax.set_xlabel(string_formatter(by))
     if title:
         plot_ax.set_title(title)
     return plot_ax
 
 
-def fplot_histogram_kde(
+def fplot_box_violin(
     pd_df: pd.DataFrame,
     column: str,
-    bins: int = 20,
-    kde: bool = True,
+    by: Optional[str] = None,
+    violin: bool = False,
     title: Optional[str] = None,
     style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (10, 6),
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
-    """Plot a histogram with optional KDE on a new figure."""
+    """Plot box or violin charts on a new figure."""
     return _wrap_aplot(
-        aplot_histogram_kde,
+        aplot_box_violin,
         pd_df=pd_df,
         figsize=figsize,
         column=column,
-        bins=bins,
-        kde=kde,
+        by=by,
+        violin=violin,
         title=title,
         style=style,
         save_path=save_path,

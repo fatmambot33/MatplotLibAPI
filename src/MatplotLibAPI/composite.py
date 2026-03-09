@@ -10,17 +10,17 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
-from .Bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
-from .Network import aplot_network
-from .StyleTemplate import (
+from .bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
+from .network import aplot_network
+from .style_template import (
     MAX_RESULTS,
     TITLE_SCALE_FACTOR,
     StyleTemplate,
     validate_dataframe,
 )
-from .Table import aplot_table
-from .Treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap
-from .Wordcloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud
+from .table import aplot_table
+from .treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap
+from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud
 
 
 def plot_composite_bubble(

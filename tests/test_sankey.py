@@ -2,7 +2,7 @@
 
 import plotly.graph_objects as go
 
-from MatplotLibAPI import fplot_sankey
+from MatplotLibAPI.sankey import fplot_sankey
 
 
 def test_fplot_sankey(load_sample_df):

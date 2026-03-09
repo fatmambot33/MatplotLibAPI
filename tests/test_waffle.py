@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI import fplot_waffle
+from MatplotLibAPI.waffle import fplot_waffle
 
 
 def test_fplot_waffle(load_sample_df):

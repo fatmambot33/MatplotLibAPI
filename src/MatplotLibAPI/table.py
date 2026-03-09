@@ -8,18 +8,17 @@ from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 from matplotlib.table import Table
 
-from .StyleTemplate import (
+from .style_template import (
     FIG_SIZE,
     TITLE_SCALE_FACTOR,
+    TABLE_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
 )
 
-TABLE_STYLE_TEMPLATE = StyleTemplate(
-    background_color="black", fig_border="darkgrey", font_color="white", palette="magma"
-)
 
+__all__ = ["TABLE_STYLE_TEMPLATE", "aplot_table", "fplot_table"]
 
 def _prepare_table_data(
     pd_df: pd.DataFrame,

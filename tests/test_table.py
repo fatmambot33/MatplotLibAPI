@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI.Table import fplot_table
+from MatplotLibAPI.table import fplot_table
 
 
 def test_fplot_table(load_sample_df):

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.axes import Axes
 
-from .StyleTemplate import (
+from .style_template import (
     PIVOTBARS_STYLE_TEMPLATE,
     PIVOTLINES_STYLE_TEMPLATE,
     StyleTemplate,
@@ -14,6 +14,8 @@ from .StyleTemplate import (
     string_formatter,
     validate_dataframe,
 )
+
+__all__ = ["PIVOTBARS_STYLE_TEMPLATE", "plot_pivoted_bars"]
 
 
 def _pivot_and_sort_data(

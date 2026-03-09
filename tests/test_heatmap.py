@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI import fplot_heatmap, fplot_correlation_matrix
+from MatplotLibAPI.heatmap import fplot_heatmap, fplot_correlation_matrix
 
 
 def test_fplot_heatmap(load_sample_df):

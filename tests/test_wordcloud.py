@@ -7,7 +7,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import numpy as np
 
-from MatplotLibAPI.Wordcloud import (
+from MatplotLibAPI.word_cloud import (
     aplot_wordcloud,
     _create_circular_mask,
     fplot_wordcloud,

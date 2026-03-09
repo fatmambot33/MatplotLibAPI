@@ -13,7 +13,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.ticker import NullLocator
 
-from .StyleTemplate import (
+from .style_template import (
     BUBBLE_STYLE_TEMPLATE,
     FIG_SIZE,
     MAX_RESULTS,
@@ -26,6 +26,7 @@ from .StyleTemplate import (
     FormatterFunc,
 )
 
+__all__ = ["BUBBLE_STYLE_TEMPLATE", "aplot_bubble", "fplot_bubble"]
 
 def _prepare_bubble_data(
     pd_df: pd.DataFrame,

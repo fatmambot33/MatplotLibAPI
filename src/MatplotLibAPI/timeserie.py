@@ -8,7 +8,7 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import (
+from .style_template import (
     TIMESERIE_STYLE_TEMPLATE,
     FIG_SIZE,
     StyleTemplate,
@@ -20,6 +20,11 @@ from .StyleTemplate import (
     FormatterFunc,
 )
 
+__all__ = [
+    "TIMESERIE_STYLE_TEMPLATE",
+    "aplot_timeserie",
+    "fplot_timeserie",
+]
 
 # region Line
 

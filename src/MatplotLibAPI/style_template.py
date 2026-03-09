@@ -91,9 +91,9 @@ def format_func(
 # region Style Constants
 
 FIG_SIZE = (19.2, 10.8)
-BACKGROUND_COLOR = "black"
-TEXT_COLOR = "white"
-PALETTE = "Greys_r"
+BACKGROUND_COLOR = "white"
+TEXT_COLOR = "black"
+PALETTE = "tab10"
 FONT_SIZE = 14
 TITLE_SCALE_FACTOR = 2
 MAX_RESULTS = 50
@@ -266,6 +266,10 @@ def generate_ticks(
 # endregion
 
 # region Style Presets
+
+TABLE_STYLE_TEMPLATE = StyleTemplate(
+    background_color="black", fig_border="darkgrey", font_color="white", palette="magma"
+)
 
 BUBBLE_STYLE_TEMPLATE = StyleTemplate(
     format_funcs=cast(

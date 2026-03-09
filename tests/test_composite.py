@@ -3,8 +3,8 @@
 from matplotlib.collections import PathCollection
 import pandas as pd
 
-from MatplotLibAPI.Composite import plot_wordcloud_network
-from MatplotLibAPI.StyleTemplate import StyleTemplate, TITLE_SCALE_FACTOR
+from MatplotLibAPI.composite import plot_wordcloud_network
+from MatplotLibAPI.style_template import StyleTemplate, TITLE_SCALE_FACTOR
 
 
 def test_plot_wordcloud_network_renders_wordcloud_and_network() -> None:

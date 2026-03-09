@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI import fplot_pie_donut
+from MatplotLibAPI.pie import fplot_pie_donut
 
 
 def test_fplot_pie_donut(load_sample_df):

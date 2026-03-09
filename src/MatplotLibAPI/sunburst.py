@@ -5,11 +5,14 @@ from typing import Any, Dict, Optional
 import pandas as pd
 import plotly.graph_objects as go
 
-from .StyleTemplate import (
+from .style_template import (
     TREEMAP_STYLE_TEMPLATE,
     StyleTemplate,
     validate_dataframe,
 )
+
+
+__all__ = ["TREEMAP_STYLE_TEMPLATE", "fplot_sunburst"]
 
 
 def fplot_sunburst(

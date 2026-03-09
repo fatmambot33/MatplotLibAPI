@@ -2,7 +2,7 @@
 
 import plotly.graph_objects as go
 
-from MatplotLibAPI.Sunburst import fplot_sunburst
+from MatplotLibAPI.sunburst import fplot_sunburst
 
 
 def test_fplot_sunburst(load_sample_df):

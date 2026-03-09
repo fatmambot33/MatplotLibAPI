@@ -1,6 +1,6 @@
 """Tests for :class:`MatplotLibAPI.StyleTemplate.StyleTemplate`."""
 
-from MatplotLibAPI.StyleTemplate import StyleTemplate
+from MatplotLibAPI.style_template import StyleTemplate
 
 
 def test_font_mapping_scales_with_small_fonts() -> None:

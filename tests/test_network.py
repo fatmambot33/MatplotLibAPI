@@ -9,15 +9,17 @@ import pandas as pd
 import pytest
 
 import MatplotLibAPI
-from MatplotLibAPI.Network import (
+from MatplotLibAPI.network import (
     NetworkGraph,
     _WEIGHT_PERCENTILES,
+    fplot_network,
     aplot_network_node,
     fplot_network_node,
+    fplot_network_components,
     _scale_weights,
     _softmax,
 )
-from MatplotLibAPI.StyleTemplate import StyleTemplate, TITLE_SCALE_FACTOR
+from MatplotLibAPI.style_template import StyleTemplate, TITLE_SCALE_FACTOR
 
 
 def test_fplot_network(load_sample_df):
@@ -25,7 +27,7 @@ def test_fplot_network(load_sample_df):
 
     df = load_sample_df("network.csv")
 
-    fig = MatplotLibAPI.fplot_network(
+    fig = fplot_network(
         pd_df=df,
         edge_source_col="city_a",
         edge_target_col="city_b",
@@ -87,7 +89,7 @@ def test_network_components_title_respects_scale_factor(load_sample_df):
     df = load_sample_df("network.csv")
     style = StyleTemplate(font_size=11)
 
-    fig = MatplotLibAPI.fplot_network_components(
+    fig = fplot_network_components(
         pd_df=df,
         edge_source_col="city_a",
         edge_target_col="city_b",

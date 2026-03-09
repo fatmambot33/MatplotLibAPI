@@ -7,10 +7,9 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
-import matplotlib.pyplot as plt
 
-from .StyleTemplate import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
-from ._visualization_utils import _get_axis, _wrap_aplot
+from .style_template import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
+from .visualization_utils import _get_axis, _wrap_aplot
 
 
 def aplot_waffle(

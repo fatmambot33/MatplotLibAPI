@@ -6,16 +6,20 @@ import pandas as pd
 import plotly.graph_objects as go
 from pandas import BooleanDtype, CategoricalDtype
 
-from .StyleTemplate import (
+from .style_template import (
     TREEMAP_STYLE_TEMPLATE,
     StyleTemplate,
-    percent_formatter,
-    string_formatter,
     validate_dataframe,
 )
 
+__all__ = [
+    "TREEMAP_STYLE_TEMPLATE",
+    "aplot_treemap",
+    "fplot_treemap",
+]
 
-def aplot_treemap(
+
+def fplot_treemap(
     pd_df: pd.DataFrame,
     path: str,
     values: str,
@@ -92,7 +96,7 @@ def aplot_treemap(
     return g  # type: ignore
 
 
-def fplot_treemap(
+def aplot_treemap(
     pd_df: pd.DataFrame,
     path: str,
     values: str,

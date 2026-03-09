@@ -2,7 +2,7 @@
 
 from matplotlib.axes import Axes
 
-from MatplotLibAPI.Pivot import plot_pivoted_bars
+from MatplotLibAPI.pivot import plot_pivoted_bars
 
 
 def test_plot_pivoted_bars(load_sample_df):

@@ -6,14 +6,15 @@ import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import (
+from .style_template import (
     AREA_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
 )
-from ._visualization_utils import _get_axis, _wrap_aplot
+from .visualization_utils import _get_axis, _wrap_aplot
 
+__all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 
 def aplot_area(
     pd_df: pd.DataFrame,

@@ -2,7 +2,7 @@
 
 import plotly.graph_objects as go
 
-from MatplotLibAPI.Treemap import fplot_treemap
+from MatplotLibAPI.treemap import fplot_treemap
 
 
 def test_fplot_treemap(load_sample_df):

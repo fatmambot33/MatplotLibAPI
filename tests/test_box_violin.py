@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI import fplot_box_violin
+from MatplotLibAPI.box_violin import fplot_box_violin
 
 
 def test_fplot_box_violin(load_sample_df):

@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI import fplot_histogram_kde
+from MatplotLibAPI.histogram import fplot_histogram_kde
 
 
 def test_fplot_histogram_kde(load_sample_df):

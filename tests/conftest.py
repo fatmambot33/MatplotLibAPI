@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import sys
 from typing import Any, Callable, Generator
 
 import pandas as pd
@@ -9,6 +10,10 @@ import pytest
 
 from scripts import generate_sample_data
 
+# Ensure the src directory is on the Python path for src layout
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+    
 
 @pytest.fixture(scope="session")
 def sample_data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:

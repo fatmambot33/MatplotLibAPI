@@ -5,7 +5,9 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 import plotly.graph_objects as go
 
-from .StyleTemplate import SANKEY_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
+from .style_template import SANKEY_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
+
+__all__ = ["SANKEY_STYLE_TEMPLATE", "fplot_sankey"]
 
 
 def fplot_sankey(

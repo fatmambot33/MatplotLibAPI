@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI import fplot_bar
+from MatplotLibAPI.bar import fplot_bar
 
 
 def test_fplot_bar(load_sample_df):

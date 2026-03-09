@@ -31,4 +31,4 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["MatplotLibAPI"]
+packages = ["src/MatplotLibAPI"]

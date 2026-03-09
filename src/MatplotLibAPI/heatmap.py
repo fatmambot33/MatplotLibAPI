@@ -8,16 +8,16 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import (
+from .style_template import (
     HEATMAP_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
 )
-from ._visualization_utils import _get_axis, _wrap_aplot
-from ._typing import CorrelationMethod
+from .visualization_utils import _get_axis, _wrap_aplot
+from .typing import CorrelationMethod
 
-
+__all__ = ["HEATMAP_STYLE_TEMPLATE", "aplot_heatmap", "aplot_correlation_matrix", "fplot_heatmap", "fplot_correlation_matrix"]
 def aplot_heatmap(
     pd_df: pd.DataFrame,
     x: str,

@@ -9,20 +9,20 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from pandas.api.extensions import register_dataframe_accessor
 
-from .Area import aplot_area, fplot_area
-from .Bar import aplot_bar, fplot_bar
-from .BoxViolin import aplot_box_violin, fplot_box_violin
-from .Bubble import BUBBLE_STYLE_TEMPLATE, aplot_bubble, fplot_bubble
-from .Composite import plot_composite_bubble, plot_composite_treemap
-from .Heatmap import (
+from .area import aplot_area, fplot_area
+from .bar import aplot_bar, fplot_bar
+from .box_violin import aplot_box_violin, fplot_box_violin
+from .bubble import BUBBLE_STYLE_TEMPLATE, aplot_bubble, fplot_bubble
+from .composite import plot_composite_bubble, plot_composite_treemap
+from .heatmap import (
     HEATMAP_STYLE_TEMPLATE,
     aplot_correlation_matrix,
     aplot_heatmap,
     fplot_correlation_matrix,
     fplot_heatmap,
 )
-from .Histogram import aplot_histogram_kde, fplot_histogram_kde
-from .Network import (
+from .histogram import aplot_histogram_kde, fplot_histogram_kde
+from .network import (
     NETWORK_STYLE_TEMPLATE,
     aplot_network,
     aplot_network_node,
@@ -31,9 +31,9 @@ from .Network import (
     fplot_network_components,
     fplot_network,
 )
-from .Pie import aplot_pie_donut, fplot_pie_donut
-from .Sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
-from .StyleTemplate import (
+from .pie import aplot_pie_donut, fplot_pie_donut
+from .sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
+from .style_template import (
     FIG_SIZE,
     AREA_STYLE_TEMPLATE,
     DISTRIBUTION_STYLE_TEMPLATE,
@@ -43,13 +43,13 @@ from .StyleTemplate import (
     TREEMAP_STYLE_TEMPLATE,
     StyleTemplate,
 )
-from ._typing import CorrelationMethod
-from .Table import aplot_table, fplot_table
-from .Timeserie import aplot_timeserie, fplot_timeserie
-from .Sunburst import fplot_sunburst
-from .Treemap import fplot_treemap
-from .Waffle import aplot_waffle, fplot_waffle
-from .Wordcloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
+from .typing import CorrelationMethod
+from .table import aplot_table, fplot_table
+from .timeserie import aplot_timeserie, fplot_timeserie
+from .sunburst import fplot_sunburst
+from .treemap import fplot_treemap
+from .waffle import aplot_waffle, fplot_waffle
+from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
 
 
 @register_dataframe_accessor("mpl")
@@ -1824,7 +1824,7 @@ class DataFrameAccessor:
             sort_by=sort_by,
             max_values=max_values,
             ascending=ascending,
-            fig=fig,
+            fig=fig, # type: ignore
         )
 
     def fplot_sunburst(

@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI import fplot_area
+from MatplotLibAPI.area import fplot_area
 
 
 def test_fplot_area(load_sample_df):

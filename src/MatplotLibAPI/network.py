@@ -11,7 +11,7 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import (
+from .style_template import (
     NETWORK_STYLE_TEMPLATE,
     FIG_SIZE,
     TITLE_SCALE_FACTOR,
@@ -103,9 +103,8 @@ def _scale_weights(
         np.percentile(weights_arr, _WEIGHT_PERCENTILES) if deciles is None else deciles
     )
     outs = np.searchsorted(percentiles, weights_arr)
-    return [
-        out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs
-    ]
+    scaled = [out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs]
+    return scaled
 
 
 class NodeView(nx.classes.reportviews.NodeView):
@@ -670,7 +669,7 @@ class NetworkGraph:
         mapped_max_font_size = style.font_mapping.get(4)
 
         node_sizes, edge_widths, font_sizes = graph.layout(
-            min_node_size=_DEFAULT["MIN_NODE_SIZE"] // 5,
+            min_node_size=_DEFAULT["MIN_NODE_SIZE"],
             max_node_size=_DEFAULT["MAX_NODE_SIZE"],
             max_edge_width=_DEFAULT["MAX_EDGE_WIDTH"],
             min_font_size=(
@@ -1016,9 +1015,23 @@ class NetworkGraph:
         NetworkGraph
             Initialized network graph.
         """
-        network_G = nx.from_pandas_edgelist(
-            edges_df, source=source, target=target, edge_attr=edge_weight_col
-        )
+        validate_dataframe(
+        edges_df, cols=[source, target, edge_weight_col]
+    )
+        network_G = nx.Graph()
+        nodes: dict[str, float] = {}
+        for _, row in edges_df.iterrows():
+            network_G.add_edge(row[source], row[target], **{edge_weight_col: row[edge_weight_col]})
+            if row[source] not in nodes.keys():
+                nodes[row[source]] = row[edge_weight_col]
+            else:
+                nodes[row[source]] += row[edge_weight_col]
+            if row[target] not in nodes.keys():
+                nodes[row[target]] = row[edge_weight_col]
+            else:
+                nodes[row[target]] += row[edge_weight_col]
+        for node, weight in nodes.items():
+            network_G.add_node(node, **{edge_weight_col: weight})
         return NetworkGraph(network_G)
 
     @staticmethod

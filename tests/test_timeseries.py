@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI.Timeserie import fplot_timeserie
+from MatplotLibAPI.timeserie import fplot_timeserie
 
 
 def test_fplot_timeserie(load_sample_df):

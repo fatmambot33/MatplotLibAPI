@@ -7,13 +7,15 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .StyleTemplate import (
+from .style_template import (
     DISTRIBUTION_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
 )
-from ._visualization_utils import _get_axis, _wrap_aplot
+from .visualization_utils import _get_axis, _wrap_aplot
+
+__all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_bar", "fplot_bar"]
 
 
 def aplot_bar(

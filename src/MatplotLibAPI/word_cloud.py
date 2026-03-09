@@ -15,7 +15,7 @@ from matplotlib.backend_bases import FigureCanvasBase
 from matplotlib.figure import Figure, SubFigure
 from wordcloud import WordCloud
 
-from .StyleTemplate import (
+from .style_template import (
     FIG_SIZE,
     MAX_RESULTS,
     TITLE_SCALE_FACTOR,

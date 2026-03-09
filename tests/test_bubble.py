@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-import MatplotLibAPI
+from MatplotLibAPI.composite import plot_composite_bubble
 
 
 def test_plot_composite_bubble(load_sample_df):
@@ -11,7 +11,7 @@ def test_plot_composite_bubble(load_sample_df):
     df = load_sample_df("bubble.csv")
     df["life_expectancy"] = [79, 77, 70, 75, 61]
 
-    fig = MatplotLibAPI.plot_composite_bubble(
+    fig = plot_composite_bubble(
         pd_df=df,
         label="country",
         x="gdp_per_capita",
