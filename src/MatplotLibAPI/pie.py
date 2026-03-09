@@ -13,6 +13,7 @@ from .visualization_utils import _get_axis, _wrap_aplot
 
 __all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie_donut", "fplot_pie_donut"]
 
+
 def aplot_pie_donut(
     pd_df: pd.DataFrame,
     category: str,

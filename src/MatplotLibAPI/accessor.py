@@ -1824,7 +1824,7 @@ class DataFrameAccessor:
             sort_by=sort_by,
             max_values=max_values,
             ascending=ascending,
-            fig=fig, # type: ignore
+            fig=fig,  # type: ignore
         )
 
     def fplot_sunburst(

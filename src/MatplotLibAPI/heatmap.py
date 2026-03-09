@@ -17,7 +17,15 @@ from .style_template import (
 from .visualization_utils import _get_axis, _wrap_aplot
 from .typing import CorrelationMethod
 
-__all__ = ["HEATMAP_STYLE_TEMPLATE", "aplot_heatmap", "aplot_correlation_matrix", "fplot_heatmap", "fplot_correlation_matrix"]
+__all__ = [
+    "HEATMAP_STYLE_TEMPLATE",
+    "aplot_heatmap",
+    "aplot_correlation_matrix",
+    "fplot_heatmap",
+    "fplot_correlation_matrix",
+]
+
+
 def aplot_heatmap(
     pd_df: pd.DataFrame,
     x: str,

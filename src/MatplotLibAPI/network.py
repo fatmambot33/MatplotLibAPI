@@ -103,7 +103,9 @@ def _scale_weights(
         np.percentile(weights_arr, _WEIGHT_PERCENTILES) if deciles is None else deciles
     )
     outs = np.searchsorted(percentiles, weights_arr)
-    scaled = [out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs]
+    scaled = [
+        out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs
+    ]
     return scaled
 
 
@@ -1015,13 +1017,13 @@ class NetworkGraph:
         NetworkGraph
             Initialized network graph.
         """
-        validate_dataframe(
-        edges_df, cols=[source, target, edge_weight_col]
-    )
+        validate_dataframe(edges_df, cols=[source, target, edge_weight_col])
         network_G = nx.Graph()
         nodes: dict[str, float] = {}
         for _, row in edges_df.iterrows():
-            network_G.add_edge(row[source], row[target], **{edge_weight_col: row[edge_weight_col]})
+            network_G.add_edge(
+                row[source], row[target], **{edge_weight_col: row[edge_weight_col]}
+            )
             if row[source] not in nodes.keys():
                 nodes[row[source]] = row[edge_weight_col]
             else:

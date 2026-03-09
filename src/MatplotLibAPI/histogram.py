@@ -17,6 +17,7 @@ from .visualization_utils import _get_axis, _wrap_aplot
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_histogram_kde", "fplot_histogram_kde"]
 
+
 def aplot_histogram_kde(
     pd_df: pd.DataFrame,
     column: str,

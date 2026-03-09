@@ -16,6 +16,7 @@ from .visualization_utils import _get_axis, _wrap_aplot
 
 __all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 
+
 def aplot_area(
     pd_df: pd.DataFrame,
     x: str,

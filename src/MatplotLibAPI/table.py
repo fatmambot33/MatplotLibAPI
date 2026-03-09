@@ -20,6 +20,7 @@ from .style_template import (
 
 __all__ = ["TABLE_STYLE_TEMPLATE", "aplot_table", "fplot_table"]
 
+
 def _prepare_table_data(
     pd_df: pd.DataFrame,
     cols: List[str],

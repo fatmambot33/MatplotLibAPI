@@ -28,6 +28,7 @@ from .style_template import (
 
 __all__ = ["BUBBLE_STYLE_TEMPLATE", "aplot_bubble", "fplot_bubble"]
 
+
 def _prepare_bubble_data(
     pd_df: pd.DataFrame,
     label: str,
