@@ -33,7 +33,7 @@ jobs:
         run: pydocstyle src
 
       - name: Format check with black
-        run: black --check .
+        run: black --check . --target-version=py${{ matrix.python-version }}
 
       - name: Type check with pyright
         run: pyright src
