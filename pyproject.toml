@@ -32,3 +32,12 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/MatplotLibAPI"]
+
+[tool.pyright]
+extraPaths = ["src"]
+
+[tool.pydocstyle]
+convention = "numpy"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
