@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        name: pydocstyle
+        entry: pydocstyle
+        language: system
+        types: [python]
+
+  - repo: https://github.com/pre-commit/mirrors-pyright
+    rev: v1.1.350
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: node
+        types: [python]
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest -q --cov=MatplotLibAPI --cov-report=term-missing --cov-fail-under=70
+        language: system
+        types: [python]
+        pass_filenames: false

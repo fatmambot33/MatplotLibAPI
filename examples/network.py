@@ -1,3 +1,9 @@
+"""
+Example module for network graph sample data generation and plotting.
+
+This module provides functions to generate and plot sample network data for testing.
+"""
+
 import sys
 import os
 from pathlib import Path
@@ -19,7 +25,6 @@ def generate_sample_network_data():
 
 def plot_sample_network_data():
     """Load a sample DataFrame for testing."""
-
     from MatplotLibAPI.network import fplot_network, NetworkGraph
 
     # Assuming sample data is stored in a 'data' directory within the tests folder

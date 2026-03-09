@@ -746,6 +746,7 @@ class NetworkGraph:
             Edge attribute used for weighting. The default is "weight".
         layout_seed : int, optional
             Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
+
         Returns
         -------
         Figure

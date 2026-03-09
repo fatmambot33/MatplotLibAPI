@@ -1861,6 +1861,7 @@ class DataFrameAccessor:
             Sort order. The default is `False`.
         fig : go.Figure, optional
             Existing Plotly figure to add to. If None, a new figure is created.
+
         Returns
         -------
         go.Figure
