@@ -337,7 +337,7 @@ def fplot_timeserie(
         max_values=max_values,
         sort_by=sort_by,
         ascending=ascending,
-        std=std
+        std=std,
     )
 
 
