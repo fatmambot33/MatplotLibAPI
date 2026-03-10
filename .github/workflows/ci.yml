@@ -32,8 +32,15 @@ jobs:
       - name: Run docstring style checks
         run: pydocstyle src
 
+
+      - name: Set Black target version
+        id: black_version
+        run: echo "BLACK_TARGET_VERSION=py${PYTHON_VERSION//./}" >> $GITHUB_ENV
+        env:
+          PYTHON_VERSION: ${{ matrix.python-version }}
+
       - name: Format check with black
-        run: black --check . --target-version=py${{ matrix.python-version }}
+        run: black --check . --target-version=$BLACK_TARGET_VERSION
 
       - name: Type check with pyright
         run: pyright src

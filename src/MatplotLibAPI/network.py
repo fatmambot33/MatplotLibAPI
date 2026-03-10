@@ -112,6 +112,9 @@ def _scale_weights(
 class NodeView(nx.classes.reportviews.NodeView):
     """Extended node view with convenience helpers."""
 
+    def __getitem__(self, n: Any) -> Dict[str, Any]:
+        return super().__getitem__(n)
+
     def sort(self, attribute: str = "weight", reverse: bool = True) -> List[Any]:
         """Return nodes sorted by the specified attribute.
 
@@ -195,6 +198,9 @@ class AdjacencyView(nx.classes.coreviews.AdjacencyView):
 
 class EdgeView(nx.classes.reportviews.EdgeView):
     """Edge view with sorting and filtering helpers."""
+
+    def __getitem__(self, e: Tuple) -> Dict[str, Any]:
+        return super().__getitem__(e)
 
     def sort(
         self, attribute: str = "weight", reverse: bool = True
@@ -322,7 +328,7 @@ class NetworkGraph:
 
     _nx_graph: nx.Graph
 
-    def __init__(self, nx_graph: nx.Graph):
+    def __init__(self, nx_graph: Optional[nx.Graph] = None):
         """Initialize with an existing NetworkX graph.
 
         Parameters
@@ -330,7 +336,7 @@ class NetworkGraph:
         nx_graph : nx.Graph
             Graph to wrap.
         """
-        self._nx_graph = nx_graph
+        self._nx_graph: nx.Graph = nx_graph or nx.Graph()
         self._scale = 1.0
 
     @property
@@ -350,19 +356,59 @@ class NetworkGraph:
         self._scale = value
 
     @property
-    def nodes(self) -> NodeView:
+    def node_view(self) -> NodeView:
         """Return a ``NodeView`` over the graph."""
         return NodeView(self._nx_graph)
 
+    @node_view.setter
+    def node_view(self, node: Any, attributes: Dict[str, Any]):
+        """Set attributes for a specific node.
+
+        Parameters
+        ----------
+        node : Any
+            Node identifier.
+        attributes : dict
+            Attributes to set for the node.
+        """
+        self._nx_graph.nodes[node].update(attributes)
+
     @property
-    def edges(self) -> EdgeView:
+    def edge_view(self) -> EdgeView:
         """Return an ``EdgeView`` over the graph."""
         return EdgeView(self._nx_graph)
 
+    @edge_view.setter
+    def edge_view(self, edge: Tuple[Any, Any], attributes: Dict[str, Any]):
+        """Set attributes for a specific edge.
+
+        Parameters
+        ----------
+        edge : tuple[Any, Any]
+            Edge defined by source and target node identifiers.
+        attributes : dict
+            Attributes to set for the edge.
+        """
+        u, v = edge
+        self._nx_graph.edges[u, v].update(attributes)
+
     @property
-    def adjacency(self) -> AdjacencyView:
+    def adjacency_view(self) -> AdjacencyView:
         """Return an ``AdjacencyView`` of the graph."""
         return AdjacencyView(self._nx_graph.adj)
+
+    @adjacency_view.setter
+    def adjacency_view(self, node: Any, attributes: Dict[str, Any]):
+        """Set attributes for a specific node.
+
+        Parameters
+        ----------
+        node : Any
+            Node identifier.
+        attributes : dict
+            Attributes to set for the node.
+        """
+        self._nx_graph.adj[node].update(attributes)
 
     @property
     def connected_components(self) -> List[set]:
@@ -434,6 +480,32 @@ class NetworkGraph:
         """Return the degree assortativity coefficient of the graph."""
         return nx.degree_assortativity_coefficient(self._nx_graph)
 
+    def add_node(self, node: Any, **attributes: Any):
+        """Add a node with optional attributes.
+
+        Parameters
+        ----------
+        node : Any
+            Node identifier.
+        **attributes : dict
+            Arbitrary node attributes as keyword arguments.
+        """
+        self._nx_graph.add_node(node, **attributes)
+
+    def add_edge(self, source: Any, target: Any, **attributes: Any):
+        """Add an edge with optional attributes.
+
+        Parameters
+        ----------
+        source : Any
+            Source node identifier.
+        target : Any
+            Target node identifier.
+        **attributes : dict
+            Arbitrary edge attributes as keyword arguments.
+        """
+        self._nx_graph.add_edge(source, target, **attributes)
+
     def edge_subgraph(self, edges: Iterable) -> "NetworkGraph":
         """Return a subgraph containing only the specified edges.
 
@@ -482,7 +554,7 @@ class NetworkGraph:
         """
         # Normalize and scale nodes' weights within the desired range of edge widths
         node_weights = [
-            data.get(edge_weight_col, 1) for node, data in self.nodes(data=True)
+            data.get(edge_weight_col, 1) for node, data in self.node_view(data=True)
         ]
         node_deciles = (
             np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
@@ -498,14 +570,14 @@ class NetworkGraph:
 
         # Normalize and scale edges' weights within the desired range of edge widths
         edge_weights = [
-            data.get(edge_weight_col, 1) for _, _, data in self.edges(data=True)
+            data.get(edge_weight_col, 1) for _, _, data in self.edge_view(data=True)
         ]
         edges_width = _scale_weights(weights=edge_weights, scale_max=max_edge_width)
 
         # Scale the normalized node weights within the desired range of font sizes
         node_size_dict = dict(
             zip(
-                self.nodes,
+                self.node_view,
                 _scale_weights(
                     weights=node_weights,
                     scale_max=max_font_size,
@@ -547,8 +619,8 @@ class NetworkGraph:
             Trimmed subgraph.
         """
         if node_list is None:
-            node_list = self.nodes.sort("weight")[: _DEFAULT["MAX_NODES"]]
-        core_subgraph_nodes = list(self.k_core(k=min_degree).nodes)
+            node_list = self.node_view.sort("weight")[: _DEFAULT["MAX_NODES"]]
+        core_subgraph_nodes = list(self.k_core(k=min_degree).node_view)
         node_list = [node for node in node_list if node in core_subgraph_nodes]
         _subgraph = nx.subgraph(self._nx_graph, node_list)
         subgraph = NetworkGraph(_subgraph)
@@ -927,8 +999,8 @@ class NetworkGraph:
             Mapping of edge tuples to attribute values.
         """
         top_list = {}
-        for node in self.nodes:
-            edges = self.edges(node, data=True)
+        for node in self.node_view:
+            edges = self.edge_view(node, data=True)
             edges_sorted = sorted(
                 edges, key=lambda x: x[2].get(attribute, 0), reverse=reverse
             )
@@ -938,8 +1010,10 @@ class NetworkGraph:
                 top_list[edge_key] = data[attribute]
         return top_list
 
-    def calculate_node_weights_from_edges(
-        self, edge_weight_col: str = "weight", k: int = 10
+    def calculate_nodes(
+        self,
+        edge_weight_col: str = "weight",
+        k: int = 10,
     ):
         """Calculate node weights by summing weights of top k edges.
 
@@ -950,20 +1024,25 @@ class NetworkGraph:
         k : int, optional
             Number of top edges to consider for each node. The default is 10.
         """
-        edge_aggregates = self.top_k_edges(attribute=edge_weight_col, k=k)
-        node_aggregates = {}
-        for (u, v), weight_value in edge_aggregates.items():
-            if u not in node_aggregates:
-                node_aggregates[u] = 0
-            if v not in node_aggregates:
-                node_aggregates[v] = 0
-            node_aggregates[u] += weight_value
-            node_aggregates[v] += weight_value
+        top_edges = self.top_k_edges(attribute=edge_weight_col, k=k)
+        attributes: dict[Any, dict[str, Any]] = {}
+        for (u, v), weight_value in top_edges.items():
+            for node in [u, v]:
+                if node not in attributes:
+                    attributes[node] = {edge_weight_col: 0, "edges": 0}
+                else:
+                    attributes[node][edge_weight_col] += weight_value
+                    attributes[node]["edges"] += 1
 
-        nx.set_node_attributes(self._nx_graph, node_aggregates, name=edge_weight_col)
+        for node, attr in attributes.items():
+            attr["degree"] = len(list(self._nx_graph.edges(node)))
+            attr[""]
+            self._nx_graph.nodes[node].update(attr)
+
+        self.set_node_attributes(attributes=attributes)
 
     def trim_edges(
-        self, edge_weight_col: str = "weight", top_k_per_node: int = 5
+        self, edge_weight_col: str = "weight", k: int = 10
     ) -> "NetworkGraph":
         """Trim the graph to keep only the top k edges per node.
 
@@ -979,10 +1058,12 @@ class NetworkGraph:
         NetworkGraph
             A new graph containing only the top edges.
         """
-        edges_to_keep = self.top_k_edges(attribute=edge_weight_col, k=top_k_per_node)
-        return self.edge_subgraph(edges=edges_to_keep)
+        edges_to_keep = self.top_k_edges(attribute=edge_weight_col, k=k)
+        network_X = self.edge_subgraph(edges=edges_to_keep)
+        network_X.sanitize_network()
+        return network_X
 
-    def set_node_attributes(self, attributes: Dict[Any, Dict[str, Any]]):
+    def set_node_attributes(self, attributes: dict[Any, dict[str, Any]]):
         """Set multiple node attributes from a dictionary.
 
         Parameters
@@ -999,6 +1080,7 @@ class NetworkGraph:
         source: str = "source",
         target: str = "target",
         edge_weight_col: str = "weight",
+        k: int = 10,
     ) -> "NetworkGraph":
         """Initialize a NetworkGraph from a simple DataFrame.
 
@@ -1019,26 +1101,32 @@ class NetworkGraph:
             Initialized network graph.
         """
         validate_dataframe(edges_df, cols=[source, target, edge_weight_col])
-        network_G = nx.Graph()
-        nodes: dict[str, float] = {}
+        network_Z = NetworkGraph(nx.Graph())
         for _, row in edges_df.iterrows():
-            network_G.add_edge(
+            network_Z.add_edge(
                 row[source], row[target], **{edge_weight_col: row[edge_weight_col]}
             )
-            if row[source] not in nodes.keys():
-                nodes[row[source]] = row[edge_weight_col]
-            else:
-                nodes[row[source]] += row[edge_weight_col]
-            if row[target] not in nodes.keys():
-                nodes[row[target]] = row[edge_weight_col]
-            else:
-                nodes[row[target]] += row[edge_weight_col]
-        for node, weight in nodes.items():
-            network_G.add_node(node, **{edge_weight_col: weight})
-        return NetworkGraph(network_G)
+        network_Z.calculate_nodes(edge_weight_col=edge_weight_col, k=k)
+
+        return network_Z
+
+    def sanitize_network(
+        self,
+    ):
+        """Remove nodes without edges and edges without nodes to ensure consistency."""
+        if len(self.node_view) == 0 or len(self.edge_view) == 0:
+            return
+        nodes = set(node for node, data in self.node_view(data=True))
+        edges = set((u, v) for u, v in self.edge_view())
+        for node in nodes:
+            if node not in edges:
+                self._nx_graph.remove_node(node)
+        for u, v in self.edge_view:
+            if u not in nodes or v not in nodes:
+                self._nx_graph.remove_edge(u, v)
 
     @staticmethod
-    def _sanitize_node_dataframe(
+    def sanitize_node_df(
         node_df: pd.DataFrame,
         edge_df: pd.DataFrame,
         node_col: str = "node",
@@ -1082,7 +1170,7 @@ class NetworkGraph:
         return filtered_node_df.loc[filtered_node_df[node_col].isin(nodes_in_edges)]
 
     @staticmethod
-    def _sanitize_edge_dataframe(
+    def sanitize_edge_df(
         node_df: pd.DataFrame,
         edge_df: pd.DataFrame,
         node_col: str = "node",
@@ -1130,7 +1218,37 @@ class NetworkGraph:
         return edge_df
 
     @staticmethod
-    def build_from_dataframes(
+    def sanitize_dfs(
+        node_df: pd.DataFrame,
+        edge_df: pd.DataFrame,
+        node_col: str = "node",
+        node_weight_col: str = "weight",
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        node_df = NetworkGraph.sanitize_node_df(
+            node_df,
+            edge_df=edge_df,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
+        )
+        edge_df = NetworkGraph.sanitize_edge_df(
+            node_df,
+            edge_df=edge_df,
+            node_col=node_col,
+            node_weight_col=node_weight_col,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
+        )
+        return node_df, edge_df
+
+    @staticmethod
+    def from_pandas(
         node_df: pd.DataFrame,
         edge_df: pd.DataFrame,
         node_col: str = "node",
@@ -1165,18 +1283,9 @@ class NetworkGraph:
             filtered to nodes present in ``node_df``.
         """
         if node_df is not None:
-            node_df = NetworkGraph._sanitize_node_dataframe(
+            node_df, edge_df = NetworkGraph.sanitize_dfs(
                 node_df,
-                edge_df=edge_df,
-                node_col=node_col,
-                node_weight_col=node_weight_col,
-                edge_source_col=edge_source_col,
-                edge_target_col=edge_target_col,
-                edge_weight_col=edge_weight_col,
-            )
-            edge_df = NetworkGraph._sanitize_edge_dataframe(
-                node_df,
-                edge_df=edge_df,
+                edge_df,
                 node_col=node_col,
                 node_weight_col=node_weight_col,
                 edge_source_col=edge_source_col,
@@ -1190,12 +1299,10 @@ class NetworkGraph:
             edge_weight_col=edge_weight_col,
         )
         if node_df is None or node_df.empty:
-            graph.calculate_node_weights_from_edges(
-                edge_weight_col=edge_weight_col, k=10
-            )
+            graph.calculate_nodes(edge_weight_col=edge_weight_col)
         else:
             node_weights = {
-                node: {"weight": weight_value}
+                node: {node_weight_col: weight_value}
                 for node, weight_value in node_df.set_index(node_col)[
                     node_weight_col
                 ].items()
@@ -1332,8 +1439,8 @@ def _prepare_network_graph(
         }
         nx.set_node_attributes(graph._nx_graph, node_weights, name=edge_weight_col)
     else:
-        graph.calculate_node_weights_from_edges(edge_weight_col=edge_weight_col, k=10)
-    graph = graph.trim_edges(edge_weight_col=edge_weight_col, top_k_per_node=5)
+        graph.calculate_nodes(edge_weight_col=edge_weight_col, k=10)
+    graph = graph.trim_edges(edge_weight_col=edge_weight_col, k=10)
     return graph
 
 
