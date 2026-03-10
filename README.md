@@ -39,6 +39,25 @@ fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='population', z='p
 plt.show()
 ```
 
+
+## MCP Integration (Bubble Chart)
+
+You can run a dedicated MCP server that exposes bubble chart generation as a tool for LLM agents.
+
+1. Install MCP dependencies:
+
+```bash
+pip install -e .[mcp]
+```
+
+2. Start the MCP server over stdio:
+
+```bash
+matplotlibapi-mcp-bubble
+```
+
+The server provides a `plot_bubble_from_csv` tool that accepts a CSV path, bubble field mapping, and an output image path.
+
 ## Plot Types
 
 The library supports the following plot types:

@@ -29,6 +29,12 @@ dev = [
     "pytest-cov",
     "tomli",
 ]
+mcp = [
+    "mcp>=1.0.0",
+]
+
+[project.scripts]
+matplotlibapi-mcp-bubble = "MatplotLibAPI.mcp_server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/MatplotLibAPI"]
