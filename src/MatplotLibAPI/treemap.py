@@ -1,16 +1,12 @@
 """Treemap plotting utilities."""
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 import pandas as pd
 import plotly.graph_objects as go
 from pandas import BooleanDtype, CategoricalDtype
 
-from .style_template import (
-    TREEMAP_STYLE_TEMPLATE,
-    StyleTemplate,
-    validate_dataframe,
-)
+from .style_template import TREEMAP_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
 
 __all__ = [
     "TREEMAP_STYLE_TEMPLATE",
@@ -19,7 +15,7 @@ __all__ = [
 ]
 
 
-def fplot_treemap(
+def aplot_treemap(
     pd_df: pd.DataFrame,
     path: str,
     values: str,
@@ -29,43 +25,43 @@ def fplot_treemap(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     max_values: int = 100,
-) -> go.Trace:
-    """Create a treemap trace from the data frame.
+) -> go.Treemap:
+    """Create a treemap trace from the provided dataframe.
 
     Parameters
     ----------
     pd_df : pd.DataFrame
         DataFrame containing the data to plot.
     path : str
-        Column representing hierarchical path.
+        Column representing the hierarchical path.
     values : str
         Column containing values for each treemap block.
     style : StyleTemplate, optional
         Style configuration. The default is `TREEMAP_STYLE_TEMPLATE`.
     title : str, optional
-        Plot title.
+        Plot title. The default is None.
     color : str, optional
-        Column used for coloring.
+        Column used for coloring. The default is None.
     sort_by : str, optional
-        Column used to sort data.
+        Column used to sort data. The default is None.
     ascending : bool, optional
-        Sort order for the data. The default is `False`.
+        Sort order for the data. The default is False.
     max_values : int, optional
         Maximum number of rows to plot. The default is 100.
 
     Returns
     -------
-    go.Trace
+    go.Treemap
         Plotly treemap trace.
     """
     cols = [path, values]
     if color:
         cols.append(color)
     validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
-    if not sort_by:
-        sort_by = values
-    df = pd_df.sort_values(by=sort_by, ascending=ascending)[cols].head(max_values)
-    data = {
+
+    sort_col = sort_by or values
+    df = pd_df.sort_values(by=sort_col, ascending=ascending)[cols].head(max_values)
+    data: Dict[str, Any] = {
         "labels": df[path],
         "parents": [""] * len(df),
         "values": df[values],
@@ -78,25 +74,20 @@ def fplot_treemap(
         },
     }
 
-    if color and color in pd_df.columns:
-        color_data = pd_df[color]
+    if color and color in df.columns:
+        color_data = cast(pd.Series, df[color])
         if isinstance(
             color_data.dtype, CategoricalDtype
         ) or pd.api.types.is_object_dtype(color_data.dtype):
             color_data = color_data.astype("category").cat.codes
         elif isinstance(color_data.dtype, BooleanDtype):
             color_data = color_data.astype(int)
-        data["marker"] = dict(colorscale="Viridis", colors=color_data.to_list())
+        data["marker"] = dict(colorscale="Viridis", colors=color_data.tolist())
 
-    g = go.Treemap(
-        data,
-        root_color=style.background_color,
-    )
-
-    return g  # type: ignore
+    return go.Treemap(data, root_color=style.background_color)
 
 
-def aplot_treemap(
+def fplot_treemap(
     pd_df: pd.DataFrame,
     path: str,
     values: str,
@@ -110,37 +101,41 @@ def aplot_treemap(
     save_path: Optional[str] = None,
     savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> go.Figure:
-    """Return a figure containing the treemap plot.
+    """Return a figure containing a treemap plot.
 
     Parameters
     ----------
     pd_df : pd.DataFrame
         DataFrame containing the data to plot.
     path : str
-        Column representing hierarchical path.
+        Column representing the hierarchical path.
     values : str
         Column containing values for each treemap block.
     style : StyleTemplate, optional
         Style configuration. The default is `TREEMAP_STYLE_TEMPLATE`.
     title : str, optional
-        Plot title.
+        Plot title. The default is None.
     color : str, optional
-        Column used for coloring.
+        Column used for coloring. The default is None.
     sort_by : str, optional
-        Column used to sort data.
+        Column used to sort data. The default is None.
     ascending : bool, optional
-        Sort order for the data. The default is `False`.
+        Sort order for the data. The default is False.
     max_values : int, optional
         Maximum number of rows to plot. The default is 100.
     fig : go.Figure, optional
-        Existing figure to add the treemap to.
+        Existing figure to add the treemap to. If None, create a new figure.
+    save_path : str, optional
+        Path to save the figure as HTML or static image. The default is None.
+    savefig_kwargs : dict[str, Any], optional
+        Extra keyword arguments passed to Plotly save methods.
 
     Returns
     -------
     go.Figure
         Figure containing the treemap plot.
     """
-    g = aplot_treemap(
+    treemap_trace = aplot_treemap(
         pd_df=pd_df,
         path=path,
         values=values,
@@ -152,25 +147,20 @@ def aplot_treemap(
         max_values=max_values,
     )
 
-    if not fig:
-        fig = go.Figure(g)
-    else:
-        fig.add_trace(g)
+    figure = go.Figure(treemap_trace) if fig is None else fig
+    if fig is not None:
+        figure.add_trace(treemap_trace)
 
-    fig.update_layout(
+    figure.update_layout(
         title=title,
         plot_bgcolor=style.background_color,
         paper_bgcolor=style.background_color,
         font=dict(family=style.font_name, size=style.font_size, color=style.font_color),
-        showlegend=style.legend if style else True,
+        showlegend=style.legend,
     )
-
-    # Apply color scale
-    fig.update_traces(marker=dict(colorscale=style.palette))
-
     if save_path:
         if save_path.lower().endswith((".html", ".htm")):
-            fig.write_html(save_path, **(savefig_kwargs or {}))
+            figure.write_html(save_path, **(savefig_kwargs or {}))
         else:
-            fig.write_image(save_path, **(savefig_kwargs or {}))
-    return fig
+            figure.write_image(save_path, **(savefig_kwargs or {}))
+    return figure

@@ -1,6 +1,6 @@
 """Sankey plotting helpers."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -23,7 +23,9 @@ def fplot_sankey(
     """Plot a Sankey diagram showing flows between categories."""
     validate_dataframe(pd_df, cols=[source, target, value])
 
-    labels: List[str] = list(pd.unique(pd.concat([pd_df[source], pd_df[target]])))
+    source_series = cast(pd.Series, pd_df[source])
+    target_series = cast(pd.Series, pd_df[target])
+    labels: List[str] = list(pd.unique(pd.concat([source_series, target_series])))
     label_to_index: Dict[str, int] = {name: idx for idx, name in enumerate(labels)}
 
     sankey = go.Sankey(

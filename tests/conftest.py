@@ -8,10 +8,10 @@ from typing import Any, Callable, Generator
 import pandas as pd
 import pytest
 
-from scripts import generate_sample_data
-
 # Ensure the src directory is on the Python path for src layout
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from examples import generate_sample_data
 
 
 @pytest.fixture(scope="session")
