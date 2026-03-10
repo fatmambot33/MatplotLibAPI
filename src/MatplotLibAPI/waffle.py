@@ -1,6 +1,6 @@
 """Waffle chart helpers."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, cast
 
 import pandas as pd
 import seaborn as sns
@@ -25,13 +25,15 @@ def aplot_waffle(
     """Plot a simple waffle chart as a grid of proportional squares."""
     validate_dataframe(pd_df, cols=[category, value])
     plot_ax = _get_axis(ax)
-    total = float(pd_df[value].sum())
+    value_series = cast(pd.Series, pd_df[value])
+    category_series = cast(pd.Series, pd_df[category])
+    total = float(value_series.sum())
     squares = rows * rows
     colors = sns.color_palette(style.palette, n_colors=len(pd_df))
     plot_ax.set_aspect("equal")
 
     start = 0
-    for idx, (label, val) in enumerate(zip(pd_df[category], pd_df[value])):
+    for idx, (label, val) in enumerate(zip(category_series, value_series)):
         count = int(round((val / total) * squares))
         for square in range(start, min(start + count, squares)):
             row = square // rows
@@ -54,7 +56,7 @@ def aplot_waffle(
         plot_ax.set_title(title)
     legend_handles = [Rectangle((0, 0), 1, 1, color=color) for color in colors]
     plot_ax.legend(
-        legend_handles, pd_df[category], loc="upper center", ncol=3, frameon=False
+        legend_handles, category_series, loc="upper center", ncol=3, frameon=False
     )
     return plot_ax
 

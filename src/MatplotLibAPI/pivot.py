@@ -119,6 +119,9 @@ def plot_pivoted_bars(
     if ax is None:
         ax = cast(Axes, plt.gca())
 
+    if pd.api.types.is_datetime64_any_dtype(pivot_df[x]):
+        pivot_df[x] = pivot_df[x].dt.strftime("%Y-%m-%d")
+
     pivot_df.plot(kind="bar", x=x, stacked=stacked, ax=ax, alpha=0.7)
 
     ax.set_ylabel(string_formatter(y))

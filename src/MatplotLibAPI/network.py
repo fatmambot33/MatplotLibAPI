@@ -519,7 +519,7 @@ class NetworkGraph:
         NetworkGraph
             Subgraph with only ``edges``.
         """
-        return NetworkGraph(nx.edge_subgraph(self._nx_graph, edges))
+        return NetworkGraph(nx.edge_subgraph(self._nx_graph, edges).copy())
 
     def layout(
         self,
@@ -1030,13 +1030,11 @@ class NetworkGraph:
             for node in [u, v]:
                 if node not in attributes:
                     attributes[node] = {edge_weight_col: 0, "edges": 0}
-                else:
-                    attributes[node][edge_weight_col] += weight_value
-                    attributes[node]["edges"] += 1
+                attributes[node][edge_weight_col] += weight_value
+                attributes[node]["edges"] += 1
 
         for node, attr in attributes.items():
             attr["degree"] = len(list(self._nx_graph.edges(node)))
-            attr[""]
             self._nx_graph.nodes[node].update(attr)
 
         self.set_node_attributes(attributes=attributes)
@@ -1227,6 +1225,30 @@ class NetworkGraph:
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """Return sanitized node and edge DataFrames.
+
+        Parameters
+        ----------
+        node_df : pd.DataFrame
+            DataFrame containing node identifiers and weights.
+        edge_df : pd.DataFrame
+            Edge DataFrame containing source, target, and weights.
+        node_col : str, optional
+            Column name for node identifiers. The default is "node".
+        node_weight_col : str, optional
+            Column name for node weights. The default is "weight".
+        edge_source_col : str, optional
+            Column name for source nodes. The default is "source".
+        edge_target_col : str, optional
+            Column name for target nodes. The default is "target".
+        edge_weight_col : str, optional
+            Column name for edge weights. The default is "weight".
+
+        Returns
+        -------
+        tuple[pd.DataFrame, pd.DataFrame]
+            A tuple containing the sanitized node and edge DataFrames.
+        """
         node_df = NetworkGraph.sanitize_node_df(
             node_df,
             edge_df=edge_df,
@@ -1428,7 +1450,6 @@ def _prepare_network_graph(
         target=edge_target_col,
         edge_weight_col=edge_weight_col,
     )
-    graph = graph.get_core_subgraph()
     if filtered_node_df is not None and not filtered_node_df.empty:
         node_weights = {
             node: weight_value
@@ -1440,7 +1461,6 @@ def _prepare_network_graph(
         nx.set_node_attributes(graph._nx_graph, node_weights, name=edge_weight_col)
     else:
         graph.calculate_nodes(edge_weight_col=edge_weight_col, k=10)
-    graph = graph.trim_edges(edge_weight_col=edge_weight_col, k=10)
     return graph
 
 
