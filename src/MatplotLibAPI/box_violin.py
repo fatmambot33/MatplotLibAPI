@@ -13,7 +13,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .visualization_utils import _get_axis, _wrap_aplot
+from .utils import _get_axis, _wrap_aplot
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_box_violin", "fplot_box_violin"]
 

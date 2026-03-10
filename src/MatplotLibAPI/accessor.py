@@ -218,8 +218,6 @@ class DataFrameAccessor:
         hline: bool = False,
         vline: bool = False,
         figsize: Tuple[float, float] = FIG_SIZE,
-        save_path: Optional[str] = None,
-        savefig_kwargs: Optional[Dict[str, Any]] = None,
     ) -> Figure:
         """Plot a bubble chart on a new figure.
 
@@ -272,8 +270,6 @@ class DataFrameAccessor:
             hline=hline,
             vline=vline,
             figsize=figsize,
-            save_path=save_path,
-            savefig_kwargs=savefig_kwargs,
         )
 
     def fplot_composite_bubble(

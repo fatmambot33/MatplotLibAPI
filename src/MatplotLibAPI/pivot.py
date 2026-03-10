@@ -52,8 +52,8 @@ def _pivot_and_sort_data(
         A pivoted and sorted DataFrame.
     """
     pivot_df = pd.pivot_table(
-        data, values=values, index=[index], columns=[columns], aggfunc=aggfunc
-    )
+        data, values=values, index=[index], columns=[columns], aggfunc=aggfunc # type: ignore
+    ) # type: ignore
     if sort_by:
         pivot_df = pivot_df.sort_values(by=sort_by, ascending=ascending)
     return pivot_df.reset_index()

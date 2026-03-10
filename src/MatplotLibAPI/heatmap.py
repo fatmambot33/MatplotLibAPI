@@ -14,7 +14,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .visualization_utils import _get_axis, _wrap_aplot
+from .utils import _get_axis, _wrap_aplot
 from .typing import CorrelationMethod
 
 __all__ = [
@@ -24,6 +24,20 @@ __all__ = [
     "fplot_heatmap",
     "fplot_correlation_matrix",
 ]
+
+
+def _prepare_treemap_data(
+    pd_df: pd.DataFrame,
+    x: str,
+    y: str,
+    value: str,
+) -> pd.DataFrame:
+    """Prepare data for treemap plotting."""
+    validate_dataframe(pd_df, cols=[x, y, value])
+    plot_df = pd_df[[x, y, value]].pivot_table(
+        index=y, columns=x, values=value, aggfunc="mean"
+    )
+    return plot_df
 
 
 def aplot_heatmap(
@@ -37,10 +51,9 @@ def aplot_heatmap(
     **kwargs: Any,
 ) -> Axes:
     """Plot a matrix heatmap for multivariate pattern detection."""
-    validate_dataframe(pd_df, cols=[x, y, value])
-    plot_ax = _get_axis(ax)
 
-    pivot_df = pd_df.pivot_table(index=y, columns=x, values=value, aggfunc="mean")
+    plot_ax = _get_axis(ax)
+    pivot_df = _prepare_treemap_data(pd_df, x, y, value)
     sns.heatmap(pivot_df, cmap=style.palette, ax=plot_ax)
 
     plot_ax.set_xlabel(string_formatter(x))
@@ -72,7 +85,7 @@ def aplot_correlation_matrix(
     plot_ax = _get_axis(ax)
 
     selected: pd.DataFrame = pd_df.loc[:, list(subset)]
-    corr = selected.corr(method=method)
+    corr = selected.corr(method=method)  # pyright: ignore[reportArgumentType]
     sns.heatmap(corr, cmap=style.palette, annot=True, fmt=".2f", ax=plot_ax)
     if title:
         plot_ax.set_title(title)

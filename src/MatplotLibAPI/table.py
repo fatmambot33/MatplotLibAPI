@@ -8,6 +8,8 @@ from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 from matplotlib.table import Table
 
+from .utils import _get_axis, _wrap_aplot
+
 from .style_template import (
     FIG_SIZE,
     TITLE_SCALE_FACTOR,
@@ -104,6 +106,7 @@ def aplot_table(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Render a table into the provided axes.
 
@@ -146,12 +149,11 @@ def aplot_table(
     >>> fig, ax = plt.subplots()
     >>> aplot_table(df, cols=['col1', 'col2'], ax=ax)
     """
-    if ax is None:
-        ax = cast(Axes, plt.gca())
+    plot_ax = _get_axis(ax)
 
     plot_df = _prepare_table_data(pd_df, cols, sort_by, ascending, max_values, style)
 
-    table_plot = ax.table(
+    table_plot = plot_ax.table(
         cellText=plot_df.values.tolist(),
         colLabels=[string_formatter(colLabel) for colLabel in cols],
         cellLoc="center",
@@ -161,17 +163,17 @@ def aplot_table(
 
     _format_table(table_plot, style)
 
-    ax.set_facecolor(style.background_color)
-    ax.set_axis_off()
-    ax.grid(False)
+    plot_ax.set_facecolor(style.background_color)
+    plot_ax.set_axis_off()
+    plot_ax.grid(False)
     if title:
-        ax.set_title(
+        plot_ax.set_title(
             title,
             color=style.font_color,
             fontsize=style.font_size * TITLE_SCALE_FACTOR,
         )
-        ax.title.set_position((0.5, 1.05))
-    return ax
+        plot_ax.title.set_position((0.5, 1.05))
+    return plot_ax
 
 
 def fplot_table(
@@ -183,8 +185,6 @@ def fplot_table(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     figsize: Tuple[float, float] = FIG_SIZE,
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a new figure containing a formatted table.
 
@@ -225,10 +225,19 @@ def fplot_table(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_table(df, cols=['col1', 'col2'])
     """
+    return _wrap_aplot(
+        aplot_table,
+        pd_df=pd_df,
+        cols=cols,
+        title=title,
+        style=style,
+        max_values=max_values,
+        sort_by=sort_by,
+        ascending=ascending,
+        figsize=figsize,
+    )
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     ax = aplot_table(pd_df, cols, title, style, max_values, sort_by, ascending, ax)
-    if save_path:
-        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig

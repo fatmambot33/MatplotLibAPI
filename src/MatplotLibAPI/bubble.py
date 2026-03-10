@@ -91,6 +91,9 @@ def _prepare_bubble_data(
 
     plot_df["quintile"] = pd.qcut(plot_df[z], 5, labels=False, duplicates="drop")
     plot_df["fontsize"] = plot_df["quintile"].map(style.font_mapping)  # type: ignore
+    plot_df[f"{x}_mean"] = plot_df[x].mean()
+    plot_df[f"{y}_mean"] = plot_df[y].mean()
+    plot_df[f"{z}_mean"] = plot_df[z].mean()
     return plot_df
 
 
@@ -225,6 +228,32 @@ def _draw_bubble_labels(
         )
 
 
+def _draw_line(
+    ax: Axes, x: Optional[int], y: Optional[int], linestyle="--", color="black"
+) -> None:
+    """Draw horizontal and vertical mean lines.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes object.
+    x : int
+        value for x-axis line. Optional, if None, no vertical line is drawn.
+    y : int
+        value for y-axis line. Optional, if None, no horizontal line is drawn.
+    linestyle : str
+        Line style for the plot.
+    color : str
+        Color for the plot.
+    """
+    if x is None and y is None:
+        return
+    if x is not None:
+        ax.axvline(x=x, linestyle=linestyle, color=color)
+    if y is not None:
+        ax.axhline(y=y, linestyle=linestyle, color=color)
+
+
 def _draw_mean_lines(
     ax: Axes,
     plot_df: pd.DataFrame,
@@ -349,8 +378,9 @@ def aplot_bubble(
     _setup_bubble_axes(ax, style, plot_df, x, y, format_funcs)
 
     _draw_bubbles(ax, plot_df, x, y, z, style)
-
-    _draw_mean_lines(ax, plot_df, x, y, hline, vline, style)
+    x_mean = int(cast(float, plot_df[x].mean())) if vline else None
+    y_mean = int(cast(float, plot_df[y].mean())) if hline else None
+    _draw_line(ax, x_mean, y_mean, linestyle="--", color=style.font_color)
 
     _draw_bubble_labels(ax, plot_df, label, x, y, style, format_funcs)
 
@@ -379,8 +409,6 @@ def fplot_bubble(
     hline: bool = False,
     vline: bool = False,
     figsize: Tuple[float, float] = FIG_SIZE,
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Create a new matplotlib Figure with a bubble chart.
 
@@ -457,6 +485,4 @@ def fplot_bubble(
         vline=vline,
         ax=ax,
     )
-    if save_path:
-        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig

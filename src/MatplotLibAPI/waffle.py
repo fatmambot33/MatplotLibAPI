@@ -9,7 +9,7 @@ from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 
 from .style_template import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
-from .visualization_utils import _get_axis, _wrap_aplot
+from .utils import _get_axis, _wrap_aplot
 
 
 def aplot_waffle(

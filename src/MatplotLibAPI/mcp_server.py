@@ -84,7 +84,6 @@ def render_bubble_chart(
         ascending=ascending,
         hline=hline,
         vline=vline,
-        save_path=str(out_path),
     )
 
     return str(out_path)

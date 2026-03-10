@@ -25,6 +25,7 @@ def aplot_treemap(
     sort_by: Optional[str] = None,
     ascending: bool = False,
     max_values: int = 100,
+    **kwargs: Any,
 ) -> go.Treemap:
     """Create a treemap trace from the provided dataframe.
 
@@ -98,8 +99,6 @@ def fplot_treemap(
     ascending: bool = False,
     max_values: int = 100,
     fig: Optional[go.Figure] = None,
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> go.Figure:
     """Return a figure containing a treemap plot.
 
@@ -158,9 +157,4 @@ def fplot_treemap(
         font=dict(family=style.font_name, size=style.font_size, color=style.font_color),
         showlegend=style.legend,
     )
-    if save_path:
-        if save_path.lower().endswith((".html", ".htm")):
-            figure.write_html(save_path, **(savefig_kwargs or {}))
-        else:
-            figure.write_image(save_path, **(savefig_kwargs or {}))
     return figure

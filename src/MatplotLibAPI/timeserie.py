@@ -8,6 +8,7 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
+from .utils import _get_axis, _wrap_aplot
 from .style_template import (
     TIMESERIE_STYLE_TEMPLATE,
     FIG_SIZE,
@@ -196,6 +197,7 @@ def aplot_timeserie(
     ascending: bool = False,
     std: bool = False,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot a time series on the provided axes.
 
@@ -248,20 +250,19 @@ def aplot_timeserie(
     >>> fig, ax = plt.subplots()
     >>> aplot_timeserie(df, label='category', x='date', y='value', ax=ax)
     """
-    if ax is None:
-        ax = cast(Axes, plt.gca())
+    plot_ax = _get_axis(ax)
 
     df = _prepare_timeserie_data(pd_df, label, x, y, sort_by)
 
     format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
 
-    _plot_timeserie_lines(ax, df, label, x, y, std, style, format_funcs)
+    _plot_timeserie_lines(plot_ax, df, label, x, y, std, style, format_funcs)
 
-    _setup_timeserie_axes(ax, label, x, y, style, format_funcs)
+    _setup_timeserie_axes(plot_ax, label, x, y, style, format_funcs)
 
     if title:
-        ax.set_title(title, color=style.font_color, fontsize=style.font_size + 4)
-    return ax
+        plot_ax.set_title(title, color=style.font_color, fontsize=style.font_size + 4)
+    return plot_ax
 
 
 def fplot_timeserie(
@@ -276,11 +277,10 @@ def fplot_timeserie(
     ascending: bool = False,
     std: bool = False,
     figsize: Tuple[float, float] = FIG_SIZE,
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
-    """Return a figure plotting the time series.
-
+    """Internal function to plot a time series on a new figure.
+        This function is intended for internal use and should not be called directly.
+        Use `fplot_timeserie` instead.
     Parameters
     ----------
     pd_df : pd.DataFrame
@@ -305,48 +305,40 @@ def fplot_timeserie(
         Whether to plot rolling standard deviation. The default is `False`.
     figsize : tuple[float, float], optional
         Size of the created figure. The default is FIG_SIZE.
-
     Returns
     -------
     Figure
         Matplotlib figure containing the time series plot.
-
     Raises
     ------
     AttributeError
         If required columns are not in the DataFrame.
-
     Examples
     --------
     >>> import pandas as pd
-    >>> from MatplotLibAPI.Timeserie import fplot_timeserie
+    >>> from MatplotLibAPI.Timeserie import _fplot_timeserie
     >>> data = {
     ...     'date': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-01', '2023-01-02']),
     ...     'category': ['A', 'A', 'B', 'B'],
     ...     'value': [10, 12, 15, 13]
     ... }
     >>> df = pd.DataFrame(data)
-    >>> fig = fplot_timeserie(df, label='category', x='date', y='value')
+    >>> fig = _fplot_timeserie(df, label='category', x='date', y='value')
     """
-    fig = cast(Figure, plt.figure(figsize=figsize))
-    fig.patch.set_facecolor(style.background_color)
-    ax = fig.add_subplot()
-    ax = aplot_timeserie(
+    return _wrap_aplot(
+        aplot_timeserie,
         pd_df=pd_df,
+        figsize=figsize,
         label=label,
         x=x,
         y=y,
         title=title,
         style=style,
         max_values=max_values,
-        std=std,
         sort_by=sort_by,
         ascending=ascending,
-        ax=ax,
+        std=std
     )
-    if save_path:
-        fig.savefig(save_path, **(savefig_kwargs or {}))
-    return fig
 
 
 # endregion
