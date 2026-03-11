@@ -79,20 +79,12 @@ def plot_composite_bubble(
     """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
 
-    if not sort_by:
-        sort_by = z
-    if not filter_by:
-        filter_by = z
-    plot_df = pd_df.sort_values(by=filter_by, ascending=ascending)[
-        [label, x, y, z]
-    ].head(max_values)
-
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.patch.set_facecolor(style.background_color)
     grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
     ax = aplot_bubble(
-        pd_df=cast(pd.DataFrame, plot_df),
+        pd_df=pd_df,
         label=label,
         x=x,
         y=y,
@@ -108,7 +100,7 @@ def plot_composite_bubble(
 
     ax2 = fig.add_subplot(grid[1, 0])
     ax2 = aplot_table(
-        pd_df=cast(pd.DataFrame, plot_df),
+        pd_df=pd_df,
         cols=[label, z, y, x],
         title=f"Top {table_rows}",
         ax=ax2,
@@ -119,7 +111,7 @@ def plot_composite_bubble(
     )
     ax3 = fig.add_subplot(grid[1, 1])
     ax3 = aplot_table(
-        pd_df=cast(pd.DataFrame, plot_df),
+        pd_df=pd_df,
         cols=[label, z, y, x],
         title=f"Last {table_rows}",
         ax=ax3,
@@ -171,39 +163,37 @@ def plot_composite_treemap(
     go.Figure, optional
         Composite treemap figure, or None if no data frames are provided.
     """
-    if pd_dfs:
-        num_dimensions = len(pd_dfs)
-        subplot_titles = [
-            f"{title}::{dim.title()}" if title is not None else dim.title()
-            for dim in pd_dfs
-        ]
-        fig = make_subplots(
-            rows=num_dimensions,
-            cols=1,
-            specs=[
-                [{"type": "treemap"} for _ in range(1)] for _ in range(num_dimensions)
-            ],
-            subplot_titles=subplot_titles,
-            vertical_spacing=0.2,
+    go_fig = go.Figure()
+    num_dimensions = len(pd_dfs)
+    subplot_titles = [
+        f"{title}::{dim.title()}" if title is not None else dim.title()
+        for dim in pd_dfs
+    ]
+    fig = make_subplots(
+        rows=num_dimensions,
+        cols=1,
+        specs=[[{"type": "treemap"} for _ in range(1)] for _ in range(num_dimensions)],
+        subplot_titles=subplot_titles,
+        vertical_spacing=0.2,
+        figure=go_fig,
+    )
+
+    for current_row, (path, df) in enumerate(pd_dfs.items(), start=1):
+        trm = aplot_treemap(
+            pd_df=df,
+            path=path,
+            values=values,
+            style=style,
+            color=color,
+            sort_by=sort_by,
+            ascending=ascending,
+            max_values=max_values,
         )
-
-        for current_row, (path, df) in enumerate(pd_dfs.items(), start=1):
-            trm = aplot_treemap(
-                pd_df=df,
-                path=path,
-                values=values,
-                style=style,
-                color=color,
-                sort_by=sort_by,
-                ascending=ascending,
-                max_values=max_values,
-            )
-            fig.add_trace(trm, row=current_row, col=1)
-        return fig
-    return None
+        fig.add_trace(trm, row=current_row, col=1)
+    return fig
 
 
-def plot_wordcloud_network(
+def fplot_wordcloud_network(
     nodes_df: pd.DataFrame,
     edges_df: pd.DataFrame,
     node_col: str = "node",
@@ -262,10 +252,6 @@ def plot_wordcloud_network(
     Figure
         Matplotlib figure containing the word cloud on top and network below.
     """
-    validate_dataframe(nodes_df, cols=[node_col], sort_by=node_weight_col)
-    validate_dataframe(
-        edges_df, cols=[edge_source_col, edge_target_col, edge_weight_col], sort_by=None
-    )
 
     fig_raw, axes_raw = plt.subplots(
         2,

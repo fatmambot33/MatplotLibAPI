@@ -2,7 +2,7 @@
 
 from matplotlib.axes import Axes
 
-from MatplotLibAPI.pivot import plot_pivoted_bars
+from MatplotLibAPI.pivot import aplot_pivoted_bars
 
 
 def test_plot_pivoted_bars(load_sample_df):
@@ -10,6 +10,6 @@ def test_plot_pivoted_bars(load_sample_df):
 
     df = load_sample_df("pivot.csv", parse_dates=["year"])
 
-    ax = plot_pivoted_bars(data=df, label="city", x="year", y="population_increase")
+    ax = aplot_pivoted_bars(data=df, label="city", x="year", y="population_increase")
 
     assert isinstance(ax, Axes)

@@ -3,7 +3,7 @@
 from matplotlib.collections import PathCollection
 import pandas as pd
 
-from MatplotLibAPI.composite import plot_wordcloud_network
+from MatplotLibAPI.composite import fplot_wordcloud_network
 from MatplotLibAPI.style_template import StyleTemplate, TITLE_SCALE_FACTOR
 
 
@@ -19,7 +19,7 @@ def test_plot_wordcloud_network_renders_wordcloud_and_network() -> None:
         }
     )
 
-    fig = plot_wordcloud_network(nodes_df, edges_df)
+    fig = fplot_wordcloud_network(nodes_df, edges_df)
 
     assert len(fig.axes) == 2
     wordcloud_ax, network_ax = fig.axes
@@ -42,7 +42,7 @@ def test_plot_wordcloud_network_handles_zero_weights() -> None:
         }
     )
 
-    fig = plot_wordcloud_network(nodes_df, edges_df)
+    fig = fplot_wordcloud_network(nodes_df, edges_df)
 
     wordcloud_ax, network_ax = fig.axes
 
@@ -65,7 +65,7 @@ def test_plot_wordcloud_network_uses_title_scale_factor() -> None:
     )
 
     style = StyleTemplate(font_size=12)
-    fig = plot_wordcloud_network(
+    fig = fplot_wordcloud_network(
         nodes_df,
         edges_df,
         title="Composite Title",

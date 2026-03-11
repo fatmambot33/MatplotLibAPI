@@ -52,10 +52,20 @@ def _filter_stopwords(
     return np.array([word for word in words if word.lower() not in stop_set])
 
 
+def from_pandas_nodelist(
+    nodes_df: pd.DataFrame,
+    node_col: str = "node",
+    weight_col: str = "weight",
+):
+    """Create SankeyData from a DataFrame."""
+    validate_dataframe(nodes_df, cols=[node_col, weight_col])
+    return nodes_df[[node_col, weight_col]].set_index(node_col)[weight_col].to_dict()
+
+
 def _prepare_word_frequencies(
     pd_df: pd.DataFrame,
     text_column: str,
-    weight_column: Optional[str],
+    weight_column: str,
     max_words: int,
     stopwords: Optional[Iterable[str]],
 ) -> Tuple[list[str], list[float]]:
@@ -85,26 +95,16 @@ def _prepare_word_frequencies(
         If required columns are missing from the DataFrame.
     """
     validate_dataframe(pd_df, cols=[text_column], sort_by=weight_column)
-
-    if weight_column is None:
-        freq_series: pd.Series = pd_df[text_column].value_counts()
-    else:
-        weight_col: str = cast(str, weight_column)
-        freq_series = cast(pd.Series, pd_df.groupby(text_column)[weight_col].sum())
-        freq_series = cast(pd.Series, freq_series[freq_series > 0])
-        freq_series = freq_series.sort_values(ascending=False)
-        if freq_series.empty:
-            freq_series = pd_df[text_column].value_counts()
-
-    words: NDArray[np.str_] = np.asarray(freq_series.index.to_numpy())
+    word_frequencies = from_pandas_nodelist(
+        pd_df, node_col=text_column, weight_col=weight_column
+    )
+    words: NDArray[np.str_] = np.asarray(list(word_frequencies.keys()), dtype=np.str_)
     weights: NDArray[np.float64] = np.asarray(
-        freq_series.to_numpy(dtype=float), dtype=np.float64
+        list(word_frequencies.values()), dtype=np.float64
     )
 
     filtered_words = _filter_stopwords(words, stopwords)
-    mask: NDArray[np.bool_] = np.asarray(
-        np.isin(freq_series.index, filtered_words), dtype=bool
-    )
+    mask: NDArray[np.bool_] = np.asarray(np.isin(words, filtered_words), dtype=bool)
     filtered_weights: NDArray[np.float64] = np.asarray(weights[mask], dtype=np.float64)
 
     sorted_indices = np.argsort(filtered_weights)[::-1]
@@ -245,7 +245,7 @@ def _plot_words(
 def aplot_wordcloud(
     pd_df: pd.DataFrame,
     text_column: str,
-    weight_column: Optional[str] = None,
+    weight_column: str,
     title: Optional[str] = None,
     style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
     max_words: int = MAX_RESULTS,

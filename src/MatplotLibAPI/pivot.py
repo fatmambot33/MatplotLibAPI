@@ -1,12 +1,16 @@
 """Pivot chart helpers for bar and line plots."""
 
-from typing import Optional, cast
+from typing import Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+
+from .utils import _wrap_aplot
 
 from .style_template import (
+    FIG_SIZE,
     PIVOTBARS_STYLE_TEMPLATE,
     PIVOTLINES_STYLE_TEMPLATE,
     StyleTemplate,
@@ -15,7 +19,7 @@ from .style_template import (
     validate_dataframe,
 )
 
-__all__ = ["PIVOTBARS_STYLE_TEMPLATE", "plot_pivoted_bars"]
+__all__ = ["PIVOTBARS_STYLE_TEMPLATE", "aplot_pivoted_bars"]
 
 
 def _pivot_and_sort_data(
@@ -59,7 +63,7 @@ def _pivot_and_sort_data(
     return pivot_df.reset_index()
 
 
-def plot_pivoted_bars(
+def aplot_pivoted_bars(
     data: pd.DataFrame,
     label: str,
     x: str,
@@ -71,6 +75,7 @@ def plot_pivoted_bars(
     ascending: bool = False,
     ax: Optional[Axes] = None,
     stacked: bool = False,
+    **kwargs,
 ) -> Axes:
     """Plot a bar chart from a pivot table.
 
@@ -137,3 +142,66 @@ def plot_pivoted_bars(
     )
     ax.tick_params(axis="x", rotation=90)
     return ax
+
+
+def fplot_pivoted_bars(
+    pd_df: pd.DataFrame,
+    label: str,
+    x: str,
+    y: str,
+    agg: str = "sum",
+    style: StyleTemplate = PIVOTBARS_STYLE_TEMPLATE,
+    title: Optional[str] = None,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    ax: Optional[Axes] = None,
+    stacked: bool = False,
+    figsize: Tuple[float, float] = FIG_SIZE,
+) -> Figure:
+    """Plot a bar chart from a pivot table.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The DataFrame containing the data to plot.
+    label : str
+        The column to pivot into series.
+    x : str
+        The column for the x-axis.
+    y : str
+        The column for the y-values.
+    agg : str, optional
+        The aggregation function for the pivot. The default is "sum".
+    style : StyleTemplate, optional
+        The style configuration. The default is `PIVOTBARS_STYLE_TEMPLATE`.
+    title : str, optional
+        The plot title.
+    sort_by : str, optional
+        The column to sort by.
+    ascending : bool, optional
+        The sort order. The default is `False`.
+    ax : Axes, optional
+        The axes to draw on.
+    stacked : bool, optional
+        Whether to stack the bars. The default is `False`.
+
+    Returns
+    -------
+    Figure
+        The matplotlib figure with the bar chart.
+    """
+    return _wrap_aplot(
+        aplot_pivoted_bars,
+        pd_df=pd_df,
+        label=label,
+        x=x,
+        y=y,
+        agg=agg,
+        style=style,
+        title=title,
+        sort_by=sort_by,
+        ascending=ascending,
+        ax=ax,
+        stacked=stacked,
+        figsize=figsize,
+    )

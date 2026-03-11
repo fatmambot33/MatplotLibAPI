@@ -8,6 +8,8 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from typing_extensions import Protocol
 
+from .style_template import StyleTemplate
+
 
 class _AplotFunc(Protocol):
     def __call__(self, *, pd_df: Any, ax: Axes, **kwargs: Any) -> Axes: ...
@@ -22,9 +24,8 @@ def _wrap_aplot(
     plot_func: _AplotFunc,
     pd_df: Any,
     figsize: Tuple[float, float],
+    style: StyleTemplate,
     ax_args: Optional[Dict[str, Any]] = None,
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
     **kwargs: Any,
 ) -> Figure:
     """Create a new figure and delegate plotting to an axis-level function.
@@ -56,6 +57,7 @@ def _wrap_aplot(
     """
     ax_args = ax_args or {}
     fig, axes_obj = plt.subplots(figsize=figsize, **ax_args)
+    fig.patch.set_facecolor(style.background_color)
     ax: Axes
     if isinstance(axes_obj, Axes):
         ax = axes_obj
@@ -63,6 +65,4 @@ def _wrap_aplot(
         ax = cast(Axes, axes_obj.flat[0] if isinstance(axes_obj, ndarray) else axes_obj)
     plot_func(pd_df=pd_df, ax=ax, **kwargs)
     fig_obj: Figure = cast(Figure, fig)
-    if save_path:
-        fig_obj.savefig(save_path, **(savefig_kwargs or {}))
     return fig_obj

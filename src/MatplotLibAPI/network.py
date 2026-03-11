@@ -492,6 +492,18 @@ class NetworkGraph:
         """
         self._nx_graph.add_node(node, **attributes)
 
+    def add_nodes_from(self, nodes: Iterable, **attributes: Any):
+        """Add multiple nodes with optional attributes.
+
+        Parameters
+        ----------
+        nodes : Iterable
+            Node identifiers to add.
+        **attributes : dict
+            Arbitrary node attributes as keyword arguments.
+        """
+        self._nx_graph.add_nodes_from(nodes, **attributes)
+
     def add_edge(self, source: Any, target: Any, **attributes: Any):
         """Add an edge with optional attributes.
 
@@ -505,6 +517,18 @@ class NetworkGraph:
             Arbitrary edge attributes as keyword arguments.
         """
         self._nx_graph.add_edge(source, target, **attributes)
+
+    def add_edges_from(self, edges: Iterable[Tuple[Any, Any]], **attributes: Any):
+        """Add multiple edges with optional attributes.
+
+        Parameters
+        ----------
+        edges : Iterable[tuple[Any, Any]]
+            Edge tuples defined by source and target node identifiers.
+        **attributes : dict
+            Arbitrary edge attributes as keyword arguments.
+        """
+        self._nx_graph.add_edges_from(edges, **attributes)
 
     def edge_subgraph(self, edges: Iterable) -> "NetworkGraph":
         """Return a subgraph containing only the specified edges.
@@ -1033,10 +1057,6 @@ class NetworkGraph:
                 attributes[node][edge_weight_col] += weight_value
                 attributes[node]["edges"] += 1
 
-        for node, attr in attributes.items():
-            attr["degree"] = len(list(self._nx_graph.edges(node)))
-            self._nx_graph.nodes[node].update(attr)
-
         self.set_node_attributes(attributes=attributes)
 
     def trim_edges(
@@ -1100,12 +1120,14 @@ class NetworkGraph:
         """
         validate_dataframe(edges_df, cols=[source, target, edge_weight_col])
         network_Z = NetworkGraph(nx.Graph())
-        for _, row in edges_df.iterrows():
-            network_Z.add_edge(
-                row[source], row[target], **{edge_weight_col: row[edge_weight_col]}
-            )
-        network_Z.calculate_nodes(edge_weight_col=edge_weight_col, k=k)
+        network_Z.add_edges_from(
+            edges_df[[source, target]].itertuples(index=False, name=None),
+            **{edge_weight_col: edges_df[edge_weight_col]},
+        )
+        network_Z.add_nodes_from(set(edges_df[source]).union(set(edges_df[target])))
 
+        network_Z.calculate_nodes(edge_weight_col=edge_weight_col, k=k)
+        network_Z.sanitize_network()
         return network_Z
 
     def sanitize_network(

@@ -28,7 +28,27 @@ def aplot_histogram_kde(
     ax: Optional[Axes] = None,
     **kwargs: Any,
 ) -> Axes:
-    """Plot a histogram with an optional kernel density estimate."""
+    """Plot a histogram with an optional kernel density estimate.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        The input DataFrame containing the data to plot.
+    column : str
+        The name of the column to plot.
+    bins : int, optional
+        The number of bins for the histogram, by default 20.
+    kde : bool, optional
+        Whether to include a kernel density estimate, by default True.
+    title : Optional[str], optional
+        The title of the plot, by default None.
+    style : StyleTemplate, optional
+        The style template to use for the plot, by default DISTRIBUTION_STYLE_TEMPLATE.
+    ax : Optional[Axes], optional
+        An optional matplotlib Axes to plot on. If None, a new figure and axes will be created, by default None.
+    **kwargs : Any
+        Additional keyword arguments to pass to seaborn.histplot.
+    """
     validate_dataframe(pd_df, cols=[column])
     plot_ax = _get_axis(ax)
 
@@ -57,10 +77,26 @@ def fplot_histogram_kde(
     title: Optional[str] = None,
     style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (10, 6),
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
-    """Plot a histogram with optional KDE on a new figure."""
+    """Plot a histogram with optional KDE on a new figure.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        The input DataFrame containing the data to plot.
+    column : str
+        The name of the column to plot.
+    bins : int, optional
+        The number of bins for the histogram, by default 20.
+    kde : bool, optional
+        Whether to include a kernel density estimate, by default True.
+    title : Optional[str], optional
+        The title of the plot, by default None.
+    style : StyleTemplate, optional
+        The style template to use for the plot, by default DISTRIBUTION_STYLE_TEMPLATE.
+    figsize : Tuple[float, float], optional
+        The size of the figure, by default (10, 6).
+    """
     return _wrap_aplot(
         aplot_histogram_kde,
         pd_df=pd_df,
@@ -70,6 +106,4 @@ def fplot_histogram_kde(
         kde=kde,
         title=title,
         style=style,
-        save_path=save_path,
-        savefig_kwargs=savefig_kwargs,
     )

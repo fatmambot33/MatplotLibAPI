@@ -13,6 +13,8 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.ticker import NullLocator
 
+from .utils import _wrap_aplot
+
 from .style_template import (
     BUBBLE_STYLE_TEMPLATE,
     FIG_SIZE,
@@ -307,6 +309,7 @@ def aplot_bubble(
     hline: bool = False,
     vline: bool = False,
     ax: Optional[Axes] = None,
+    **kwargs: Any,
 ) -> Axes:
     """Plot a bubble chart onto the given axes.
 
@@ -466,7 +469,24 @@ def fplot_bubble(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='life_expectancy', z='population')
     """
-    fig = cast(Figure, plt.figure(figsize=figsize))
+    fig = _wrap_aplot(
+        aplot_bubble,
+        pd_df=pd_df,
+        figsize=figsize,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        title=title,
+        style=style,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+        sort_by=sort_by,
+        ascending=ascending,
+        hline=hline,
+        vline=vline,
+        ax=None,  # ax will be created inside aplot_bubble
+    )
     fig.patch.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     aplot_bubble(

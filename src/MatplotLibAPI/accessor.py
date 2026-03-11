@@ -1244,7 +1244,7 @@ class DataFrameAccessor:
     def aplot_wordcloud(
         self,
         text_column: str,
-        weight_column: Optional[str] = None,
+        weight_column: str,
         title: Optional[str] = None,
         style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
         max_words: int = 50,
@@ -1293,7 +1293,7 @@ class DataFrameAccessor:
     def fplot_wordcloud(
         self,
         text_column: str,
-        weight_column: Optional[str] = None,
+        weight_column: str,
         title: Optional[str] = None,
         style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
         max_words: int = 50,
