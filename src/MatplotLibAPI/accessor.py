@@ -9,10 +9,11 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from pandas.api.extensions import register_dataframe_accessor
 
+from .base_plot import BasePlot
 from .area import aplot_area, fplot_area
 from .bar import aplot_bar, fplot_bar
 from .box_violin import aplot_box_violin, fplot_box_violin
-from .bubble import BUBBLE_STYLE_TEMPLATE, aplot_bubble, fplot_bubble
+from .bubble import BUBBLE_STYLE_TEMPLATE, Bubble
 from .composite import plot_composite_bubble, plot_composite_treemap
 from .heatmap import (
     HEATMAP_STYLE_TEMPLATE,
@@ -55,6 +56,10 @@ from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordclo
 @register_dataframe_accessor("mpl")
 class DataFrameAccessor:
     """Expose MatplotLibAPI plotting helpers as a pandas accessor.
+
+    All plot methods follow the BasePlot interface pattern, providing both
+    aplot_* (plot on existing axes) and fplot_* (plot on new figure) variants
+    for consistency and ease of use.
 
     Methods
     -------
@@ -186,18 +191,19 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
-        return aplot_bubble(
+        return Bubble(
             pd_df=self._obj,
             label=label,
             x=x,
             y=y,
             z=z,
-            title=title,
-            style=style,
             max_values=max_values,
             center_to_mean=center_to_mean,
             sort_by=sort_by,
             ascending=ascending,
+        ).aplot(
+            title=title,
+            style=style,
             hline=hline,
             vline=vline,
             ax=ax,
@@ -255,8 +261,17 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the plot.
         """
-        return fplot_bubble(
+        return Bubble(
             pd_df=self._obj,
+            label=label,
+            x=x,
+            y=y,
+            z=z,
+            sort_by=sort_by,
+            ascending=ascending,
+            max_values=max_values,
+            center_to_mean=center_to_mean,
+        ).fplot(
             label=label,
             x=x,
             y=y,

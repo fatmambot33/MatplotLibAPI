@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
-from .bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, aplot_bubble
+from .bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, Bubble
 from .network import aplot_network
 from .style_template import (
     MAX_RESULTS,
@@ -83,7 +83,7 @@ def plot_composite_bubble(
     fig.patch.set_facecolor(style.background_color)
     grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
-    ax = aplot_bubble(
+    ax = Bubble.aplot(
         pd_df=pd_df,
         label=label,
         x=x,

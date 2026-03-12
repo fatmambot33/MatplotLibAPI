@@ -1,6 +1,6 @@
 """Smoke tests for the MatplotLibAPI package."""
 
-from MatplotLibAPI.bubble import aplot_bubble
+from MatplotLibAPI.bubble import Bubble
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -9,11 +9,11 @@ import pandas as pd
 
 def test_import():
     """Test that the package can be imported."""
-    assert aplot_bubble is not None
+    assert Bubble is not None
 
 
 def test_aplot_bubble_returns_axes():
-    """Test that aplot_bubble returns a Matplotlib Axes object."""
+    """Test that Bubble.aplot returns a Matplotlib Axes object."""
     # Create a sample DataFrame
     data = {
         "country": ["A", "B", "C", "D"],
@@ -24,7 +24,7 @@ def test_aplot_bubble_returns_axes():
     df = pd.DataFrame(data)
 
     # Call the plotting function
-    ax = aplot_bubble(
+    ax = Bubble.aplot(
         pd_df=df,
         label="country",
         x="gdp_per_capita",

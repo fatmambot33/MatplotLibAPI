@@ -19,7 +19,6 @@ from .style_template import (
     validate_dataframe,
 )
 
-
 __all__ = ["TABLE_STYLE_TEMPLATE", "aplot_table", "fplot_table"]
 
 

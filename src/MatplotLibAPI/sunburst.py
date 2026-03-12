@@ -11,7 +11,6 @@ from .style_template import (
     validate_dataframe,
 )
 
-
 __all__ = ["TREEMAP_STYLE_TEMPLATE", "fplot_sunburst"]
 
 

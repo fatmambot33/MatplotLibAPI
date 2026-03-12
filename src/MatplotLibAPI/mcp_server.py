@@ -10,10 +10,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.figure import Figure
 
+from .style_template import BUBBLE_STYLE_TEMPLATE, StyleTemplate
+
 from .area import fplot_area
 from .bar import fplot_bar
 from .box_violin import fplot_box_violin
-from .bubble import aplot_bubble
+from .bubble import Bubble
 from .heatmap import fplot_correlation_matrix, fplot_heatmap
 from .histogram import fplot_histogram_kde
 from .network import fplot_network
@@ -133,26 +135,17 @@ def _build_bubble_chart_figure(
     center_to_mean: bool = False,
     sort_by: Optional[str] = None,
     ascending: bool = False,
+    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
     hline: bool = False,
     vline: bool = False,
 ) -> Figure:
     """Create a bubble chart figure from tabular input."""
     pd_df = _load_dataframe(csv_path=csv_path, table=table)
-    fig, ax = plt.subplots()
-    aplot_bubble(
-        pd_df=pd_df,
-        label=label,
-        x=x,
-        y=y,
-        z=z,
+    fig = Bubble(pd_df=pd_df, label=label, x=x, y=y, z=z, max_values=max_values, center_to_mean=center_to_mean, sort_by=sort_by, ascending=ascending).fplot(
         title=title,
-        max_values=max_values,
-        center_to_mean=center_to_mean,
-        sort_by=sort_by,
-        ascending=ascending,
         hline=hline,
         vline=vline,
-        ax=ax,
+        style=style,
     )
     return fig
 

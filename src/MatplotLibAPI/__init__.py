@@ -1,5 +1,6 @@
 """Public API and pandas accessor for MatplotLibAPI."""
 
-from .accessor import DataFrameAccessor
+from .base_plot import BasePlot
+from .bubble import Bubble
 
-__all__ = ["DataFrameAccessor"]
+__all__ = ["BasePlot", "Bubble"]

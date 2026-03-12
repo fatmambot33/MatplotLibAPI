@@ -11,7 +11,7 @@ import pytest
 # Ensure the src directory is on the Python path for src layout
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from examples import generate_sample_data
+from examples import sample_data
 
 
 @pytest.fixture(scope="session")
@@ -21,7 +21,7 @@ def sample_data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     cwd = os.getcwd()
     os.chdir(base_dir)
     try:
-        generate_sample_data.main()
+        sample_data.main()
     finally:
         os.chdir(cwd)
 

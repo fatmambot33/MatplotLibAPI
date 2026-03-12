@@ -8,6 +8,7 @@ import sys
 import os
 from pathlib import Path
 import pandas as pd
+from sample_data import main as generate_sample_data
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
