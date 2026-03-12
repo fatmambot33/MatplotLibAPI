@@ -29,6 +29,26 @@ def test_render_bubble_chart_from_csv(load_sample_df, tmp_path: Path):
     assert Path(result).suffix == ".png"
 
 
+def test_render_bubble_chart_accepts_table_input(load_sample_df, tmp_path: Path):
+    """Render a bubble chart image to disk using table records."""
+    df = load_sample_df("bubble.csv")
+    df["score"] = df["population"] / 10
+    out_path = tmp_path / "charts" / "bubble-table.png"
+
+    result = render_bubble_chart(
+        table=df.to_dict(orient="records"),
+        output_path=str(out_path),
+        label="country",
+        x="gdp_per_capita",
+        y="population",
+        z="score",
+        title="Bubble via MCP",
+    )
+
+    assert Path(result).exists()
+    assert Path(result).suffix == ".png"
+
+
 def test_render_bubble_chart_octet_returns_png_payload(load_sample_df, tmp_path: Path):
     """Return PNG bytes for MCP octet-stream responses using CSV input."""
     df = load_sample_df("bubble.csv")

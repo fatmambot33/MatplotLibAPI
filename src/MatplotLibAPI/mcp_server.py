@@ -122,6 +122,80 @@ def _build_bubble_chart_figure(
     return fig
 
 
+def _render_bubble_chart_octet_from_source(
+    label: str,
+    x: str,
+    y: str,
+    z: str,
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+    title: Optional[str] = None,
+    max_values: int = 50,
+    center_to_mean: bool = False,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    hline: bool = False,
+    vline: bool = False,
+) -> bytes:
+    """Render a bubble chart from tabular input and return PNG octets.
+
+    Parameters
+    ----------
+    label : str
+        Column name used for bubble labels.
+    x : str
+        Column name for the x-axis values.
+    y : str
+        Column name for the y-axis values.
+    z : str
+        Column name used for bubble size.
+    csv_path : str, optional
+        Path to a CSV file containing plotting data. The default is None.
+    table : list[dict[str, Any]], optional
+        In-memory row records with column names as keys. The default is None.
+    title : str, optional
+        Chart title. The default is None.
+    max_values : int, optional
+        Maximum number of rows to include in the plot. The default is 50.
+    center_to_mean : bool, optional
+        Whether to center x-axis values around their mean. The default is False.
+    sort_by : str, optional
+        Column used to sort before selecting rows. The default is None.
+    ascending : bool, optional
+        Sort order used with ``sort_by``. The default is False.
+    hline : bool, optional
+        Whether to draw a horizontal mean line for y values. The default is False.
+    vline : bool, optional
+        Whether to draw a vertical mean line for x values. The default is False.
+
+    Returns
+    -------
+    bytes
+        PNG payload bytes suitable for ``application/octet-stream`` responses.
+    """
+    fig = _build_bubble_chart_figure(
+        csv_path=csv_path,
+        table=table,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        title=title,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+        sort_by=sort_by,
+        ascending=ascending,
+        hline=hline,
+        vline=vline,
+    )
+    with NamedTemporaryFile(suffix=".png") as tmp_file:
+        fig.savefig(tmp_file.name, format="png", dpi=300, bbox_inches="tight")
+        tmp_file.seek(0)
+        payload = tmp_file.read()
+    plt.close(fig)
+    return payload
+
+
 def render_bubble_chart(
     output_path: str,
     label: str,
@@ -181,7 +255,7 @@ def render_bubble_chart(
         out_path = out_path.with_suffix(".png")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    fig = _build_bubble_chart_figure(
+    payload = _render_bubble_chart_octet_from_source(
         csv_path=csv_path,
         table=table,
         label=label,
@@ -196,8 +270,7 @@ def render_bubble_chart(
         hline=hline,
         vline=vline,
     )
-    fig.savefig(out_path, format="png", dpi=300, bbox_inches="tight")
-    plt.close(fig)
+    out_path.write_bytes(payload)
     return str(out_path)
 
 
@@ -252,7 +325,7 @@ def render_bubble_chart_octet(
     bytes
         PNG payload bytes suitable for ``application/octet-stream`` responses.
     """
-    fig = _build_bubble_chart_figure(
+    return _render_bubble_chart_octet_from_source(
         csv_path=csv_path,
         table=table,
         label=label,
@@ -267,12 +340,6 @@ def render_bubble_chart_octet(
         hline=hline,
         vline=vline,
     )
-    with NamedTemporaryFile(suffix=".png") as tmp_file:
-        fig.savefig(tmp_file.name, format="png", dpi=300, bbox_inches="tight")
-        tmp_file.seek(0)
-        payload = tmp_file.read()
-    plt.close(fig)
-    return payload
 
 
 def create_bubble_mcp_server() -> Any:
@@ -349,7 +416,78 @@ def create_bubble_mcp_server() -> Any:
         bytes
             PNG octet payload of the rendered bubble chart.
         """
-        return render_bubble_chart_octet(
+        return _render_bubble_chart_octet_from_source(
+            csv_path=csv_path,
+            table=table,
+            label=label,
+            x=x,
+            y=y,
+            z=z,
+            title=title,
+            max_values=max_values,
+            center_to_mean=center_to_mean,
+            sort_by=sort_by,
+            ascending=ascending,
+            hline=hline,
+            vline=vline,
+        )
+
+    @mcp.tool()
+    def plot_bubble_from_csv(
+        label: str,
+        x: str,
+        y: str,
+        z: str,
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+        title: Optional[str] = None,
+        max_values: int = 50,
+        center_to_mean: bool = False,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        hline: bool = False,
+        vline: bool = False,
+    ) -> bytes:
+        """Generate a bubble chart image and return octets.
+
+        This compatibility entry point supports either ``csv_path`` or ``table``
+        inputs and mirrors ``plot_bubble`` behavior.
+
+        Parameters
+        ----------
+        label : str
+            Column name used for bubble labels.
+        x : str
+            Column name for x-axis values.
+        y : str
+            Column name for y-axis values.
+        z : str
+            Column name used for bubble size.
+        csv_path : str, optional
+            Path to a CSV file containing plotting data. The default is None.
+        table : list[dict[str, Any]], optional
+            In-memory row records with column names as keys. The default is None.
+        title : str, optional
+            Chart title. The default is None.
+        max_values : int, optional
+            Maximum number of points to include. The default is 50.
+        center_to_mean : bool, optional
+            Whether to center x-axis values around their mean. The default is False.
+        sort_by : str, optional
+            Column used to sort before plotting. The default is None.
+        ascending : bool, optional
+            Sort order used with ``sort_by``. The default is False.
+        hline : bool, optional
+            Whether to draw a horizontal mean line. The default is False.
+        vline : bool, optional
+            Whether to draw a vertical mean line. The default is False.
+
+        Returns
+        -------
+        bytes
+            PNG octet payload of the rendered bubble chart.
+        """
+        return _render_bubble_chart_octet_from_source(
             csv_path=csv_path,
             table=table,
             label=label,
