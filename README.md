@@ -40,9 +40,9 @@ plt.show()
 ```
 
 
-## MCP Integration (Bubble Chart)
+## MCP Integration
 
-You can run a dedicated MCP server that exposes bubble chart generation as a tool for LLM agents.
+You can run a dedicated MCP server that exposes MatplotLibAPI plotting tools for LLM agents.
 
 1. Install MCP dependencies:
 
@@ -56,7 +56,57 @@ pip install -e .[mcp]
 matplotlibapi-mcp-bubble
 ```
 
-The server provides a `plot_bubble_from_csv` tool that accepts a CSV path, bubble field mapping, and an output image path.
+### Tool surface
+
+The MCP server provides these tools:
+
+- `plot_bubble`: dedicated bubble-chart rendering.
+- `plot_network`: dedicated network-chart rendering.
+- `plot_module`: generic module renderer for `bar`, `histogram`, `box_violin`, `heatmap`, `correlation_matrix`, `area`, `pie`, `waffle`, `sankey`, `table`, `timeserie`, `wordcloud`, `treemap`, and `sunburst`.
+- Explicit module endpoints such as `plot_bar`, `plot_heatmap`, `plot_sankey`, `plot_treemap`, and others for direct LLM tool selection with no module-dispatch step.
+- `describe_plot_modules`: discoverability endpoint that returns supported modules, shared input contract, parameter hints, and dedicated-tool mapping.
+
+All rendering tools accept either:
+
+- `csv_path`: filesystem path to a CSV file, or
+- `table`: in-memory records (`list[dict]`).
+
+All rendering tools return PNG bytes (octet payload) for downstream transport.
+
+For LLM orchestration, explicit endpoints are generally easier to select and ground (for example `plot_heatmap` rather than `plot_module` + `plot_module="heatmap"`). Keep `plot_module` for dynamic clients that need one generic surface.
+
+### Discoverability-first workflow
+
+For dynamic clients and agent exploration, use this sequence:
+
+1. Call `describe_plot_modules`.
+2. Select a module from `supported_plot_modules`.
+3. Read recommended keys from `parameter_hints[module_name]`.
+4. Call `plot_module` with `params` + `csv_path` or `table`.
+
+If a module key is invalid, `plot_module` returns a clear error with supported values.
+
+### Example generic call
+
+Example payload for `plot_module` with in-memory table records:
+
+```json
+{
+  "plot_module": "heatmap",
+  "table": [
+    {"month": "Jan", "channel": "Email", "engagements": 120},
+    {"month": "Jan", "channel": "Social", "engagements": 200}
+  ],
+  "params": {
+    "x": "month",
+    "y": "channel",
+    "value": "engagements",
+    "title": "Engagement Heatmap"
+  }
+}
+```
+
+Dedicated MCP entry points are also available per module, for example `matplotlibapi-mcp-bubble`, `matplotlibapi-mcp-network`, `matplotlibapi-mcp-bar`, and `matplotlibapi-mcp-heatmap`.
 
 ## Plot Types
 
