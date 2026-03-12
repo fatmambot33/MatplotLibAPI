@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from MatplotLibAPI.mcp_server import (
+    get_plot_module_metadata,
     render_bubble_chart,
     render_bubble_chart_octet,
     render_network_chart_octet,
@@ -167,3 +168,16 @@ def test_render_plot_module_octet_heatmap(load_sample_df):
     )
 
     assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_get_plot_module_metadata_is_discoverable():
+    """Expose discoverability metadata for MCP module exploration."""
+    metadata = get_plot_module_metadata()
+
+    assert "supported_plot_modules" in metadata
+    assert "shared_input_contract" in metadata
+    assert "parameter_hints" in metadata
+    assert "plot_module" not in metadata["supported_plot_modules"]
+    assert "bubble" in metadata["supported_plot_modules"]
+    assert "network" in metadata["supported_plot_modules"]
+    assert metadata["shared_input_contract"]["return"].startswith("PNG bytes")

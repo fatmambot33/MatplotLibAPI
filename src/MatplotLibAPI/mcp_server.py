@@ -29,6 +29,74 @@ from .word_cloud import fplot_wordcloud
 TableRecords = list[dict[str, Any]]
 Renderer = Callable[..., Any]
 
+SHARED_INPUT_CONTRACT: dict[str, str] = {
+    "csv_path": "Path to a CSV file with source data.",
+    "table": "In-memory table as list[dict[str, Any]] records.",
+    "return": "PNG bytes suitable for application/octet-stream.",
+}
+
+PLOT_MODULE_PARAMETER_HINTS: dict[str, dict[str, str]] = {
+    "bubble": {
+        "label": "Bubble label column name.",
+        "x": "X-axis column name.",
+        "y": "Y-axis column name.",
+        "z": "Bubble size column name.",
+    },
+    "network": {
+        "edge_source_col": "Source-node column name (default: source).",
+        "edge_target_col": "Target-node column name (default: target).",
+        "edge_weight_col": "Edge-weight column name (default: weight).",
+    },
+    "bar": {
+        "category": "Category column name.",
+        "value": "Numeric value column name.",
+    },
+    "histogram": {"value": "Numeric value column name."},
+    "box_violin": {"y": "Numeric value column name."},
+    "heatmap": {
+        "x": "X-axis category column name.",
+        "y": "Y-axis category column name.",
+        "value": "Cell value column name.",
+    },
+    "correlation_matrix": {
+        "features": "List of numeric columns used in correlation matrix.",
+    },
+    "area": {
+        "x": "X-axis column name.",
+        "y": "List of stacked y-axis columns.",
+    },
+    "pie": {
+        "label": "Category label column name.",
+        "value": "Numeric value column name.",
+    },
+    "waffle": {
+        "label": "Category label column name.",
+        "value": "Numeric value column name.",
+    },
+    "sankey": {
+        "source": "Source-node column name.",
+        "target": "Target-node column name.",
+        "value": "Flow/weight column name.",
+    },
+    "table": {},
+    "timeserie": {
+        "x": "Datetime or ordered x-axis column name.",
+        "y": "List of y-axis series columns.",
+    },
+    "wordcloud": {
+        "text_column": "Text/token column name.",
+        "weight_column": "Weight/frequency column name (optional).",
+    },
+    "treemap": {
+        "path": "Hierarchy column names in order.",
+        "values": "Numeric value column name.",
+    },
+    "sunburst": {
+        "path": "Hierarchy column names in order.",
+        "values": "Numeric value column name.",
+    },
+}
+
 
 def _load_dataframe(
     csv_path: Optional[str] = None,
@@ -322,6 +390,22 @@ _SUPPORTED_PLOT_MODULES = sorted(
 )
 
 
+def get_plot_module_metadata() -> dict[str, Any]:
+    """Return MCP metadata for module discoverability and exploration.
+
+    Returns
+    -------
+    dict[str, Any]
+        Discoverability metadata containing supported modules, shared input
+        contract, and parameter hints per module.
+    """
+    return {
+        "supported_plot_modules": _SUPPORTED_PLOT_MODULES,
+        "shared_input_contract": SHARED_INPUT_CONTRACT,
+        "parameter_hints": PLOT_MODULE_PARAMETER_HINTS,
+    }
+
+
 def render_plot_module_octet(
     plot_module: str,
     params: dict[str, Any],
@@ -459,6 +543,18 @@ def create_bubble_mcp_server() -> Any:
             csv_path=csv_path,
             table=table,
         )
+
+    @mcp.tool()
+    def describe_plot_modules() -> dict[str, Any]:
+        """Describe MCP plot-module capabilities for tool exploration.
+
+        Returns
+        -------
+        dict[str, Any]
+            Metadata including supported module names, shared input contract,
+            and parameter-hint dictionaries.
+        """
+        return get_plot_module_metadata()
 
     return mcp
 
