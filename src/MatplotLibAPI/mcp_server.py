@@ -390,6 +390,26 @@ _SUPPORTED_PLOT_MODULES = sorted(
 )
 
 
+_DEDICATED_PLOT_TOOLS = {
+    "plot_bubble": "bubble",
+    "plot_network": "network",
+    "plot_bar": "bar",
+    "plot_histogram": "histogram",
+    "plot_box_violin": "box_violin",
+    "plot_heatmap": "heatmap",
+    "plot_correlation_matrix": "correlation_matrix",
+    "plot_area": "area",
+    "plot_pie": "pie",
+    "plot_waffle": "waffle",
+    "plot_sankey": "sankey",
+    "plot_table": "table",
+    "plot_timeserie": "timeserie",
+    "plot_wordcloud": "wordcloud",
+    "plot_treemap": "treemap",
+    "plot_sunburst": "sunburst",
+}
+
+
 def get_plot_module_metadata() -> dict[str, Any]:
     """Return MCP metadata for module discoverability and exploration.
 
@@ -403,6 +423,7 @@ def get_plot_module_metadata() -> dict[str, Any]:
         "supported_plot_modules": _SUPPORTED_PLOT_MODULES,
         "shared_input_contract": SHARED_INPUT_CONTRACT,
         "parameter_hints": PLOT_MODULE_PARAMETER_HINTS,
+        "dedicated_tools": _DEDICATED_PLOT_TOOLS,
     }
 
 
@@ -543,6 +564,156 @@ def create_bubble_mcp_server() -> Any:
             csv_path=csv_path,
             table=table,
         )
+
+    def _render_module(
+        module_name: str,
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Render a module-specific chart as PNG octets."""
+        return render_plot_module_octet(
+            plot_module=module_name,
+            params=params,
+            csv_path=csv_path,
+            table=table,
+        )
+
+    @mcp.tool()
+    def plot_bar(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a bar chart and return PNG octets."""
+        return _render_module("bar", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_histogram(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a histogram chart and return PNG octets."""
+        return _render_module(
+            "histogram", params=params, csv_path=csv_path, table=table
+        )
+
+    @mcp.tool()
+    def plot_box_violin(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a box/violin chart and return PNG octets."""
+        return _render_module(
+            "box_violin", params=params, csv_path=csv_path, table=table
+        )
+
+    @mcp.tool()
+    def plot_heatmap(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a heatmap chart and return PNG octets."""
+        return _render_module("heatmap", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_correlation_matrix(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a correlation matrix chart and return PNG octets."""
+        return _render_module(
+            "correlation_matrix", params=params, csv_path=csv_path, table=table
+        )
+
+    @mcp.tool()
+    def plot_area(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate an area chart and return PNG octets."""
+        return _render_module("area", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_pie(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a pie chart and return PNG octets."""
+        return _render_module("pie", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_waffle(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a waffle chart and return PNG octets."""
+        return _render_module("waffle", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_sankey(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a sankey chart and return PNG octets."""
+        return _render_module("sankey", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_table(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a table chart and return PNG octets."""
+        return _render_module("table", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_timeserie(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a timeserie chart and return PNG octets."""
+        return _render_module(
+            "timeserie", params=params, csv_path=csv_path, table=table
+        )
+
+    @mcp.tool()
+    def plot_wordcloud(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a wordcloud chart and return PNG octets."""
+        return _render_module(
+            "wordcloud", params=params, csv_path=csv_path, table=table
+        )
+
+    @mcp.tool()
+    def plot_treemap(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a treemap chart and return PNG octets."""
+        return _render_module("treemap", params=params, csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def plot_sunburst(
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a sunburst chart and return PNG octets."""
+        return _render_module("sunburst", params=params, csv_path=csv_path, table=table)
 
     @mcp.tool()
     def describe_plot_modules() -> dict[str, Any]:

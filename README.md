@@ -63,7 +63,8 @@ The MCP server provides these tools:
 - `plot_bubble`: dedicated bubble-chart rendering.
 - `plot_network`: dedicated network-chart rendering.
 - `plot_module`: generic module renderer for `bar`, `histogram`, `box_violin`, `heatmap`, `correlation_matrix`, `area`, `pie`, `waffle`, `sankey`, `table`, `timeserie`, `wordcloud`, `treemap`, and `sunburst`.
-- `describe_plot_modules`: discoverability endpoint that returns supported modules, shared input contract, and parameter hints.
+- Explicit module endpoints such as `plot_bar`, `plot_heatmap`, `plot_sankey`, `plot_treemap`, and others for direct LLM tool selection with no module-dispatch step.
+- `describe_plot_modules`: discoverability endpoint that returns supported modules, shared input contract, parameter hints, and dedicated-tool mapping.
 
 All rendering tools accept either:
 
@@ -71,6 +72,8 @@ All rendering tools accept either:
 - `table`: in-memory records (`list[dict]`).
 
 All rendering tools return PNG bytes (octet payload) for downstream transport.
+
+For LLM orchestration, explicit endpoints are generally easier to select and ground (for example `plot_heatmap` rather than `plot_module` + `plot_module="heatmap"`). Keep `plot_module` for dynamic clients that need one generic surface.
 
 ### Discoverability-first workflow
 

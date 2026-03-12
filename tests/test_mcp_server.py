@@ -177,7 +177,10 @@ def test_get_plot_module_metadata_is_discoverable():
     assert "supported_plot_modules" in metadata
     assert "shared_input_contract" in metadata
     assert "parameter_hints" in metadata
+    assert "dedicated_tools" in metadata
     assert "plot_module" not in metadata["supported_plot_modules"]
     assert "bubble" in metadata["supported_plot_modules"]
     assert "network" in metadata["supported_plot_modules"]
     assert metadata["shared_input_contract"]["return"].startswith("PNG bytes")
+    assert metadata["dedicated_tools"]["plot_heatmap"] == "heatmap"
+    assert metadata["dedicated_tools"]["plot_wordcloud"] == "wordcloud"
