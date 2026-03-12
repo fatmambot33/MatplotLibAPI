@@ -252,7 +252,6 @@ def fplot_wordcloud_network(
     Figure
         Matplotlib figure containing the word cloud on top and network below.
     """
-
     fig_raw, axes_raw = plt.subplots(
         2,
         1,

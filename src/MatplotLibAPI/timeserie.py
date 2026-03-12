@@ -278,9 +278,8 @@ def fplot_timeserie(
     std: bool = False,
     figsize: Tuple[float, float] = FIG_SIZE,
 ) -> Figure:
-    """Internal function to plot a time series on a new figure.
-        This function is intended for internal use and should not be called directly.
-        Use `fplot_timeserie` instead.
+    """Return a new figure containing a time series plot.
+
     Parameters
     ----------
     pd_df : pd.DataFrame
@@ -292,38 +291,41 @@ def fplot_timeserie(
     y : str
         Column for the y-axis values.
     title : str, optional
-        Plot title.
+        Plot title. The default is None.
     style : StyleTemplate, optional
-        Style configuration. The default is `TIMESERIE_STYLE_TEMPLATE`.
+        Style configuration. The default is ``TIMESERIE_STYLE_TEMPLATE``.
     max_values : int, optional
         Maximum number of rows to plot. The default is 100.
     sort_by : str, optional
-        Column used to sort the data.
+        Column used to sort the data. The default is None.
     ascending : bool, optional
-        Sort order for the data. The default is `False`.
+        Sort order for the data. The default is False.
     std : bool, optional
-        Whether to plot rolling standard deviation. The default is `False`.
+        Whether to plot rolling standard deviation. The default is False.
     figsize : tuple[float, float], optional
-        Size of the created figure. The default is FIG_SIZE.
+        Size of the created figure. The default is ``FIG_SIZE``.
+
     Returns
     -------
     Figure
         Matplotlib figure containing the time series plot.
+
     Raises
     ------
     AttributeError
         If required columns are not in the DataFrame.
+
     Examples
     --------
     >>> import pandas as pd
-    >>> from MatplotLibAPI.Timeserie import _fplot_timeserie
+    >>> from MatplotLibAPI.Timeserie import fplot_timeserie
     >>> data = {
-    ...     'date': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-01', '2023-01-02']),
-    ...     'category': ['A', 'A', 'B', 'B'],
-    ...     'value': [10, 12, 15, 13]
+    ...     "date": pd.to_datetime(["2023-01-01", "2023-01-02", "2023-01-01", "2023-01-02"]),
+    ...     "category": ["A", "A", "B", "B"],
+    ...     "value": [10, 12, 15, 13],
     ... }
     >>> df = pd.DataFrame(data)
-    >>> fig = _fplot_timeserie(df, label='category', x='date', y='value')
+    >>> fig = fplot_timeserie(df, label="category", x="date", y="value")
     """
     return _wrap_aplot(
         aplot_timeserie,

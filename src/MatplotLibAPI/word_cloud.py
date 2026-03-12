@@ -215,8 +215,10 @@ def _plot_words(
     height, width = resolved_mask.shape
 
     frequency_map: Dict[str, float] = {
-        string_formatter(word): weight for word, weight in zip(words, weights)
+        string_formatter(word): float(weight) for word, weight in zip(words, weights)
     }
+    if frequency_map and max(frequency_map.values()) <= 0:
+        frequency_map = {word: 1.0 for word in frequency_map}
 
     max_font_size = int(style.font_mapping[max(style.font_mapping.keys())] * 20)
 
@@ -330,6 +332,36 @@ def fplot_wordcloud(
     figsize: Tuple[float, float] = FIG_SIZE,
     mask: Optional[np.ndarray] = None,
 ) -> Figure:
+    """Return a new figure containing a word cloud.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        DataFrame containing text and optional weight columns.
+    text_column : str
+        Column containing text terms.
+    weight_column : str, optional
+        Column containing numeric weights. The default is None.
+    title : str, optional
+        Plot title. The default is None.
+    style : StyleTemplate, optional
+        Style configuration. The default is ``WORDCLOUD_STYLE_TEMPLATE``.
+    max_words : int, optional
+        Maximum number of words to include. The default is ``MAX_RESULTS``.
+    stopwords : Iterable[str], optional
+        Words to exclude from the cloud. The default is None.
+    random_state : int, optional
+        Random seed used by word cloud layout. The default is None.
+    figsize : tuple[float, float], optional
+        Size of the created figure. The default is ``FIG_SIZE``.
+    mask : np.ndarray, optional
+        Optional 2D mask limiting word cloud shape. The default is None.
+
+    Returns
+    -------
+    Figure
+        Matplotlib figure containing the word cloud.
+    """
     return _wrap_aplot(
         aplot_wordcloud,
         pd_df=pd_df,

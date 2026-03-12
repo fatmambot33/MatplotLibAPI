@@ -69,7 +69,6 @@ def fplot_sankey(
     style: StyleTemplate = SANKEY_STYLE_TEMPLATE,
 ) -> go.Figure:
     """Plot a Sankey diagram showing flows between categories."""
-
     sankey_data = SankeyData.from_pandas_edgelist(pd_df, source, target, value)
 
     sankey = go.Sankey(

@@ -51,7 +51,6 @@ def aplot_heatmap(
     **kwargs: Any,
 ) -> Axes:
     """Plot a matrix heatmap for multivariate pattern detection."""
-
     plot_ax = _get_axis(ax)
     pivot_df = _prepare_treemap_data(pd_df, x, y, value)
     sns.heatmap(pivot_df, cmap=style.palette, ax=plot_ax)

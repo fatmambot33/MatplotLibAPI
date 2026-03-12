@@ -1120,11 +1120,10 @@ class NetworkGraph:
         """
         validate_dataframe(edges_df, cols=[source, target, edge_weight_col])
         network_Z = NetworkGraph(nx.Graph())
-        network_Z.add_edges_from(
-            edges_df[[source, target]].itertuples(index=False, name=None),
-            **{edge_weight_col: edges_df[edge_weight_col]},
-        )
-        network_Z.add_nodes_from(set(edges_df[source]).union(set(edges_df[target])))
+        for src, dst, weight in edges_df[[source, target, edge_weight_col]].itertuples(
+            index=False, name=None
+        ):
+            network_Z.add_edge(src, dst, **{edge_weight_col: weight})
 
         network_Z.calculate_nodes(edge_weight_col=edge_weight_col, k=k)
         network_Z.sanitize_network()
@@ -1133,16 +1132,20 @@ class NetworkGraph:
     def sanitize_network(
         self,
     ):
-        """Remove nodes without edges and edges without nodes to ensure consistency."""
-        if len(self.node_view) == 0 or len(self.edge_view) == 0:
+        """Remove inconsistent nodes and edges to ensure graph consistency."""
+        if len(self.node_view) == 0:
             return
-        nodes = set(node for node, data in self.node_view(data=True))
-        edges = set((u, v) for u, v in self.edge_view())
-        for node in nodes:
-            if node not in edges:
+
+        nodes = set(self.node_view)
+        edges = list(self.edge_view())
+        nodes_in_edges = {endpoint for edge in edges for endpoint in edge}
+
+        for node in list(nodes):
+            if node not in nodes_in_edges:
                 self._nx_graph.remove_node(node)
-        for u, v in self.edge_view:
-            if u not in nodes or v not in nodes:
+
+        for u, v in list(self.edge_view()):
+            if u not in self._nx_graph or v not in self._nx_graph:
                 self._nx_graph.remove_edge(u, v)
 
     @staticmethod
