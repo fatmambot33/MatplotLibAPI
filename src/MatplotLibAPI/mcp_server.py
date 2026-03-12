@@ -556,77 +556,6 @@ def create_bubble_mcp_server() -> Any:
         )
 
     @mcp.tool()
-    def plot_bubble_from_csv(
-        label: str,
-        x: str,
-        y: str,
-        z: str,
-        csv_path: Optional[str] = None,
-        table: Optional[TableRecords] = None,
-        title: Optional[str] = None,
-        max_values: int = 50,
-        center_to_mean: bool = False,
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        hline: bool = False,
-        vline: bool = False,
-    ) -> bytes:
-        """Generate a bubble chart image and return octets.
-
-        This compatibility entry point supports either ``csv_path`` or ``table``
-        inputs and mirrors ``plot_bubble`` behavior.
-
-        Parameters
-        ----------
-        label : str
-            Column name used for bubble labels.
-        x : str
-            Column name for x-axis values.
-        y : str
-            Column name for y-axis values.
-        z : str
-            Column name used for bubble size.
-        csv_path : str, optional
-            Path to a CSV file containing plotting data. The default is None.
-        table : list[dict[str, Any]], optional
-            In-memory row records with column names as keys. The default is None.
-        title : str, optional
-            Chart title. The default is None.
-        max_values : int, optional
-            Maximum number of points to include. The default is 50.
-        center_to_mean : bool, optional
-            Whether to center x-axis values around their mean. The default is False.
-        sort_by : str, optional
-            Column used to sort before plotting. The default is None.
-        ascending : bool, optional
-            Sort order used with ``sort_by``. The default is False.
-        hline : bool, optional
-            Whether to draw a horizontal mean line. The default is False.
-        vline : bool, optional
-            Whether to draw a vertical mean line. The default is False.
-
-        Returns
-        -------
-        bytes
-            PNG octet payload of the rendered bubble chart.
-        """
-        return _render_bubble_chart_octet_from_source(
-            csv_path=csv_path,
-            table=table,
-            label=label,
-            x=x,
-            y=y,
-            z=z,
-            title=title,
-            max_values=max_values,
-            center_to_mean=center_to_mean,
-            sort_by=sort_by,
-            ascending=ascending,
-            hline=hline,
-            vline=vline,
-        )
-
-    @mcp.tool()
     def plot_network(
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
@@ -636,49 +565,6 @@ def create_bubble_mcp_server() -> Any:
         title: Optional[str] = None,
     ) -> bytes:
         """Generate a network chart image from table input and return octets.
-
-        Parameters
-        ----------
-        csv_path : str, optional
-            Path to a CSV file containing edge data. The default is None.
-        table : list[dict[str, Any]], optional
-            In-memory row records with edge columns as keys. The default is None.
-        edge_source_col : str, optional
-            Column name for source nodes. The default is ``"source"``.
-        edge_target_col : str, optional
-            Column name for target nodes. The default is ``"target"``.
-        edge_weight_col : str, optional
-            Column name for edge weights. The default is ``"weight"``.
-        title : str, optional
-            Chart title. The default is None.
-
-        Returns
-        -------
-        bytes
-            PNG octet payload of the rendered network chart.
-        """
-        return _render_network_chart_octet_from_source(
-            csv_path=csv_path,
-            table=table,
-            edge_source_col=edge_source_col,
-            edge_target_col=edge_target_col,
-            edge_weight_col=edge_weight_col,
-            title=title,
-        )
-
-    @mcp.tool()
-    def plot_network_from_csv(
-        csv_path: Optional[str] = None,
-        table: Optional[TableRecords] = None,
-        edge_source_col: str = "source",
-        edge_target_col: str = "target",
-        edge_weight_col: str = "weight",
-        title: Optional[str] = None,
-    ) -> bytes:
-        """Generate a network chart image and return octets.
-
-        This compatibility entry point supports either ``csv_path`` or ``table``
-        inputs and mirrors ``plot_network`` behavior.
 
         Parameters
         ----------
