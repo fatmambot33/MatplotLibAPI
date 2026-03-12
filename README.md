@@ -40,9 +40,9 @@ plt.show()
 ```
 
 
-## MCP Integration (Bubble Chart)
+## MCP Integration
 
-You can run a dedicated MCP server that exposes bubble chart generation as a tool for LLM agents.
+You can run a dedicated MCP server that exposes MatplotLibAPI plotting tools for LLM agents.
 
 1. Install MCP dependencies:
 
