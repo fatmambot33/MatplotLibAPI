@@ -16,6 +16,7 @@ import pandas as pd
 from matplotlib.figure import Figure
 
 from .bubble import aplot_bubble
+from .network import fplot_network
 
 TableRecords = list[dict[str, Any]]
 
@@ -340,6 +341,130 @@ def render_bubble_chart_octet(
     )
 
 
+def _build_network_chart_figure(
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
+    title: Optional[str] = None,
+) -> Figure:
+    """Create a network chart figure from tabular input.
+
+    Parameters
+    ----------
+    csv_path : str, optional
+        Path to a CSV file containing edge data. The default is None.
+    table : list[dict[str, Any]], optional
+        In-memory row records with edge columns as keys. The default is None.
+    edge_source_col : str, optional
+        Column name for source nodes. The default is ``"source"``.
+    edge_target_col : str, optional
+        Column name for target nodes. The default is ``"target"``.
+    edge_weight_col : str, optional
+        Column name for edge weights. The default is ``"weight"``.
+    title : str, optional
+        Chart title. The default is None.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        Figure containing the rendered network chart.
+    """
+    pd_df = _load_bubble_dataframe(csv_path=csv_path, table=table)
+    return fplot_network(
+        pd_df=pd_df,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+        title=title,
+    )
+
+
+def _render_network_chart_octet_from_source(
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
+    title: Optional[str] = None,
+) -> bytes:
+    """Render a network chart from tabular input and return PNG octets.
+
+    Parameters
+    ----------
+    csv_path : str, optional
+        Path to a CSV file containing edge data. The default is None.
+    table : list[dict[str, Any]], optional
+        In-memory row records with edge columns as keys. The default is None.
+    edge_source_col : str, optional
+        Column name for source nodes. The default is ``"source"``.
+    edge_target_col : str, optional
+        Column name for target nodes. The default is ``"target"``.
+    edge_weight_col : str, optional
+        Column name for edge weights. The default is ``"weight"``.
+    title : str, optional
+        Chart title. The default is None.
+
+    Returns
+    -------
+    bytes
+        PNG payload bytes suitable for ``application/octet-stream`` responses.
+    """
+    fig = _build_network_chart_figure(
+        csv_path=csv_path,
+        table=table,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+        title=title,
+    )
+    buffer = BytesIO()
+    fig.savefig(buffer, format="png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    return buffer.getvalue()
+
+
+def render_network_chart_octet(
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
+    title: Optional[str] = None,
+) -> bytes:
+    """Render a network chart and return PNG bytes as an octet payload.
+
+    Parameters
+    ----------
+    csv_path : str, optional
+        Path to a CSV file containing edge data. The default is None.
+    table : list[dict[str, Any]], optional
+        In-memory row records with edge columns as keys. The default is None.
+    edge_source_col : str, optional
+        Column name for source nodes. The default is ``"source"``.
+    edge_target_col : str, optional
+        Column name for target nodes. The default is ``"target"``.
+    edge_weight_col : str, optional
+        Column name for edge weights. The default is ``"weight"``.
+    title : str, optional
+        Chart title. The default is None.
+
+    Returns
+    -------
+    bytes
+        PNG payload bytes suitable for ``application/octet-stream`` responses.
+    """
+    return _render_network_chart_octet_from_source(
+        csv_path=csv_path,
+        table=table,
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+        title=title,
+    )
+
+
 def create_bubble_mcp_server() -> Any:
     """Create an MCP server exposing bubble plotting as a tool.
 
@@ -499,6 +624,89 @@ def create_bubble_mcp_server() -> Any:
             ascending=ascending,
             hline=hline,
             vline=vline,
+        )
+
+    @mcp.tool()
+    def plot_network(
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
+        title: Optional[str] = None,
+    ) -> bytes:
+        """Generate a network chart image from table input and return octets.
+
+        Parameters
+        ----------
+        csv_path : str, optional
+            Path to a CSV file containing edge data. The default is None.
+        table : list[dict[str, Any]], optional
+            In-memory row records with edge columns as keys. The default is None.
+        edge_source_col : str, optional
+            Column name for source nodes. The default is ``"source"``.
+        edge_target_col : str, optional
+            Column name for target nodes. The default is ``"target"``.
+        edge_weight_col : str, optional
+            Column name for edge weights. The default is ``"weight"``.
+        title : str, optional
+            Chart title. The default is None.
+
+        Returns
+        -------
+        bytes
+            PNG octet payload of the rendered network chart.
+        """
+        return _render_network_chart_octet_from_source(
+            csv_path=csv_path,
+            table=table,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
+            title=title,
+        )
+
+    @mcp.tool()
+    def plot_network_from_csv(
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
+        title: Optional[str] = None,
+    ) -> bytes:
+        """Generate a network chart image and return octets.
+
+        This compatibility entry point supports either ``csv_path`` or ``table``
+        inputs and mirrors ``plot_network`` behavior.
+
+        Parameters
+        ----------
+        csv_path : str, optional
+            Path to a CSV file containing edge data. The default is None.
+        table : list[dict[str, Any]], optional
+            In-memory row records with edge columns as keys. The default is None.
+        edge_source_col : str, optional
+            Column name for source nodes. The default is ``"source"``.
+        edge_target_col : str, optional
+            Column name for target nodes. The default is ``"target"``.
+        edge_weight_col : str, optional
+            Column name for edge weights. The default is ``"weight"``.
+        title : str, optional
+            Chart title. The default is None.
+
+        Returns
+        -------
+        bytes
+            PNG octet payload of the rendered network chart.
+        """
+        return _render_network_chart_octet_from_source(
+            csv_path=csv_path,
+            table=table,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
+            title=title,
         )
 
     return mcp

@@ -4,7 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from MatplotLibAPI.mcp_server import render_bubble_chart, render_bubble_chart_octet
+from MatplotLibAPI.mcp_server import (
+    render_bubble_chart,
+    render_bubble_chart_octet,
+    render_network_chart_octet,
+)
 
 
 def test_render_bubble_chart_from_csv(load_sample_df, tmp_path: Path):
@@ -94,3 +98,35 @@ def test_render_bubble_chart_octet_requires_input_source():
             y="population",
             z="score",
         )
+
+
+def test_render_network_chart_octet_returns_png_payload(load_sample_df, tmp_path: Path):
+    """Return PNG bytes for network octet responses using CSV input."""
+    df = load_sample_df("network.csv")
+    csv_path = tmp_path / "network.csv"
+    df.to_csv(csv_path, index=False)
+
+    payload = render_network_chart_octet(
+        csv_path=str(csv_path),
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
+        title="Network via MCP",
+    )
+
+    assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_render_network_chart_octet_accepts_table_input(load_sample_df):
+    """Return PNG bytes for network octet responses using table records."""
+    df = load_sample_df("network.csv")
+
+    payload = render_network_chart_octet(
+        table=df.to_dict(orient="records"),
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
+        title="Network via MCP",
+    )
+
+    assert payload.startswith(b"\x89PNG\r\n\x1a\n")
