@@ -15,8 +15,21 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.figure import Figure
 
+from .area import fplot_area
+from .bar import fplot_bar
+from .box_violin import fplot_box_violin
 from .bubble import aplot_bubble
+from .heatmap import fplot_correlation_matrix, fplot_heatmap
+from .histogram import fplot_histogram_kde
 from .network import fplot_network
+from .pie import fplot_pie_donut
+from .sankey import fplot_sankey
+from .sunburst import fplot_sunburst
+from .table import fplot_table
+from .timeserie import fplot_timeserie
+from .treemap import fplot_treemap
+from .waffle import fplot_waffle
+from .word_cloud import fplot_wordcloud
 
 TableRecords = list[dict[str, Any]]
 
@@ -465,6 +478,107 @@ def render_network_chart_octet(
     )
 
 
+def _render_plotly_octet(fig: Any) -> bytes:
+    """Render a Plotly figure into PNG octets.
+
+    Parameters
+    ----------
+    fig : Any
+        Plotly figure object supporting ``to_image``.
+
+    Returns
+    -------
+    bytes
+        PNG payload bytes suitable for ``application/octet-stream`` responses.
+    """
+    return bytes(fig.to_image(format="png"))
+
+
+def render_plot_module_octet(
+    plot_module: str,
+    params: dict[str, Any],
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+) -> bytes:
+    """Render a supported plot module and return PNG bytes.
+
+    Parameters
+    ----------
+    plot_module : str
+        Plot module key. Supported values are ``bubble``, ``network``, ``bar``,
+        ``histogram``, ``box_violin``, ``heatmap``, ``correlation_matrix``,
+        ``area``, ``pie``, ``waffle``, ``sankey``, ``table``, ``timeserie``,
+        ``wordcloud``, ``treemap``, and ``sunburst``.
+    params : dict[str, Any]
+        Module-specific plotting parameters excluding the DataFrame argument.
+    csv_path : str, optional
+        Path to a CSV file containing source data. The default is None.
+    table : list[dict[str, Any]], optional
+        In-memory row records with source columns as keys. The default is None.
+
+    Returns
+    -------
+    bytes
+        PNG payload bytes suitable for ``application/octet-stream`` responses.
+
+    Raises
+    ------
+    ValueError
+        If ``plot_module`` is not supported.
+    """
+    pd_df = _load_bubble_dataframe(csv_path=csv_path, table=table)
+
+    if plot_module == "bubble":
+        return _render_bubble_chart_octet_from_source(
+            csv_path=csv_path,
+            table=table,
+            **params,
+        )
+    if plot_module == "network":
+        return _render_network_chart_octet_from_source(
+            csv_path=csv_path,
+            table=table,
+            **params,
+        )
+
+    matplotlib_renderers: dict[str, Any] = {
+        "bar": fplot_bar,
+        "histogram": fplot_histogram_kde,
+        "box_violin": fplot_box_violin,
+        "heatmap": fplot_heatmap,
+        "correlation_matrix": fplot_correlation_matrix,
+        "area": fplot_area,
+        "pie": fplot_pie_donut,
+        "waffle": fplot_waffle,
+        "table": fplot_table,
+        "timeserie": fplot_timeserie,
+        "wordcloud": fplot_wordcloud,
+    }
+    plotly_renderers: dict[str, Any] = {
+        "sankey": fplot_sankey,
+        "treemap": fplot_treemap,
+        "sunburst": fplot_sunburst,
+    }
+
+    if plot_module in matplotlib_renderers:
+        fig = matplotlib_renderers[plot_module](pd_df=pd_df, **params)
+        buffer = BytesIO()
+        fig.savefig(buffer, format="png", dpi=300, bbox_inches="tight")
+        plt.close(fig)
+        return buffer.getvalue()
+
+    if plot_module in plotly_renderers:
+        fig = plotly_renderers[plot_module](pd_df=pd_df, **params)
+        return _render_plotly_octet(fig)
+
+    supported = sorted(
+        list(matplotlib_renderers.keys())
+        + list(plotly_renderers.keys())
+        + ["bubble", "network"]
+    )
+    raise ValueError(f"Unsupported plot_module '{plot_module}'. Supported: {supported}")
+
+
 def create_bubble_mcp_server() -> Any:
     """Create an MCP server exposing bubble plotting as a tool.
 
@@ -595,13 +709,120 @@ def create_bubble_mcp_server() -> Any:
             title=title,
         )
 
+    @mcp.tool()
+    def plot_module(
+        plot_module: str,
+        params: dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> bytes:
+        """Generate a chart for any supported plot module and return octets.
+
+        Parameters
+        ----------
+        plot_module : str
+            Plot module key to render.
+        params : dict[str, Any]
+            Module-specific plotting parameters excluding the DataFrame argument.
+        csv_path : str, optional
+            Path to a CSV file containing source data. The default is None.
+        table : list[dict[str, Any]], optional
+            In-memory row records with source columns as keys. The default is None.
+
+        Returns
+        -------
+        bytes
+            PNG octet payload of the rendered chart.
+        """
+        return render_plot_module_octet(
+            plot_module=plot_module,
+            params=params,
+            csv_path=csv_path,
+            table=table,
+        )
+
     return mcp
 
 
 def main() -> None:
-    """Run the bubble MCP server over stdio transport."""
+    """Run the MCP server over stdio transport."""
     server = create_bubble_mcp_server()
     server.run(transport="stdio")
+
+
+def main_bubble() -> None:
+    """Run the bubble MCP entry point over stdio transport."""
+    main()
+
+
+def main_network() -> None:
+    """Run the network MCP entry point over stdio transport."""
+    main()
+
+
+def main_bar() -> None:
+    """Run the bar MCP entry point over stdio transport."""
+    main()
+
+
+def main_histogram() -> None:
+    """Run the histogram MCP entry point over stdio transport."""
+    main()
+
+
+def main_box_violin() -> None:
+    """Run the box/violin MCP entry point over stdio transport."""
+    main()
+
+
+def main_heatmap() -> None:
+    """Run the heatmap MCP entry point over stdio transport."""
+    main()
+
+
+def main_area() -> None:
+    """Run the area MCP entry point over stdio transport."""
+    main()
+
+
+def main_pie() -> None:
+    """Run the pie MCP entry point over stdio transport."""
+    main()
+
+
+def main_waffle() -> None:
+    """Run the waffle MCP entry point over stdio transport."""
+    main()
+
+
+def main_sankey() -> None:
+    """Run the sankey MCP entry point over stdio transport."""
+    main()
+
+
+def main_table() -> None:
+    """Run the table MCP entry point over stdio transport."""
+    main()
+
+
+def main_timeserie() -> None:
+    """Run the timeserie MCP entry point over stdio transport."""
+    main()
+
+
+def main_wordcloud() -> None:
+    """Run the wordcloud MCP entry point over stdio transport."""
+    main()
+
+
+def main_treemap() -> None:
+    """Run the treemap MCP entry point over stdio transport."""
+    main()
+
+
+def main_sunburst() -> None:
+    """Run the sunburst MCP entry point over stdio transport."""
+    main()
 
 
 if __name__ == "__main__":  # pragma: no cover

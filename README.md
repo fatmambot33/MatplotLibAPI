@@ -56,7 +56,9 @@ pip install -e .[mcp]
 matplotlibapi-mcp-bubble
 ```
 
-The server provides `plot_bubble` and `plot_network` tools. Each accepts either a CSV path or a table payload and returns PNG bytes as an octet payload.
+The MCP server provides `plot_bubble`, `plot_network`, and a generic `plot_module` tool (for bar, histogram, box_violin, heatmap, correlation_matrix, area, pie, waffle, sankey, table, timeserie, wordcloud, treemap, and sunburst). Each accepts either a CSV path or a table payload and returns PNG bytes as an octet payload.
+
+Dedicated MCP entry points are also available per module, for example `matplotlibapi-mcp-bubble`, `matplotlibapi-mcp-network`, `matplotlibapi-mcp-bar`, and `matplotlibapi-mcp-heatmap`.
 
 ## Plot Types
 

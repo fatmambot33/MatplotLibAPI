@@ -8,6 +8,7 @@ from MatplotLibAPI.mcp_server import (
     render_bubble_chart,
     render_bubble_chart_octet,
     render_network_chart_octet,
+    render_plot_module_octet,
 )
 
 
@@ -127,6 +128,42 @@ def test_render_network_chart_octet_accepts_table_input(load_sample_df):
         edge_target_col="city_b",
         edge_weight_col="distance_km",
         title="Network via MCP",
+    )
+
+    assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_render_plot_module_octet_bar(load_sample_df):
+    """Return PNG bytes for generic bar module rendering."""
+    df = load_sample_df("bar.csv")
+
+    payload = render_plot_module_octet(
+        plot_module="bar",
+        table=df.to_dict(orient="records"),
+        params={
+            "category": "product",
+            "value": "revenue",
+            "group": "region",
+            "title": "Bar via MCP",
+        },
+    )
+
+    assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_render_plot_module_octet_heatmap(load_sample_df):
+    """Return PNG bytes for generic heatmap module rendering."""
+    df = load_sample_df("heatmap.csv")
+
+    payload = render_plot_module_octet(
+        plot_module="heatmap",
+        table=df.to_dict(orient="records"),
+        params={
+            "x": "month",
+            "y": "channel",
+            "value": "engagements",
+            "title": "Heatmap via MCP",
+        },
     )
 
     assert payload.startswith(b"\x89PNG\r\n\x1a\n")
