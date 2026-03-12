@@ -56,7 +56,7 @@ pip install -e .[mcp]
 matplotlibapi-mcp-bubble
 ```
 
-The server provides a `plot_bubble_from_csv` tool that accepts a CSV path, bubble field mapping, and an output image path.
+The server provides a `plot_bubble` tool that accepts either a CSV path or a table payload with bubble field mapping, then returns PNG bytes as an octet payload.
 
 ## Plot Types
 

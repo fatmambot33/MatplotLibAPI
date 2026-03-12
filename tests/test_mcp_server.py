@@ -2,11 +2,13 @@
 
 from pathlib import Path
 
-from MatplotLibAPI.mcp_server import render_bubble_chart
+import pytest
+
+from MatplotLibAPI.mcp_server import render_bubble_chart, render_bubble_chart_octet
 
 
 def test_render_bubble_chart_from_csv(load_sample_df, tmp_path: Path):
-    """Render a bubble chart image using the MCP helper function."""
+    """Render a bubble chart image using CSV input."""
     df = load_sample_df("bubble.csv")
     df["score"] = df["population"] / 10
     csv_path = tmp_path / "bubble.csv"
@@ -25,3 +27,50 @@ def test_render_bubble_chart_from_csv(load_sample_df, tmp_path: Path):
 
     assert Path(result).exists()
     assert Path(result).suffix == ".png"
+
+
+def test_render_bubble_chart_octet_returns_png_payload(load_sample_df, tmp_path: Path):
+    """Return PNG bytes for MCP octet-stream responses using CSV input."""
+    df = load_sample_df("bubble.csv")
+    df["score"] = df["population"] / 10
+    csv_path = tmp_path / "bubble.csv"
+    df.to_csv(csv_path, index=False)
+
+    payload = render_bubble_chart_octet(
+        csv_path=str(csv_path),
+        label="country",
+        x="gdp_per_capita",
+        y="population",
+        z="score",
+        title="Bubble via MCP",
+    )
+
+    assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_render_bubble_chart_octet_accepts_table_input(load_sample_df):
+    """Return PNG bytes for MCP octet-stream responses using table records."""
+    df = load_sample_df("bubble.csv")
+    df["score"] = df["population"] / 10
+
+    payload = render_bubble_chart_octet(
+        table=df.to_dict(orient="records"),
+        label="country",
+        x="gdp_per_capita",
+        y="population",
+        z="score",
+        title="Bubble via MCP",
+    )
+
+    assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_render_bubble_chart_octet_requires_input_source():
+    """Raise an error when no CSV path or table input is provided."""
+    with pytest.raises(ValueError, match="Provide either `csv_path` or `table`"):
+        render_bubble_chart_octet(
+            label="country",
+            x="gdp_per_capita",
+            y="population",
+            z="score",
+        )
