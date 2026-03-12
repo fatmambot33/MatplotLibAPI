@@ -7,8 +7,8 @@ CSV input or in-memory tabular records.
 
 from __future__ import annotations
 
+from io import BytesIO
 from pathlib import Path
-from tempfile import NamedTemporaryFile
 from typing import Any, Optional
 
 import matplotlib.pyplot as plt
@@ -188,12 +188,10 @@ def _render_bubble_chart_octet_from_source(
         hline=hline,
         vline=vline,
     )
-    with NamedTemporaryFile(suffix=".png") as tmp_file:
-        fig.savefig(tmp_file.name, format="png", dpi=300, bbox_inches="tight")
-        tmp_file.seek(0)
-        payload = tmp_file.read()
+    buffer = BytesIO()
+    fig.savefig(buffer, format="png", dpi=300, bbox_inches="tight")
     plt.close(fig)
-    return payload
+    return buffer.getvalue()
 
 
 def render_bubble_chart(
