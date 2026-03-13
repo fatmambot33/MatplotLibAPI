@@ -344,14 +344,19 @@ class NetworkGraph(BasePlot):
         nx_graph : nx.Graph
             Graph to wrap.
         """
-        self._nx_graph: nx.Graph = (
-            nx_graph
-            or NetworkGraph.from_pandas_edgelist(
+        if isinstance(pd_df, nx.Graph) and nx_graph is None:
+            nx_graph = pd_df
+            pd_df = None
+
+        if nx_graph is not None:
+            self._nx_graph = nx_graph
+        elif pd_df is not None:
+            self._nx_graph = NetworkGraph.from_pandas_edgelist(
                 pd_df, source=source, target=target, edge_weight_col=weight
             )._nx_graph
-            if pd_df is not None
-            else nx.Graph()
-        )
+        else:
+            self._nx_graph = nx.Graph()
+
         self._scale = 1.0
 
     @property
@@ -838,6 +843,27 @@ class NetworkGraph(BasePlot):
 
         return ax
 
+    def aplot_network(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        edge_weight_col: str = "weight",
+        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
+        ax: Optional[Axes] = None,
+    ) -> Axes:
+        """Plot the graph on existing axes.
+
+        This method is kept for backward compatibility and delegates to
+        :meth:`aplot`.
+        """
+        return self.aplot(
+            title=title,
+            style=style,
+            edge_weight_col=edge_weight_col,
+            layout_seed=layout_seed,
+            ax=ax,
+        )
+
     def fplot(
         self,
         title: Optional[str] = None,
@@ -875,6 +901,25 @@ class NetworkGraph(BasePlot):
             ax=ax,
         )
         return fig
+
+    def fplot_network(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        edge_weight_col: str = "weight",
+        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
+    ) -> Figure:
+        """Plot the graph on a new figure.
+
+        This method is kept for backward compatibility and delegates to
+        :meth:`fplot`.
+        """
+        return self.fplot(
+            title=title,
+            style=style,
+            edge_weight_col=edge_weight_col,
+            layout_seed=layout_seed,
+        )
 
     def aplot_connected_components(
         self,
@@ -939,7 +984,7 @@ class NetworkGraph(BasePlot):
             component_graph = NetworkGraph(
                 nx.subgraph(graph._nx_graph, component).copy()
             )
-            component_graph.aplot(
+            component_graph.aplot_network(
                 title=f"{title}::{i}" if title else str(i),
                 style=style,
                 edge_weight_col=edge_weight_col,
@@ -1645,7 +1690,7 @@ def aplot_network_node(
     )
     component_graph = graph.get_component_subgraph(node)
     resolved_title = title if title is not None else string_formatter(node)
-    return component_graph.aplot(
+    return component_graph.aplot_network(
         title=resolved_title,
         style=style,
         edge_weight_col=edge_weight_col,

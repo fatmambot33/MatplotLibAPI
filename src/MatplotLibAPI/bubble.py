@@ -267,12 +267,13 @@ class Bubble(BasePlot):
             x_val, y_val, label_val = row[x], row[y], str(row[label])
             if format_funcs and (fmt_label := format_funcs.get(label)):
                 label_val = fmt_label(label_val, None)
+            quintile = cast(int, row["quintile"])
             ax.text(
                 cast(float, x_val),
                 cast(float, y_val),
                 label_val,
                 ha="center",
-                fontsize=row["quintile"].map(style.font_mapping),  # type: ignore
+                fontsize=style.font_mapping.get(quintile, style.font_size),
                 color=style.font_color,
             )
 

@@ -26,7 +26,7 @@ def generate_sample_network_data():
 
 def plot_sample_network_data():
     """Load a sample DataFrame for testing."""
-    from MatplotLibAPI.network import fplot_network, NetworkGraph
+    from MatplotLibAPI.network import NetworkGraph
 
     # Assuming sample data is stored in a 'data' directory within the tests folder
     filepath = os.path.join("data", "network.csv")
