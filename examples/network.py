@@ -34,7 +34,7 @@ def plot_sample_network_data():
     graph = NetworkGraph.from_pandas_edgelist(
         pd_df, source="city_a", target="city_b", edge_weight_col="distance_km"
     )
-    plot_fig = graph.fplot_network(title="Network Graph", edge_weight_col="distance_km")
+    plot_fig = graph.fplot(title="Network Graph", edge_weight_col="distance_km")
 
     return plot_fig
 

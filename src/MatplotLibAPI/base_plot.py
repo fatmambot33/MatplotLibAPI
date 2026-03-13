@@ -4,14 +4,12 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 import pandas as pd
-from pandas.api.extensions import register_dataframe_accessor
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from .style_template import StyleTemplate
 
 
-@register_dataframe_accessor("mpl")
 class BasePlot(ABC):
     """Base class defining the interface for all plot types.
 

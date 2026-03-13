@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
-
+from pandas.api.extensions import register_dataframe_accessor
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -10,7 +10,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-
+from .base_plot import BasePlot
 from .style_template import (
     NETWORK_STYLE_TEMPLATE,
     FIG_SIZE,
@@ -289,7 +289,8 @@ def _sanitize_node_dataframe(
     return filtered_node_df.loc[filtered_node_df[node_col].isin(nodes_in_edges)]
 
 
-class NetworkGraph:
+@register_dataframe_accessor("network")
+class NetworkGraph(BasePlot):
     """Custom graph class based on NetworkX's ``Graph``.
 
     Methods
@@ -328,7 +329,14 @@ class NetworkGraph:
 
     _nx_graph: nx.Graph
 
-    def __init__(self, nx_graph: Optional[nx.Graph] = None):
+    def __init__(
+        self,
+        pd_df: Optional[pd.DataFrame] = None,
+        nx_graph: Optional[nx.Graph] = None,
+        source: str = "source",
+        target: str = "target",
+        weight: str = "weight",
+    ):
         """Initialize with an existing NetworkX graph.
 
         Parameters
@@ -336,7 +344,14 @@ class NetworkGraph:
         nx_graph : nx.Graph
             Graph to wrap.
         """
-        self._nx_graph: nx.Graph = nx_graph or nx.Graph()
+        self._nx_graph: nx.Graph = (
+            nx_graph
+            or NetworkGraph.from_pandas_edgelist(
+                pd_df, source=source, target=target, edge_weight_col=weight
+            )._nx_graph
+            if pd_df is not None
+            else nx.Graph()
+        )
         self._scale = 1.0
 
     @property
@@ -709,11 +724,11 @@ class NetworkGraph:
         )
 
         if component_nodes is None:
-            return NetworkGraph(nx.Graph())
+            return NetworkGraph()
 
         return NetworkGraph(nx.subgraph(self._nx_graph, component_nodes).copy())
 
-    def aplot_network(
+    def aplot(
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
@@ -751,7 +766,7 @@ class NetworkGraph:
             graph_nx = graph_nx.copy()
             graph_nx.remove_nodes_from(isolated_nodes)
 
-        graph = self if graph_nx is self._nx_graph else NetworkGraph(graph_nx)
+        graph = self if graph_nx is self._nx_graph else NetworkGraph(nx_graph=graph_nx)
 
         if graph._nx_graph.number_of_nodes() == 0:
             ax.set_axis_off()
@@ -823,7 +838,7 @@ class NetworkGraph:
 
         return ax
 
-    def fplot_network(
+    def fplot(
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
@@ -852,7 +867,7 @@ class NetworkGraph:
         fig = cast(Figure, fig)
         ax = cast(Axes, ax)
         fig.patch.set_facecolor(style.background_color)
-        self.aplot_network(
+        self.aplot(
             title=title,
             style=style,
             edge_weight_col=edge_weight_col,
@@ -898,7 +913,7 @@ class NetworkGraph:
         graph = self
         isolated_nodes = list(nx.isolates(self._nx_graph))
         if isolated_nodes:
-            graph = NetworkGraph(self._nx_graph.copy())
+            graph = NetworkGraph(nx_graph=self._nx_graph.copy())
             graph._nx_graph.remove_nodes_from(isolated_nodes)
 
         connected_components = list(nx.connected_components(graph._nx_graph))
@@ -924,7 +939,7 @@ class NetworkGraph:
             component_graph = NetworkGraph(
                 nx.subgraph(graph._nx_graph, component).copy()
             )
-            component_graph.aplot_network(
+            component_graph.aplot(
                 title=f"{title}::{i}" if title else str(i),
                 style=style,
                 edge_weight_col=edge_weight_col,
@@ -1119,7 +1134,7 @@ class NetworkGraph:
             Initialized network graph.
         """
         validate_dataframe(edges_df, cols=[source, target, edge_weight_col])
-        network_Z = NetworkGraph(nx.Graph())
+        network_Z = NetworkGraph()
         for src, dst, weight in edges_df[[source, target, edge_weight_col]].itertuples(
             index=False, name=None
         ):
@@ -1550,7 +1565,7 @@ def aplot_network(
         sort_by=sort_by,
         node_df=node_df,
     )
-    return graph.aplot_network(
+    return graph.aplot(
         title=title,
         style=style,
         edge_weight_col=edge_weight_col,
@@ -1630,7 +1645,7 @@ def aplot_network_node(
     )
     component_graph = graph.get_component_subgraph(node)
     resolved_title = title if title is not None else string_formatter(node)
-    return component_graph.aplot_network(
+    return component_graph.aplot(
         title=resolved_title,
         style=style,
         edge_weight_col=edge_weight_col,
@@ -1718,8 +1733,6 @@ def fplot_network(
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     figsize: Tuple[float, float] = FIG_SIZE,
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a figure with a network graph.
 
@@ -1751,10 +1764,6 @@ def fplot_network(
         Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
     figsize : tuple[float, float], optional
         Size of the created figure. The default is FIG_SIZE.
-    save_path : str, optional
-        File path to save the figure. The default is ``None``.
-    savefig_kwargs : dict[str, Any], optional
-        Extra keyword arguments forwarded to ``Figure.savefig``. The default is ``None``.
 
     Returns
     -------
@@ -1779,8 +1788,6 @@ def fplot_network(
         layout_seed=layout_seed,
         ax=ax,
     )
-    if save_path:
-        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig
 
 
@@ -1953,7 +1960,7 @@ def fplot_network_components(
     working_graph = graph
     isolated_nodes = list(nx.isolates(graph._nx_graph))
     if isolated_nodes:
-        working_graph = NetworkGraph(graph._nx_graph.copy())
+        working_graph = NetworkGraph(nx_graph=graph._nx_graph.copy())
         working_graph._nx_graph.remove_nodes_from(isolated_nodes)
 
     connected_components = list(nx.connected_components(working_graph._nx_graph))

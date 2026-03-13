@@ -54,10 +54,10 @@ class Bubble(BasePlot):
         x: str,
         y: str,
         z: str,
-        sort_by: Optional[str],
-        ascending: bool,
-        max_values: int,
-        center_to_mean: bool,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        max_values: int = MAX_RESULTS,
+        center_to_mean: bool = False,
     ):
         """Initialize the Bubble plot accessor."""
         plot_df = self._prepare_data(
@@ -84,10 +84,10 @@ class Bubble(BasePlot):
         x: str,
         y: str,
         z: str,
-        sort_by: Optional[str],
-        ascending: bool,
-        max_values: int,
-        center_to_mean: bool,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        max_values: int = MAX_RESULTS,
+        center_to_mean: bool = False,
     ) -> pd.DataFrame:
         """Prepare data for bubble chart.
 
@@ -111,8 +111,7 @@ class Bubble(BasePlot):
             Maximum number of bubbles to display.
         center_to_mean : bool
             Whether to center x-axis values around the mean.
-        style : StyleTemplate
-            Styling for the plot.
+
 
         Returns
         -------
@@ -138,7 +137,6 @@ class Bubble(BasePlot):
             plot_df[x] -= plot_df[x].mean()
 
         plot_df["quintile"] = pd.qcut(plot_df[z], 5, labels=False, duplicates="drop")
-        plot_df["fontsize"] = plot_df["quintile"].map(style.font_mapping)  # type: ignore
         plot_df[f"{x}_mean"] = plot_df[x].mean()
         plot_df[f"{y}_mean"] = plot_df[y].mean()
         plot_df[f"{z}_mean"] = plot_df[z].mean()
@@ -274,7 +272,7 @@ class Bubble(BasePlot):
                 cast(float, y_val),
                 label_val,
                 ha="center",
-                fontsize=row["quintile"].map(style.font_mapping),
+                fontsize=row["quintile"].map(style.font_mapping),  # type: ignore
                 color=style.font_color,
             )
 

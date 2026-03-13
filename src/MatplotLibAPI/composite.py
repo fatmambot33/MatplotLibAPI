@@ -83,18 +83,19 @@ def plot_composite_bubble(
     fig.patch.set_facecolor(style.background_color)
     grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
-    ax = Bubble.aplot(
+    ax = Bubble(
         pd_df=pd_df,
         label=label,
         x=x,
         y=y,
         z=z,
-        title=title,
-        style=style,
         max_values=max_values,
         center_to_mean=center_to_mean,
         sort_by=sort_by,
         ascending=ascending,
+    ).aplot(
+        title=title,
+        style=style,
         ax=ax,
     )
 

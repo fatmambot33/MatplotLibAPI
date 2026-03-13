@@ -141,7 +141,17 @@ def _build_bubble_chart_figure(
 ) -> Figure:
     """Create a bubble chart figure from tabular input."""
     pd_df = _load_dataframe(csv_path=csv_path, table=table)
-    fig = Bubble(pd_df=pd_df, label=label, x=x, y=y, z=z, max_values=max_values, center_to_mean=center_to_mean, sort_by=sort_by, ascending=ascending).fplot(
+    fig = Bubble(
+        pd_df=pd_df,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+        sort_by=sort_by,
+        ascending=ascending,
+    ).fplot(
         title=title,
         hline=hline,
         vline=vline,

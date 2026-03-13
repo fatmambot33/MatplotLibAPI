@@ -24,12 +24,17 @@ def test_aplot_bubble_returns_axes():
     df = pd.DataFrame(data)
 
     # Call the plotting function
-    ax = Bubble.aplot(
+    ax = Bubble(
         pd_df=df,
         label="country",
         x="gdp_per_capita",
         y="life_expectancy",
         z="population",
+        sort_by="gdp_per_capita",
+        ascending=False,
+        max_values=50,
+        center_to_mean=False,
+    ).aplot(
         title="GDP vs. Life Expectancy",
     )
 
