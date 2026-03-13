@@ -10,6 +10,8 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+
+from .utils import _wrap_aplot
 from .base_plot import BasePlot
 from .style_template import (
     NETWORK_STYLE_TEMPLATE,
@@ -740,6 +742,7 @@ class NetworkGraph(BasePlot):
         edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
         ax: Optional[Axes] = None,
+        **kwargs: Any,
     ) -> Axes:
         """Plot the graph using node and edge weights.
 
@@ -868,8 +871,8 @@ class NetworkGraph(BasePlot):
         self,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot the graph using node and edge weights.
 
@@ -889,37 +892,17 @@ class NetworkGraph(BasePlot):
         Figure
             Matplotlib figure with the plotted network.
         """
-        fig, ax = plt.subplots(figsize=FIG_SIZE)
-        fig = cast(Figure, fig)
-        ax = cast(Axes, ax)
+        fig = _wrap_aplot(
+            self.aplot,
+            pd_df=self._obj,
+            title=title,
+            style=style,
+            layout_seed=layout_seed,
+            figsize=figsize,
+        )
         fig.patch.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            edge_weight_col=edge_weight_col,
-            layout_seed=layout_seed,
-            ax=ax,
-        )
+
         return fig
-
-    def fplot_network(
-        self,
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        edge_weight_col: str = "weight",
-        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
-    ) -> Figure:
-        """Plot the graph on a new figure.
-
-        This method is kept for backward compatibility and delegates to
-        :meth:`fplot`.
-        """
-        return self.fplot(
-            title=title,
-            style=style,
-            edge_weight_col=edge_weight_col,
-            layout_seed=layout_seed,
-        )
 
     def aplot_connected_components(
         self,
@@ -1551,14 +1534,9 @@ def _prepare_network_graph(
 
 def aplot_network(
     pd_df: pd.DataFrame,
-    node_col: str = "node",
-    node_weight_col: str = "weight",
     edge_source_col: str = "source",
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    node_df: Optional[pd.DataFrame] = None,
     title: Optional[str] = None,
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
@@ -1600,17 +1578,13 @@ def aplot_network(
     Axes
         Matplotlib axes with the plotted network.
     """
-    graph = _prepare_network_graph(
-        pd_df,
-        node_col=node_col,
-        node_weight_col=node_weight_col,
-        edge_source_col=edge_source_col,
-        edge_target_col=edge_target_col,
-        edge_weight_col=edge_weight_col,
-        sort_by=sort_by,
-        node_df=node_df,
-    )
-    return graph.aplot(
+
+    return NetworkGraph(
+        pd_df=pd_df,
+        source=edge_source_col,
+        target=edge_target_col,
+        weight=edge_weight_col,
+    ).aplot(
         title=title,
         style=style,
         edge_weight_col=edge_weight_col,
@@ -1766,14 +1740,9 @@ def aplot_network_components(
 
 def fplot_network(
     pd_df: pd.DataFrame,
-    node_col: str = "node",
-    node_weight_col: str = "weight",
     edge_source_col: str = "source",
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    node_df: Optional[pd.DataFrame] = None,
     title: Optional[str] = None,
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
@@ -1815,25 +1784,17 @@ def fplot_network(
     Figure
         Matplotlib figure with the network graph.
     """
-    fig = cast(Figure, plt.figure(figsize=figsize))
-    fig.patch.set_facecolor(style.background_color)
-    ax = fig.add_subplot()
-    ax = aplot_network(
-        pd_df,
-        node_col=node_col,
-        node_weight_col=node_weight_col,
-        edge_source_col=edge_source_col,
-        edge_target_col=edge_target_col,
-        edge_weight_col=edge_weight_col,
-        sort_by=sort_by,
-        ascending=ascending,
-        node_df=node_df,
+
+    return NetworkGraph(
+        pd_df=pd_df,
+        source=edge_source_col,
+        target=edge_target_col,
+        weight=edge_weight_col,
+    ).fplot(
         title=title,
         style=style,
-        layout_seed=layout_seed,
-        ax=ax,
+        figsize=figsize,
     )
-    return fig
 
 
 def fplot_network_node(

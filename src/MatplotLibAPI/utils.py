@@ -40,29 +40,23 @@ def _wrap_aplot(
         Size of the created figure.
     ax_args : dict, optional
         Additional keyword arguments forwarded to ``plt.subplots``.
-    save_path : str, optional
-        File path where the figure should be saved. The default is ``None``
-        and no file is written.
-    savefig_kwargs : dict, optional
-        Extra keyword arguments forwarded to ``Figure.savefig`` when
-        ``save_path`` is provided. Defaults to ``None``.
     **kwargs : Any
         Additional arguments forwarded to ``plot_func``.
 
     Returns
     -------
     Figure
-        Figure containing the rendered plot. If ``save_path`` is supplied the
-        figure is saved before being returned.
+        Figure containing the rendered plot. 
     """
     ax_args = ax_args or {}
     fig, axes_obj = plt.subplots(figsize=figsize, **ax_args)
-    fig.patch.set_facecolor(style.background_color)
+    fig_obj: Figure = cast(Figure, fig)
+    fig_obj.patch.set_facecolor(style.background_color)
     ax: Axes
     if isinstance(axes_obj, Axes):
         ax = axes_obj
     else:
         ax = cast(Axes, axes_obj.flat[0] if isinstance(axes_obj, ndarray) else axes_obj)
     plot_func(pd_df=pd_df, ax=ax, **kwargs)
-    fig_obj: Figure = cast(Figure, fig)
+    
     return fig_obj
