@@ -22,18 +22,24 @@ This will create a `data` directory with CSV files for each plot type.
 
 ## Usage
 
-Here's a simple example of how to create a bubble chart using MatplotLibAPI with a sample CSV file:
+Here's a simple example of how to create a bubble chart using the object-based API with a sample CSV file:
 
 ```python
 import pandas as pd
 import matplotlib.pyplot as plt
-from MatplotLibAPI import fplot_bubble
+from MatplotLibAPI.bubble import Bubble
 
 # Load the sample data
 df = pd.read_csv('data/bubble.csv')
 
-# Generate the bubble chart
-fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='population', z='population', title='Country Statistics')
+# Build and render the bubble chart
+fig = Bubble(
+    pd_df=df,
+    label='country',
+    x='gdp_per_capita',
+    y='population',
+    z='population',
+).fplot(title='Country Statistics')
 
 # Display the plot
 plt.show()
@@ -136,10 +142,16 @@ This repository includes a `data` directory with sample CSV files for each plot 
 
 ```python
 import pandas as pd
-from MatplotLibAPI import fplot_bubble
+from MatplotLibAPI.bubble import Bubble
 
 df = pd.read_csv('data/bubble.csv')
-fig = fplot_bubble(df, label='country', x='gdp_per_capita', y='life_expectancy', z='population')
+fig = Bubble(
+    pd_df=df,
+    label='country',
+    x='gdp_per_capita',
+    y='life_expectancy',
+    z='population',
+).fplot()
 fig.show()
 ```
 
@@ -147,10 +159,16 @@ fig.show()
 
 ```python
 import pandas as pd
-from MatplotLibAPI import fplot_network
+from MatplotLibAPI.network import NetworkGraph
 
 df = pd.read_csv('data/network.csv')
-fig = fplot_network(df)
+graph = NetworkGraph.from_pandas_edgelist(
+    df,
+    source='city_a',
+    target='city_b',
+    edge_weight_col='distance_km',
+)
+fig = graph.fplot(title='City Network', edge_weight_col='distance_km')
 fig.show()
 ```
 
