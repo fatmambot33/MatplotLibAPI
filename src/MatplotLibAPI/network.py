@@ -301,9 +301,9 @@ class NetworkGraph(BasePlot):
         Return node positions computed with a spring layout.
     layout
         Return scaled node sizes, edge widths, and grouped font sizes.
-    aplot_network
+    aplot
         Plot the graph on a provided axis.
-    fplot_network
+    fplot
         Plot the graph and return a new figure.
     aplot_connected_components
         Plot each connected component on a shared axis.
@@ -846,27 +846,6 @@ class NetworkGraph(BasePlot):
 
         return ax
 
-    def aplot_network(
-        self,
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        edge_weight_col: str = "weight",
-        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
-        ax: Optional[Axes] = None,
-    ) -> Axes:
-        """Plot the graph on existing axes.
-
-        This method is kept for backward compatibility and delegates to
-        :meth:`aplot`.
-        """
-        return self.aplot(
-            title=title,
-            style=style,
-            edge_weight_col=edge_weight_col,
-            layout_seed=layout_seed,
-            ax=ax,
-        )
-
     def fplot(
         self,
         title: Optional[str] = None,
@@ -967,7 +946,7 @@ class NetworkGraph(BasePlot):
             component_graph = NetworkGraph(
                 nx.subgraph(graph._nx_graph, component).copy()
             )
-            component_graph.aplot_network(
+            component_graph.aplot(
                 title=f"{title}::{i}" if title else str(i),
                 style=style,
                 edge_weight_col=edge_weight_col,
@@ -1664,7 +1643,7 @@ def aplot_network_node(
     )
     component_graph = graph.get_component_subgraph(node)
     resolved_title = title if title is not None else string_formatter(node)
-    return component_graph.aplot_network(
+    return component_graph.aplot(
         title=resolved_title,
         style=style,
         edge_weight_col=edge_weight_col,

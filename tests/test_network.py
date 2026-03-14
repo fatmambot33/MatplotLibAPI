@@ -152,7 +152,7 @@ def test_aplot_network_node_limits_to_component(monkeypatch):
         captured_nodes.append(set(self._nx_graph.nodes))
         return plt.gca()
 
-    monkeypatch.setattr(NetworkGraph, "aplot_network", fake_plot)
+    monkeypatch.setattr(NetworkGraph, "aplot", fake_plot)
 
     aplot_network_node(df, node="a")
 
