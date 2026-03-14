@@ -7,6 +7,7 @@ This module provides functions to generate and plot sample network data for test
 import sys
 import os
 from pathlib import Path
+from matplotlib.figure import Figure
 import pandas as pd
 from sample_data import main as generate_sample_data
 
@@ -21,27 +22,23 @@ def generate_sample_network_data():
         "distance_km": [5585, 9562, 7824, 16027, 10850],
     }
     df = pd.DataFrame(data)
-    df.to_csv("data/network.csv", index=False)
+    return df
 
 
-def plot_sample_network_data():
+def plot_sample_network_data() -> Figure:
     """Load a sample DataFrame for testing."""
     from MatplotLibAPI.network import NetworkGraph
 
-    # Assuming sample data is stored in a 'data' directory within the tests folder
-    filepath = os.path.join("data", "network.csv")
-    pd_df = pd.read_csv(filepath)
+    
+    pd_df = generate_sample_network_data()
     graph = NetworkGraph.from_pandas_edgelist(
         pd_df, source="city_a", target="city_b", edge_weight_col="distance_km"
     )
-    plot_fig = graph.fplot(title="Network Graph", edge_weight_col="distance_km")
+    plot_fig = graph.fplot(title="Network Graph")
 
     return plot_fig
 
 
 if __name__ == "__main__":
-    generate_sample_network_data()
     plot_fig = plot_sample_network_data()
-    fig_path = os.path.join("data", "network.png")
-    plot_fig.savefig(fig_path)
-    # plot_fig.show()
+    plot_fig.savefig("examples/network.png")

@@ -894,7 +894,7 @@ class NetworkGraph(BasePlot):
         """
         fig = _wrap_aplot(
             self.aplot,
-            pd_df=self._obj,
+            pd_df=self._nx_graph,
             title=title,
             style=style,
             layout_seed=layout_seed,
