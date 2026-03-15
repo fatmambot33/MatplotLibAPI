@@ -22,7 +22,15 @@ __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_bar", "fplot_bar"]
 
 
 class BarChart(BasePlot):
-    """Class for plotting bar charts."""
+    """Plot grouped and stacked bar charts from tabular data.
+
+    Methods
+    -------
+    aplot
+        Plot a bar chart on an existing Matplotlib axes.
+    fplot
+        Plot a bar chart on a new Matplotlib figure.
+    """
 
     def __init__(
         self,

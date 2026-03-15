@@ -21,7 +21,15 @@ __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_box_violin", "fplot_box_violin"
 
 
 class BoxViolinPlot(BasePlot):
-    """Class for plotting box and violin charts."""
+    """Plot box and violin distribution charts from tabular data.
+
+    Methods
+    -------
+    aplot
+        Plot a box or violin chart on an existing Matplotlib axes.
+    fplot
+        Plot a box or violin chart on a new Matplotlib figure.
+    """
 
     def __init__(
         self,
@@ -47,7 +55,24 @@ class BoxViolinPlot(BasePlot):
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
+        """Plot a box or violin chart on the provided axis.
 
+        Parameters
+        ----------
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is DISTRIBUTION_STYLE_TEMPLATE.
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, use the current axes.
+        **kwargs : Any
+            Additional keyword arguments reserved for compatibility.
+
+        Returns
+        -------
+        Axes
+            The Matplotlib axes containing the distribution chart.
+        """
         plot_ax = _get_axis(ax)
 
         common_kwargs = {
@@ -76,6 +101,22 @@ class BoxViolinPlot(BasePlot):
         style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
+        """Plot a box or violin chart on a new figure.
+
+        Parameters
+        ----------
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is DISTRIBUTION_STYLE_TEMPLATE.
+        figsize : tuple[float, float], optional
+            Figure size. The default is (10, 6).
+
+        Returns
+        -------
+        Figure
+            The Matplotlib figure containing the distribution chart.
+        """
         return _wrap_aplot(
             aplot_box_violin,
             pd_df=self._obj,
