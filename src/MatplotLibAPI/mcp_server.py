@@ -362,7 +362,7 @@ def render_plot_module_octet(
     )
 
 
-def create_bubble_mcp_server() -> Any:
+def create_mcp_server() -> Any:
     """Create an MCP server exposing MatplotLibAPI plotting tools.
 
     Returns
@@ -618,25 +618,8 @@ def create_bubble_mcp_server() -> Any:
 
 def main() -> None:
     """Run the MCP server over stdio transport."""
-    server = create_bubble_mcp_server()
+    server = create_mcp_server()
     server.run(transport="stdio")
-
-
-main_bubble = main
-main_network = main
-main_bar = main
-main_histogram = main
-main_box_violin = main
-main_heatmap = main
-main_area = main
-main_pie = main
-main_waffle = main
-main_sankey = main
-main_table = main
-main_timeserie = main
-main_wordcloud = main
-main_treemap = main
-main_sunburst = main
 
 
 if __name__ == "__main__":  # pragma: no cover
