@@ -155,6 +155,29 @@ class NodeView(nx.classes.reportviews.NodeView):
         filtered_nodes = [node for node in self if self[node].get(attribute) == value]
         return filtered_nodes
 
+    def to_dataframe(
+        self, node_col: str = "node", weight_col: str = "weight"
+    ) -> pd.DataFrame:
+        """Convert the node view to a DataFrame.
+
+        Parameters
+        ----------
+        node_col : str, optional
+            Column name for node identifiers. The default is "node".
+        weight_col : str, optional
+            Column name for node weights. The default is "weight".
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with columns for nodes and their weights.
+        """
+        data = [
+            {node_col: node, weight_col: data.get(weight_col, 1)}
+            for node, data in self(data=True)
+        ]
+        return pd.DataFrame(data)
+
 
 class AdjacencyView(nx.classes.coreviews.AdjacencyView):
     """Adjacency view with sorting and filtering helpers."""
@@ -196,6 +219,26 @@ class AdjacencyView(nx.classes.coreviews.AdjacencyView):
         """
         filtered_nodes = [node for node in self if self[node].get(attribute) == value]
         return filtered_nodes
+
+    def to_dataframe(
+        self, node_col: str = "node", weight_col: str = "weight"
+    ) -> pd.DataFrame:
+        """Convert the adjacency view to a DataFrame.
+
+        Parameters
+        ----------
+        node_col : str, optional
+            Column name for node identifiers. The default is "node".
+        weight_col : str, optional
+            Column name for node weights. The default is "weight".
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with columns for adjacent nodes and their weights.
+        """
+        data = {node: self[node].get(weight_col, 1) for node in self}
+        return pd.DataFrame(data)
 
 
 class EdgeView(nx.classes.reportviews.EdgeView):
@@ -244,6 +287,34 @@ class EdgeView(nx.classes.reportviews.EdgeView):
         return [
             (edge[0], edge[1]) for edge in self if self[edge].get(attribute) == value
         ]
+
+    def to_dataframe(
+        self,
+        source_col: str = "source",
+        target_col: str = "target",
+        weight_col: str = "weight",
+    ) -> pd.DataFrame:
+        """Convert the edge view to a DataFrame.
+
+        Parameters
+        ----------
+        source_col : str, optional
+            Column name for source nodes. The default is "source".
+        target_col : str, optional
+            Column name for target nodes. The default is "target".
+        weight_col : str, optional
+            Column name for edge weights. The default is "weight".
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with columns for source, target and weight.
+        """
+        data = [
+            {source_col: u, target_col: v, weight_col: data.get(weight_col, 1)}
+            for u, v, data in self(data=True)
+        ]
+        return pd.DataFrame(data)
 
 
 def _sanitize_node_dataframe(

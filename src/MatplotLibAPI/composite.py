@@ -10,8 +10,10 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
+from .base_plot import BasePlot
+
 from .bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, Bubble
-from .network import aplot_network
+from .network import aplot_network, NetworkGraph
 from .style_template import (
     MAX_RESULTS,
     TITLE_SCALE_FACTOR,
@@ -20,7 +22,7 @@ from .style_template import (
 )
 from .table import aplot_table
 from .treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap
-from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud
+from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, WordCloud
 
 
 def plot_composite_bubble(
@@ -195,10 +197,8 @@ def plot_composite_treemap(
 
 
 def fplot_wordcloud_network(
-    nodes_df: pd.DataFrame,
+    node_df: pd.DataFrame,
     edges_df: pd.DataFrame,
-    node_col: str = "node",
-    node_weight_col: str = "weight",
     edge_source_col: str = "source",
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
@@ -214,15 +214,8 @@ def fplot_wordcloud_network(
 
     Parameters
     ----------
-    nodes_df : pd.DataFrame
-        DataFrame containing node labels and optional weights for the word cloud.
     edges_df : pd.DataFrame
         DataFrame containing edge connections for the network plot.
-    node_col : str, optional
-        Column in ``nodes_df`` containing the node labels. The default is ``"node"``.
-    node_weight_col : str, optional
-        Column in ``nodes_df`` containing weights for sizing words. The default is
-        ``"weight"``.
     edge_source_col : str, optional
         Column in ``edges_df`` containing source nodes. The default is ``"source"``.
     edge_target_col : str, optional
@@ -274,28 +267,39 @@ def fplot_wordcloud_network(
             fontname=style.font_name,
         )
 
+    validate_dataframe(
+        node_df,
+        cols=["node", "weight"],
+    )
+    validate_dataframe(
+        edges_df,
+        cols=[edge_source_col, edge_target_col, edge_weight_col],
+    )
+
+    network = NetworkGraph.from_pandas(
+        node_df,
+        edges_df,
+        node_col="node",
+        node_weight_col="weight",
+        edge_source_col=edge_source_col,
+        edge_target_col=edge_target_col,
+        edge_weight_col=edge_weight_col,
+    )
+    network.aplot(
+        title=None,
+        style=network_style,
+        ax=network_ax,
+    )
+
     aplot_wordcloud(
-        pd_df=nodes_df,
-        text_column=node_col,
-        weight_column=node_weight_col,
+        pd_df=network.node_view.to_dataframe(),
+        text_column="node",
+        weight_column=edge_weight_col,
         title=None,
         style=wordcloud_style,
         max_words=max_words,
         stopwords=stopwords,
         ax=wordcloud_ax,
-    )
-
-    aplot_network(
-        pd_df=edges_df,
-        node_df=nodes_df,
-        node_col=node_col,
-        node_weight_col=node_weight_col,
-        edge_source_col=edge_source_col,
-        edge_target_col=edge_target_col,
-        edge_weight_col=edge_weight_col,
-        title=None,
-        style=network_style,
-        ax=network_ax,
     )
 
     if title:

@@ -46,7 +46,7 @@ def _wrap_aplot(
     Returns
     -------
     Figure
-        Figure containing the rendered plot. 
+        Figure containing the rendered plot.
     """
     ax_args = ax_args or {}
     fig, axes_obj = plt.subplots(figsize=figsize, **ax_args)
@@ -58,5 +58,5 @@ def _wrap_aplot(
     else:
         ax = cast(Axes, axes_obj.flat[0] if isinstance(axes_obj, ndarray) else axes_obj)
     plot_func(pd_df=pd_df, ax=ax, **kwargs)
-    
+
     return fig_obj

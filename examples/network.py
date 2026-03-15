@@ -29,7 +29,6 @@ def plot_sample_network_data() -> Figure:
     """Load a sample DataFrame for testing."""
     from MatplotLibAPI.network import NetworkGraph
 
-    
     pd_df = generate_sample_network_data()
     graph = NetworkGraph.from_pandas_edgelist(
         pd_df, source="city_a", target="city_b", edge_weight_col="distance_km"

@@ -724,43 +724,6 @@ class DataFrameAccessor:
             ax=ax,
         )
 
-    def fplot_correlation_matrix(
-        self,
-        columns: Optional[List[str]] = None,
-        method: CorrelationMethod = "pearson",
-        title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = FIG_SIZE,
-    ) -> Figure:
-        """Plot a correlation matrix heatmap on a new figure.
-
-        Parameters
-        ----------
-        columns : list[str], optional
-            Numeric columns to include. The default is ``None`` for all numeric columns.
-        method : CorrelationMethod, optional
-            Correlation method. The default is "pearson".
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is ``HEATMAP_STYLE_TEMPLATE``.
-        figsize : tuple[float, float], optional
-            Figure size. The default is FIG_SIZE.
-
-        Returns
-        -------
-        Figure
-            The new Matplotlib figure with the correlation matrix.
-        """
-        return fplot_correlation_matrix(
-            pd_df=self._obj,
-            columns=columns,
-            method=method,
-            title=title,
-            style=style,
-            figsize=figsize,
-        )
-
     def aplot_area(
         self,
         x: str,
@@ -1409,14 +1372,9 @@ class DataFrameAccessor:
 
         return aplot_network(
             pd_df=self._obj,
-            node_col=node_col,
-            node_weight_col=node_weight_col,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
-            sort_by=sort_by,
-            ascending=ascending,
-            node_df=node_df,
             title=title,
             style=style,
             ax=ax,
@@ -1620,14 +1578,9 @@ class DataFrameAccessor:
 
         return fplot_network(
             pd_df=self._obj,
-            node_col=node_col,
-            node_weight_col=node_weight_col,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
-            sort_by=sort_by,
-            ascending=ascending,
-            node_df=node_df,
             title=title,
             style=style,
             figsize=figsize,

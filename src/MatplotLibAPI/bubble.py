@@ -492,3 +492,67 @@ class Bubble(BasePlot):
             ax=ax,
         )
         return fig
+
+
+def aplot_bubble(
+    pd_df: pd.DataFrame,
+    label: str,
+    x: str,
+    y: str,
+    z: str,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    max_values: int = MAX_RESULTS,
+    center_to_mean: bool = False,
+    title: Optional[str] = None,
+    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+    hline: bool = False,
+    vline: bool = False,
+    ax: Optional[Axes] = None,
+    **kwargs: Any,
+) -> Axes:
+    """Plot a bubble chart on existing axes."""
+    return Bubble(
+        pd_df=pd_df,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        sort_by=sort_by,
+        ascending=ascending,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+    ).aplot(title=title, style=style, hline=hline, vline=vline, ax=ax, **kwargs)
+
+
+def fplot_bubble(
+    pd_df: pd.DataFrame,
+    label: str,
+    x: str,
+    y: str,
+    z: str,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    max_values: int = MAX_RESULTS,
+    center_to_mean: bool = False,
+    title: Optional[str] = None,
+    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+    hline: bool = False,
+    vline: bool = False,
+    figsize: Tuple[float, float] = FIG_SIZE,
+    **kwargs: Any,
+) -> Figure:
+    """Plot a bubble chart on a new figure."""
+    return Bubble(
+        pd_df=pd_df,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        sort_by=sort_by,
+        ascending=ascending,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+    ).fplot(
+        title=title, style=style, hline=hline, vline=vline, figsize=figsize, **kwargs
+    )
