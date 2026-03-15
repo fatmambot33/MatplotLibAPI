@@ -30,16 +30,14 @@ class BoxViolinPlot(BasePlot):
         by: Optional[str] = None,
         violin: bool = False,
     ):
-        super().__init__(pd_df=pd_df)
-        self.column = column
-        self.by = by
-        self.violin = violin
-
-    def post_init(self):
         cols = [self.column]
         if self.by:
             cols.append(self.by)
         validate_dataframe(self._obj, cols=cols)
+        super().__init__(pd_df=pd_df)
+        self.column = column
+        self.by = by
+        self.violin = violin
 
     def aplot(
         self,

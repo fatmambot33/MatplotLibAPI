@@ -8,6 +8,7 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
+from .base_plot import BasePlot
 from .utils import _get_axis, _wrap_aplot
 from .style_template import (
     TIMESERIE_STYLE_TEMPLATE,
@@ -185,6 +186,66 @@ def _setup_timeserie_axes(
     ax.grid(True)
 
 
+class TimeSeriePlot(BasePlot):
+    """Class for plotting time series."""
+
+    def __init__(self, pd_df: pd.DataFrame, label: str, x: str, y: str):
+        validate_dataframe(pd_df, cols=[label, x, y])
+        super().__init__(pd_df=pd_df)
+        self.label = label
+        self.x = x
+        self.y = y
+
+    def aplot(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
+        max_values: int = 100,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        std: bool = False,
+        ax: Optional[Axes] = None,
+        **kwargs: Any,
+    ) -> Axes:
+        df = _prepare_timeserie_data(self._obj, self.label, self.x, self.y, sort_by)
+        format_funcs = format_func(
+            style.format_funcs, label=self.label, x=self.x, y=self.y
+        )
+        plot_ax = _get_axis(ax)
+        _plot_timeserie_lines(
+            plot_ax, df, self.label, self.x, self.y, std, style, format_funcs
+        )
+        _setup_timeserie_axes(plot_ax, self.label, self.x, self.y, style, format_funcs)
+
+        if title:
+            plot_ax.set_title(
+                title, color=style.font_color, fontsize=style.font_size + 4
+            )
+        return plot_ax
+
+    def fplot(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
+        max_values: int = 100,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        std: bool = False,
+        figsize: Tuple[float, float] = FIG_SIZE,
+    ) -> Figure:
+        fig, ax = plt.subplots(figsize=figsize)
+        self.aplot(
+            title=title,
+            style=style,
+            max_values=max_values,
+            sort_by=sort_by,
+            ascending=ascending,
+            std=std,
+            ax=ax,
+        )
+        return fig
+
+
 def aplot_timeserie(
     pd_df: pd.DataFrame,
     label: str,
@@ -250,19 +311,16 @@ def aplot_timeserie(
     >>> fig, ax = plt.subplots()
     >>> aplot_timeserie(df, label='category', x='date', y='value', ax=ax)
     """
-    plot_ax = _get_axis(ax)
-
-    df = _prepare_timeserie_data(pd_df, label, x, y, sort_by)
-
-    format_funcs = format_func(style.format_funcs, label=label, x=x, y=y)
-
-    _plot_timeserie_lines(plot_ax, df, label, x, y, std, style, format_funcs)
-
-    _setup_timeserie_axes(plot_ax, label, x, y, style, format_funcs)
-
-    if title:
-        plot_ax.set_title(title, color=style.font_color, fontsize=style.font_size + 4)
-    return plot_ax
+    return TimeSeriePlot(pd_df=pd_df, label=label, x=x, y=y).aplot(
+        title=title,
+        style=style,
+        max_values=max_values,
+        sort_by=sort_by,
+        ascending=ascending,
+        std=std,
+        ax=ax,
+        **kwargs,
+    )
 
 
 def fplot_timeserie(
@@ -327,19 +385,14 @@ def fplot_timeserie(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_timeserie(df, label="category", x="date", y="value")
     """
-    return _wrap_aplot(
-        aplot_timeserie,
-        pd_df=pd_df,
-        figsize=figsize,
-        label=label,
-        x=x,
-        y=y,
+    return TimeSeriePlot(pd_df=pd_df, label=label, x=x, y=y).fplot(
         title=title,
         style=style,
         max_values=max_values,
         sort_by=sort_by,
         ascending=ascending,
         std=std,
+        figsize=figsize,
     )
 
 

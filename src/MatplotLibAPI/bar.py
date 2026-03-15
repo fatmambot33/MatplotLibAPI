@@ -31,17 +31,15 @@ class BarChart(BasePlot):
         group: Optional[str] = None,
         stacked: bool = False,
     ):
+        cols = [self.category, self.value]
+        if self.group:
+            cols.append(self.group)
+        validate_dataframe(self._obj, cols=cols)
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
         self.group = group
         self.stacked = stacked
-
-    def post_init(self):
-        cols = [self.category, self.value]
-        if self.group:
-            cols.append(self.group)
-        validate_dataframe(self._obj, cols=cols)
 
     def aplot(
         self,

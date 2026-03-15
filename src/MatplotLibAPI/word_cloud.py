@@ -14,7 +14,9 @@ from matplotlib.backend_bases import FigureCanvasBase
 from matplotlib.figure import Figure, SubFigure
 from wordcloud import WordCloud
 
-from .utils import _wrap_aplot
+from .base_plot import BasePlot
+
+from .utils import _get_axis, _wrap_aplot
 
 from .style_template import (
     FIG_SIZE,
@@ -241,6 +243,65 @@ def _plot_words(
     return ax
 
 
+class WordCloudPlot(BasePlot):
+    def __init__(self, pd_df: pd.DataFrame, text_column: str, weight_column: str):
+        validate_dataframe(pd_df, cols=[text_column], sort_by=weight_column)
+        super().__init__(pd_df=pd_df)
+        self.text_column = text_column
+        self.weight_column = weight_column
+
+    def aplot(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        max_words: int = MAX_RESULTS,
+        stopwords: Optional[Iterable[str]] = None,
+        random_state: Optional[int] = None,
+        ax: Optional[Axes] = None,
+        mask: Optional[np.ndarray] = None,
+        **kwargs: Any,
+    ) -> Axes:
+        words, weights = _prepare_word_frequencies(
+            pd_df=self._obj,
+            text_column=self.text_column,
+            weight_column=self.weight_column,
+            max_words=max_words,
+            stopwords=stopwords,
+        )
+        plot_ax = _get_axis(ax)
+        return _plot_words(
+            plot_ax,
+            words,
+            weights,
+            style=style,
+            title=title,
+            random_state=random_state,
+            mask=mask,
+        )
+
+    def fplot(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        max_words: int = MAX_RESULTS,
+        stopwords: Optional[Iterable[str]] = None,
+        random_state: Optional[int] = None,
+        figsize: Tuple[float, float] = FIG_SIZE,
+        mask: Optional[np.ndarray] = None,
+    ) -> Figure:
+        fig, ax = plt.subplots(figsize=figsize)
+        self.aplot(
+            title=title,
+            style=style,
+            max_words=max_words,
+            stopwords=stopwords,
+            random_state=random_state,
+            ax=ax,
+            mask=mask,
+        )
+        return fig
+
+
 def aplot_wordcloud(
     pd_df: pd.DataFrame,
     text_column: str,
@@ -250,7 +311,7 @@ def aplot_wordcloud(
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
     random_state: Optional[int] = None,
-    ax: Optional[Axes | np.ndarray] = None,
+    ax: Optional[Axes] = None,
     mask: Optional[np.ndarray] = None,
     **kwargs: Any,
 ) -> Axes:
@@ -292,35 +353,26 @@ def aplot_wordcloud(
     TypeError
         If ``ax`` is not a ``matplotlib.axes.Axes`` instance.
     """
-    if ax is None:
-        ax = cast(Axes, plt.gca())
-    elif isinstance(ax, np.ndarray):
-        raise TypeError("ax must be a single matplotlib Axes instance, not an array.")
-    elif not isinstance(ax, Axes):
-        raise TypeError("ax must be a matplotlib Axes instance.")
-
-    words, weights = _prepare_word_frequencies(
+    return WordCloudPlot(
         pd_df=pd_df,
         text_column=text_column,
         weight_column=weight_column,
+    ).aplot(
+        title=title,
+        style=style,
         max_words=max_words,
         stopwords=stopwords,
-    )
-    return _plot_words(
-        ax,
-        words,
-        weights,
-        style=style,
-        title=title,
         random_state=random_state,
+        ax=ax,
         mask=mask,
+        **kwargs,
     )
 
 
 def fplot_wordcloud(
     pd_df: pd.DataFrame,
     text_column: str,
-    weight_column: Optional[str] = None,
+    weight_column: str,
     title: Optional[str] = None,
     style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
     max_words: int = MAX_RESULTS,
@@ -359,11 +411,9 @@ def fplot_wordcloud(
     Figure
         Matplotlib figure containing the word cloud.
     """
-    return _wrap_aplot(
-        aplot_wordcloud,
-        pd_df=pd_df,
-        text_column=text_column,
-        weight_column=weight_column,
+    return WordCloudPlot(
+        pd_df=pd_df, text_column=text_column, weight_column=weight_column
+    ).fplot(
         title=title,
         style=style,
         max_words=max_words,

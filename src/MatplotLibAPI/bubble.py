@@ -177,14 +177,22 @@ class Bubble(BasePlot):
 
         # X-axis ticks and formatting
         x_min, x_max = cast(float, pd_df[x].min()), cast(float, pd_df[x].max())
-        ax.xaxis.set_ticks(generate_ticks(x_min, x_max, num_ticks=style.x_ticks))
+        ax.xaxis.set_ticks(
+            generate_ticks(
+                x_min, x_max, num_ticks=style.x_ticks
+            )  # pyright: ignore[reportArgumentType]
+        )
         ax.xaxis.grid(True, "major", linewidth=0.5, color=style.font_color)
         if format_funcs and (fmt_x := format_funcs.get(x)):
             ax.xaxis.set_major_formatter(DynamicFuncFormatter(fmt_x))
 
         # Y-axis ticks and formatting
         y_min, y_max = cast(float, pd_df[y].min()), cast(float, pd_df[y].max())
-        ax.yaxis.set_ticks(generate_ticks(y_min, y_max, num_ticks=style.y_ticks))
+        ax.yaxis.set_ticks(
+            generate_ticks(
+                y_min, y_max, num_ticks=style.y_ticks
+            )  # pyright: ignore[reportArgumentType]
+        )
         if style.yscale == "log":
             ax.yaxis.set_minor_locator(NullLocator())
         else:

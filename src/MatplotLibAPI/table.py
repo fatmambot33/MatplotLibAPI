@@ -8,6 +8,8 @@ from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 from matplotlib.table import Table
 
+from .base_plot import BasePlot
+
 from .utils import _get_axis, _wrap_aplot
 
 from .style_template import (
@@ -20,60 +22,6 @@ from .style_template import (
 )
 
 __all__ = ["TABLE_STYLE_TEMPLATE", "aplot_table", "fplot_table"]
-
-
-def _prepare_table_data(
-    pd_df: pd.DataFrame,
-    cols: List[str],
-    sort_by: Optional[str],
-    ascending: bool,
-    max_values: int,
-    style: StyleTemplate,
-) -> pd.DataFrame:
-    """Prepare data for table plotting.
-
-    Parameters
-    ----------
-    pd_df : pd.DataFrame
-        Input DataFrame.
-    cols : List[str]
-        Columns to include in the table.
-    sort_by : Optional[str]
-        Column to sort by.
-    ascending : bool
-        Sort order.
-    max_values : int
-        Maximum number of rows to display.
-    style : StyleTemplate
-        Styling for the plot.
-
-    Returns
-    -------
-    pd.DataFrame
-        Prepared DataFrame for plotting.
-
-    Raises
-    ------
-    AttributeError
-        If required columns are missing from the DataFrame.
-    """
-    validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
-
-    if sort_by is None:
-        sort_by = cols[0]
-
-    plot_df = (
-        pd_df[cols]
-        .sort_values(by=[sort_by], ascending=ascending)  # type: ignore
-        .head(max_values)
-        .copy()
-    )
-
-    if style.format_funcs:
-        for col, func in style.format_funcs.items():
-            if col in plot_df.columns and func is not None:
-                plot_df[col] = plot_df[col].apply(func)
-    return plot_df
 
 
 def _format_table(table: Table, style: StyleTemplate):
@@ -94,6 +42,84 @@ def _format_table(table: Table, style: StyleTemplate):
         cell.set_fontsize(style.font_size)
         cell.set_facecolor(style.background_color)
         cell.get_text().set_color(style.font_color)
+
+
+class TablePlot(BasePlot):
+    """Class for plotting tables."""
+
+    def __init__(self, pd_df: pd.DataFrame, cols: List[str]):
+        validate_dataframe(pd_df, cols=cols)
+        super().__init__(pd_df=pd_df)
+        self.cols = cols
+
+    def aplot(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        max_values: int = 20,
+        ax: Optional[Axes] = None,
+        **kwargs: Any,
+    ) -> Axes:
+        plot_ax = _get_axis(ax)
+
+        if sort_by is None:
+            sort_by = self.cols[0]
+
+        plot_df = (
+            self._obj[self.cols]
+            .sort_values(by=[sort_by], ascending=ascending)  # type: ignore
+            .head(max_values)
+            .copy()
+        )
+
+        if style.format_funcs:
+            for col, func in style.format_funcs.items():
+                if col in plot_df.columns and func is not None:
+                    plot_df[col] = plot_df[col].apply(func)
+
+        table_plot = plot_ax.table(
+            cellText=plot_df.values.tolist(),
+            colLabels=[string_formatter(colLabel) for colLabel in self.cols],
+            cellLoc="center",
+            colWidths=style.col_widths,
+            bbox=Bbox.from_bounds(0, -0.3, 1, 1.3),
+        )
+
+        _format_table(table_plot, style)
+
+        plot_ax.set_facecolor(style.background_color)
+        plot_ax.set_axis_off()
+        plot_ax.grid(False)
+        if title:
+            plot_ax.set_title(
+                title,
+                color=style.font_color,
+                fontsize=style.font_size * TITLE_SCALE_FACTOR,
+            )
+            plot_ax.title.set_position((0.5, 1.05))
+        return plot_ax
+
+    def fplot(
+        self,
+        title: Optional[str] = None,
+        style: StyleTemplate = TABLE_STYLE_TEMPLATE,
+        sort_by: Optional[str] = None,
+        ascending: bool = False,
+        max_values: int = 20,
+        figsize: Tuple[float, float] = FIG_SIZE,
+    ) -> Figure:
+        return _wrap_aplot(
+            self.aplot,
+            pd_df=self._obj,
+            title=title,
+            style=style,
+            sort_by=sort_by,
+            ascending=ascending,
+            max_values=max_values,
+            figsize=figsize,
+        )
 
 
 def aplot_table(
@@ -148,31 +174,15 @@ def aplot_table(
     >>> fig, ax = plt.subplots()
     >>> aplot_table(df, cols=['col1', 'col2'], ax=ax)
     """
-    plot_ax = _get_axis(ax)
-
-    plot_df = _prepare_table_data(pd_df, cols, sort_by, ascending, max_values, style)
-
-    table_plot = plot_ax.table(
-        cellText=plot_df.values.tolist(),
-        colLabels=[string_formatter(colLabel) for colLabel in cols],
-        cellLoc="center",
-        colWidths=style.col_widths,
-        bbox=Bbox.from_bounds(0, -0.3, 1, 1.3),
+    return TablePlot(pd_df=pd_df, cols=cols).aplot(
+        title=title,
+        style=style,
+        sort_by=sort_by,
+        ascending=ascending,
+        max_values=max_values,
+        ax=ax,
+        **kwargs,
     )
-
-    _format_table(table_plot, style)
-
-    plot_ax.set_facecolor(style.background_color)
-    plot_ax.set_axis_off()
-    plot_ax.grid(False)
-    if title:
-        plot_ax.set_title(
-            title,
-            color=style.font_color,
-            fontsize=style.font_size * TITLE_SCALE_FACTOR,
-        )
-        plot_ax.title.set_position((0.5, 1.05))
-    return plot_ax
 
 
 def fplot_table(

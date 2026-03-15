@@ -8,10 +8,65 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
+from .base_plot import BasePlot
+
 from .style_template import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
 from .utils import _get_axis, _wrap_aplot
 
 __all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie_donut", "fplot_pie_donut"]
+
+
+class PieChart(BasePlot):
+    """Class for plotting pie and donut charts."""
+
+    def __init__(self, pd_df: pd.DataFrame, category: str, value: str):
+        validate_dataframe(self._obj, cols=[self.category, self.value])
+        super().__init__(pd_df=pd_df)
+        self.category = category
+        self.value = value
+
+    def aplot(
+        self,
+        donut: bool = False,
+        title: Optional[str] = None,
+        style: StyleTemplate = PIE_STYLE_TEMPLATE,
+        ax: Optional[Axes] = None,
+        **kwargs: Any,
+    ) -> Axes:
+        labels = self._obj[self.category].astype(str).tolist()
+        sizes = self._obj[self.value]
+        plot_ax = _get_axis(ax)
+        wedgeprops: Optional[Dict[str, Any]] = None
+        if donut:
+            wedgeprops = {"width": 0.3}
+        plot_ax.pie(
+            sizes,
+            labels=labels,
+            autopct="%1.1f%%",
+            colors=sns.color_palette(style.palette),
+            wedgeprops=wedgeprops,
+            textprops={"color": style.font_color, "fontsize": style.font_size},
+        )
+        plot_ax.axis("equal")
+        if title:
+            plot_ax.set_title(title)
+        return plot_ax
+
+    def fplot(
+        self,
+        donut: bool = False,
+        title: Optional[str] = None,
+        style: StyleTemplate = PIE_STYLE_TEMPLATE,
+        figsize: Tuple[float, float] = (8, 8),
+    ) -> Figure:
+        return _wrap_aplot(
+            self.aplot,
+            pd_df=self._obj,
+            donut=donut,
+            title=title,
+            style=style,
+            figsize=figsize,
+        )
 
 
 def aplot_pie_donut(
@@ -25,26 +80,13 @@ def aplot_pie_donut(
     **kwargs: Any,
 ) -> Axes:
     """Plot pie or donut charts for categorical share visualization."""
-    validate_dataframe(pd_df, cols=[category, value])
-    plot_ax = _get_axis(ax)
-    labels = pd_df[category].astype(str).tolist()
-    sizes = pd_df[value]
-
-    wedgeprops: Optional[Dict[str, Any]] = None
-    if donut:
-        wedgeprops = {"width": 0.3}
-    wedges, *_ = plot_ax.pie(
-        sizes,
-        labels=labels,
-        autopct="%1.1f%%",
-        colors=sns.color_palette(style.palette),
-        wedgeprops=wedgeprops,
-        textprops={"color": style.font_color, "fontsize": style.font_size},
+    return PieChart(pd_df=pd_df, category=category, value=value).aplot(
+        donut=donut,
+        title=title,
+        style=style,
+        ax=ax,
+        **kwargs,
     )
-    plot_ax.axis("equal")
-    if title:
-        plot_ax.set_title(title)
-    return plot_ax
 
 
 def fplot_pie_donut(
@@ -57,13 +99,9 @@ def fplot_pie_donut(
     figsize: Tuple[float, float] = (8, 8),
 ) -> Figure:
     """Plot pie or donut charts on a new figure."""
-    return _wrap_aplot(
-        aplot_pie_donut,
-        pd_df=pd_df,
-        figsize=figsize,
-        category=category,
-        value=value,
+    return PieChart(pd_df=pd_df, category=category, value=value).fplot(
         donut=donut,
         title=title,
         style=style,
+        figsize=figsize,
     )

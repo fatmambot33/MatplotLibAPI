@@ -14,6 +14,86 @@ from .style_template import (
 __all__ = ["TREEMAP_STYLE_TEMPLATE", "fplot_sunburst"]
 
 
+class SunburstData:
+    labels: list[str]
+    parents: list[str]
+    values: list[float]
+
+    def __init__(self, labels: list[str], parents: list[str], values: list[float]):
+        self.labels = labels
+        self.parents = parents
+        self.values = values
+
+    @staticmethod
+    def from_pandas(
+        edges_df: pd.DataFrame,
+        labels_col: str,
+        parents_col: str,
+        values_col: str,
+    ) -> "SunburstData":
+        """Create SunburstData from a DataFrame.
+        Parameters
+        ----------
+        edges_df : pd.DataFrame
+            DataFrame containing the data to plot.
+        labels_col : str
+            Column representing the labels of the sectors.
+        parents_col : str
+            Column representing the parent of each sector.
+        values_col : str
+            Column containing values for each sunburst sector.
+
+        Returns
+        -------
+        SunburstData
+            SunburstData object containing the labels, parents, and values for the sunburst plot.
+        """
+        validate_dataframe(edges_df, cols=[labels_col, parents_col, values_col])
+        return SunburstData(
+            labels=edges_df[labels_col].astype(str).tolist(),
+            parents=edges_df[parents_col].astype(str).tolist(),
+            values=edges_df[values_col].tolist(),
+        )
+
+    def fplot(
+        self,
+        style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+        title: Optional[str] = None,
+    ) -> go.Figure:
+        """Return a figure containing the sunburst plot.
+        Parameters
+        ----------
+        style : StyleTemplate, optional
+            Style configuration. The default is `TREEMAP_STYLE_TEMPLATE`.
+        title : str, optional
+            Plot title.
+
+        Returns
+        -------
+        go.Figure
+            Figure containing the sunburst plot.
+        """
+        trace = go.Sunburst(
+            labels=self.labels,
+            parents=self.parents,
+            values=self.values,
+            textinfo="label+percent entry",
+        )
+
+        fig = go.Figure(trace)
+
+        fig.update_layout(
+            title=title,
+            plot_bgcolor=style.background_color,
+            paper_bgcolor=style.background_color,
+            font=dict(
+                family=style.font_name, size=style.font_size, color=style.font_color
+            ),
+            showlegend=style.legend if style else True,
+        )
+        return fig
+
+
 def fplot_sunburst(
     pd_df: pd.DataFrame,
     labels: str,
@@ -21,10 +101,6 @@ def fplot_sunburst(
     values: str,
     style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
     title: Optional[str] = None,
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    max_values: int = 100,
-    fig: Optional[go.Figure] = None,
 ) -> go.Figure:
     """Return a figure containing the sunburst plot.
 
@@ -42,43 +118,19 @@ def fplot_sunburst(
         Style configuration. The default is `TREEMAP_STYLE_TEMPLATE`.
     title : str, optional
         Plot title.
-    sort_by : str, optional
-        Column used to sort data.
-    ascending : bool, optional
-        Sort order for the data. The default is `False`.
-    max_values : int, optional
-        Maximum number of rows to plot. The default is 100.
-    fig : go.Figure, optional
-        Existing figure to add the sunburst chart to.
 
     Returns
     -------
     go.Figure
         Figure containing the sunburst plot.
     """
-    cols = [labels, parents, values]
-    validate_dataframe(pd_df, cols=cols, sort_by=sort_by)
-    if not sort_by:
-        sort_by = values
-    df = pd_df.sort_values(by=sort_by, ascending=ascending)[cols].head(max_values)
 
-    trace = go.Sunburst(
-        labels=df[labels],
-        parents=df[parents],
-        values=df[values],
-        textinfo="label+percent entry",
-    )
-
-    if not fig:
-        fig = go.Figure(trace)
-    else:
-        fig.add_trace(trace)
-
-    fig.update_layout(
+    return SunburstData.from_pandas(
+        edges_df=pd_df,
+        labels_col=labels,
+        parents_col=parents,
+        values_col=values,
+    ).fplot(
+        style=style,
         title=title,
-        plot_bgcolor=style.background_color,
-        paper_bgcolor=style.background_color,
-        font=dict(family=style.font_name, size=style.font_size, color=style.font_color),
-        showlegend=style.legend if style else True,
     )
-    return fig

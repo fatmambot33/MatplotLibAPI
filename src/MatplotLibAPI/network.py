@@ -1598,22 +1598,12 @@ def aplot_network(
     ----------
     pd_df : pd.DataFrame
         DataFrame containing edge data.
-    node_col : str, optional
-        Column name for node identifiers. The default is "node".
-    node_weight_col : str, optional
-        Column name for node weights. The default is "weight".
     edge_source_col : str, optional
         Column name for source nodes. The default is "source".
     edge_target_col : str, optional
         Column name for target nodes. The default is "target".
     edge_weight_col : str, optional
         Column name for edge weights. The default is "weight".
-    sort_by : str, optional
-        Column used to sort the data.
-    ascending : bool, optional
-        Sort order for the data. The default is `False`.
-    node_df : pd.DataFrame, optional
-        DataFrame containing ``node`` and ``weight`` columns to include.
     title : str, optional
         Plot title.
     style : StyleTemplate, optional

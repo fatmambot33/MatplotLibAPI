@@ -59,6 +59,32 @@ class SankeyData:
             ),
         )
 
+    def fplot(
+        self, title: Optional[str] = None, style: StyleTemplate = SANKEY_STYLE_TEMPLATE
+    ) -> go.Figure:
+        """Plot the Sankey diagram using Plotly."""
+        sankey = go.Sankey(
+            node=dict(
+                label=self.node.label,
+                pad=15,
+                thickness=20,
+                color=style.font_color,
+            ),
+            link=dict(
+                source=self.link.source,
+                target=self.link.target,
+                value=self.link.value,
+            ),
+        )
+
+        fig = go.Figure(sankey)
+        if title:
+            fig.update_layout(
+                title_text=title,
+                font=dict(color=style.font_color, size=style.font_size),
+            )
+        return fig
+
 
 def fplot_sankey(
     pd_df: pd.DataFrame,
@@ -70,24 +96,4 @@ def fplot_sankey(
 ) -> go.Figure:
     """Plot a Sankey diagram showing flows between categories."""
     sankey_data = SankeyData.from_pandas_edgelist(pd_df, source, target, value)
-
-    sankey = go.Sankey(
-        node=dict(
-            label=sankey_data.node.label,
-            pad=15,
-            thickness=20,
-            color=style.font_color,
-        ),
-        link=dict(
-            source=sankey_data.link.source,
-            target=sankey_data.link.target,
-            value=sankey_data.link.value,
-        ),
-    )
-
-    fig = go.Figure(sankey)
-    if title:
-        fig.update_layout(
-            title_text=title, font=dict(color=style.font_color, size=style.font_size)
-        )
-    return fig
+    return sankey_data.fplot(title=title, style=style)
