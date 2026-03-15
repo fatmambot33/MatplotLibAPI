@@ -1787,7 +1787,7 @@ class DataFrameAccessor:
             parents=parents,
             values=values,
             title=title,
-            style=style
+            style=style,
         )
 
     def fplot_composite_treemap(
