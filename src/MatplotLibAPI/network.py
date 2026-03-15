@@ -104,7 +104,7 @@ def _scale_weights(
     percentiles = (
         np.percentile(weights_arr, _WEIGHT_PERCENTILES) if deciles is None else deciles
     )
-    outs = np.searchsorted(percentiles, weights_arr)
+    outs = np.atleast_1d(np.searchsorted(percentiles, weights_arr))
     scaled = [
         out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs
     ]
@@ -1022,9 +1022,9 @@ class NetworkGraph(BasePlot):
                 style=style,
                 edge_weight_col=edge_weight_col,
                 layout_seed=layout_seed,
-                ax=local_axes[i],
+                ax=cast(Axes, local_axes[i]),
             )
-            local_axes[i].set_axis_on()
+            cast(Axes, local_axes[i]).set_axis_on()
 
         for axis in local_axes[len(connected_components) :]:
             axis.set_axis_off()
@@ -1174,12 +1174,12 @@ class NetworkGraph(BasePlot):
         network_X.sanitize_network()
         return network_X
 
-    def set_node_attributes(self, attributes: dict[Any, dict[str, Any]]):
+    def set_node_attributes(self, attributes: Dict[Any, Dict[str, Any]]):
         """Set multiple node attributes from a dictionary.
 
         Parameters
         ----------
-        attributes : dict[Any, dict[str, Any]]
+        attributes : Dict[Any, Dict[str, Any]]
             Mapping of node identifiers to their attribute dictionaries.
         """
         for node, attrs in attributes.items():

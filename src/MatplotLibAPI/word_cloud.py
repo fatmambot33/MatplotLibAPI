@@ -6,7 +6,6 @@ from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, cast
 
 from matplotlib.transforms import BboxBase
 import numpy as np
-from numpy.typing import NDArray
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
@@ -30,7 +29,7 @@ from .style_template import (
 
 def _filter_stopwords(
     words: Iterable[str], stopwords: Optional[Iterable[str]]
-) -> NDArray[np.str_]:
+) -> np.ndarray:
     """Remove stopwords from a sequence of words.
 
     Parameters
@@ -98,14 +97,12 @@ def _prepare_word_frequencies(
     word_frequencies = from_pandas_nodelist(
         pd_df, node_col=text_column, weight_col=weight_column
     )
-    words: NDArray[np.str_] = np.asarray(list(word_frequencies.keys()), dtype=np.str_)
-    weights: NDArray[np.float64] = np.asarray(
-        list(word_frequencies.values()), dtype=np.float64
-    )
+    words: np.ndarray = np.asarray(list(word_frequencies.keys()), dtype=np.str_)
+    weights: np.ndarray = np.asarray(list(word_frequencies.values()), dtype=np.float64)
 
     filtered_words = _filter_stopwords(words, stopwords)
-    mask: NDArray[np.bool_] = np.asarray(np.isin(words, filtered_words), dtype=bool)
-    filtered_weights: NDArray[np.float64] = np.asarray(weights[mask], dtype=np.float64)
+    mask: np.ndarray = np.asarray(np.isin(words, filtered_words), dtype=bool)
+    filtered_weights: np.ndarray = np.asarray(weights[mask], dtype=np.float64)
 
     sorted_indices = np.argsort(filtered_weights)[::-1]
     sorted_words = filtered_words[sorted_indices][:max_words].tolist()
@@ -205,9 +202,9 @@ def _plot_words(
 
     if mask is None:
         mask_dimension: int = max(int(ax_bbox.width), int(ax_bbox.height), 1)
-        resolved_mask: NDArray[np.uint8] = _create_circular_mask(size=mask_dimension)
+        resolved_mask: np.ndarray = _create_circular_mask(size=mask_dimension)
     else:
-        resolved_mask: NDArray[np.uint8] = np.asarray(mask, dtype=np.uint8)
+        resolved_mask: np.ndarray = np.asarray(mask, dtype=np.uint8)
 
     if resolved_mask.ndim != 2:
         raise ValueError("mask must be a 2D array.")
@@ -253,7 +250,7 @@ def aplot_wordcloud(
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
     random_state: Optional[int] = None,
-    ax: Optional[Axes | np.ndarray[Any, np.dtype[Any]]] = None,
+    ax: Optional[Axes | np.ndarray] = None,
     mask: Optional[np.ndarray] = None,
     **kwargs: Any,
 ) -> Axes:

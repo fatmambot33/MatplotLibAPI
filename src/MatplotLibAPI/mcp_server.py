@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -28,16 +28,16 @@ from .treemap import fplot_treemap
 from .waffle import fplot_waffle
 from .word_cloud import fplot_wordcloud
 
-TableRecords = list[dict[str, Any]]
+TableRecords = List[Dict[str, Any]]
 Renderer = Callable[..., Any]
 
-SHARED_INPUT_CONTRACT: dict[str, str] = {
+SHARED_INPUT_CONTRACT: Dict[str, str] = {
     "csv_path": "Path to a CSV file with source data.",
     "table": "In-memory table as list[dict[str, Any]] records.",
     "return": "PNG bytes suitable for application/octet-stream.",
 }
 
-PLOT_MODULE_PARAMETER_HINTS: dict[str, dict[str, str]] = {
+PLOT_MODULE_PARAMETER_HINTS: Dict[str, Dict[str, str]] = {
     "bubble": {
         "label": "Bubble label column name.",
         "x": "X-axis column name.",
@@ -368,7 +368,7 @@ def render_network_chart_octet(
     return _figure_to_png_bytes(fig)
 
 
-_MATPLOTLIB_RENDERERS: dict[str, Renderer] = {
+_MATPLOTLIB_RENDERERS: Dict[str, Renderer] = {
     "bar": fplot_bar,
     "histogram": fplot_histogram,
     "box_violin": fplot_box_violin,
@@ -382,7 +382,7 @@ _MATPLOTLIB_RENDERERS: dict[str, Renderer] = {
     "wordcloud": fplot_wordcloud,
 }
 
-_PLOTLY_RENDERERS: dict[str, Renderer] = {
+_PLOTLY_RENDERERS: Dict[str, Renderer] = {
     "sankey": fplot_sankey,
     "treemap": fplot_treemap,
     "sunburst": fplot_sunburst,
@@ -413,7 +413,7 @@ _DEDICATED_PLOT_TOOLS = {
 }
 
 
-def get_plot_module_metadata() -> dict[str, Any]:
+def get_plot_module_metadata() -> Dict[str, Any]:
     """Return MCP metadata for module discoverability and exploration.
 
     Returns
@@ -432,7 +432,7 @@ def get_plot_module_metadata() -> dict[str, Any]:
 
 def render_plot_module_octet(
     plot_module: str,
-    params: dict[str, Any],
+    params: Dict[str, Any],
     csv_path: Optional[str] = None,
     table: Optional[TableRecords] = None,
 ) -> bytes:
@@ -556,7 +556,7 @@ def create_bubble_mcp_server() -> Any:
     @mcp.tool()
     def plot_module(
         plot_module: str,
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -570,7 +570,7 @@ def create_bubble_mcp_server() -> Any:
 
     def _render_module(
         module_name: str,
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -584,7 +584,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_bar(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -593,7 +593,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_histogram(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -604,7 +604,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_box_violin(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -615,7 +615,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_heatmap(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -624,7 +624,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_correlation_matrix(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -635,7 +635,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_area(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -644,7 +644,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_pie(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -653,7 +653,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_waffle(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -662,7 +662,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_sankey(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -671,7 +671,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_table(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -680,7 +680,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_timeserie(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -691,7 +691,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_wordcloud(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -702,7 +702,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_treemap(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -711,7 +711,7 @@ def create_bubble_mcp_server() -> Any:
 
     @mcp.tool()
     def plot_sunburst(
-        params: dict[str, Any],
+        params: Dict[str, Any],
         csv_path: Optional[str] = None,
         table: Optional[TableRecords] = None,
     ) -> bytes:
@@ -719,7 +719,7 @@ def create_bubble_mcp_server() -> Any:
         return _render_module("sunburst", params=params, csv_path=csv_path, table=table)
 
     @mcp.tool()
-    def describe_plot_modules() -> dict[str, Any]:
+    def describe_plot_modules() -> Dict[str, Any]:
         """Describe MCP plot-module capabilities for tool exploration.
 
         Returns

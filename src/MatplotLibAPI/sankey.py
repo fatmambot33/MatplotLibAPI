@@ -13,14 +13,14 @@ __all__ = ["SANKEY_STYLE_TEMPLATE", "fplot_sankey"]
 
 @dataclass
 class SankeyNode:
-    label: list[str]
+    label: List[str]
 
 
 @dataclass
 class SankeyLink:
-    source: list[int]
-    target: list[int]
-    value: list[float]
+    source: List[int]
+    target: List[int]
+    value: List[float]
 
     def __post_init__(self) -> None:
         """Validate that all lists have the same length."""

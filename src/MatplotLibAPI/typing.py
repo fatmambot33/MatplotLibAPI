@@ -1,10 +1,9 @@
 """Internal type aliases used across MatplotLibAPI."""
 
-from typing import Any, Callable, Literal, Union
+from typing import Callable, Literal, Sequence, Union
 
 from typing_extensions import TypeAlias
 
-import numpy.typing as npt
 
 # ``DataFrame.corr`` supports the three built-in correlation methods or a callable
 # that operates on two array-like inputs and returns a float. Using a local alias
@@ -12,5 +11,5 @@ import numpy.typing as npt
 # considered stable across releases.
 CorrelationMethod: TypeAlias = Union[
     Literal["pearson", "kendall", "spearman"],
-    Callable[[npt.NDArray[Any], npt.NDArray[Any]], float],
+    Callable[[Sequence[float], Sequence[float]], float],
 ]
