@@ -1628,7 +1628,6 @@ def aplot_network(
     Axes
         Matplotlib axes with the plotted network.
     """
-
     return NetworkGraph(
         pd_df=pd_df,
         source=edge_source_col,
@@ -1825,7 +1824,6 @@ def fplot_network(
     Figure
         Matplotlib figure with the network graph.
     """
-
     return NetworkGraph(
         pd_df=pd_df,
         source=edge_source_col,
