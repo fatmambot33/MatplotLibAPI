@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from pandas.api.extensions import register_dataframe_accessor
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -17,7 +16,6 @@ from .utils import _get_axis, _wrap_aplot
 __all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie_donut", "fplot_pie_donut"]
 
 
-@register_dataframe_accessor("pie")
 class PieChart(BasePlot):
     """Class for plotting pie and donut charts."""
 

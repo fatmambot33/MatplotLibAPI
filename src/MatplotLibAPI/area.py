@@ -3,7 +3,6 @@
 from typing import Any, Optional, Tuple
 
 import pandas as pd
-from pandas.api.extensions import register_dataframe_accessor
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -21,7 +20,6 @@ from .utils import _get_axis, _wrap_aplot
 __all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 
 
-@register_dataframe_accessor("area")
 class AreaChart(BasePlot):
     """Class for plotting area charts."""
 
