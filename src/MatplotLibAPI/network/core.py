@@ -11,9 +11,9 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .utils import _wrap_aplot
-from .base_plot import BasePlot
-from .style_template import (
+from ..utils import _wrap_aplot
+from ..base_plot import BasePlot
+from ..style_template import (
     NETWORK_STYLE_TEMPLATE,
     FIG_SIZE,
     TITLE_SCALE_FACTOR,
