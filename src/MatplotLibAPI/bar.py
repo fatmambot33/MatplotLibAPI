@@ -62,7 +62,7 @@ class BarChart(BasePlot):
             Matplotlib Axes to plot on, by default None which uses the current Axes.
         **kwargs : Any
             Additional keyword arguments forwarded to the plotting function.
-        
+
         Returns
         -------
         Axes
@@ -102,7 +102,7 @@ class BarChart(BasePlot):
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
         """Plot bar or stacked bar charts on a new figure.
-        
+
         Parameters
         ----------
         title : str, optional
@@ -111,7 +111,7 @@ class BarChart(BasePlot):
             Style template for the plot, by default DISTRIBUTION_STYLE_TEMPLATE.
         figsize : tuple[float, float], optional
             The size of the figure, by default (10, 6).
-       
+
         Returns
         -------
         Figure
