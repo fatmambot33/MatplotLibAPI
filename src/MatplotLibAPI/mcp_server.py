@@ -17,7 +17,7 @@ from .bar import fplot_bar
 from .box_violin import fplot_box_violin
 from .bubble import Bubble
 from .heatmap import fplot_correlation_matrix, fplot_heatmap
-from .histogram import fplot_histogram_kde
+from .histogram import fplot_histogram
 from .network import fplot_network
 from .pie import fplot_pie_donut
 from .sankey import fplot_sankey
@@ -370,7 +370,7 @@ def render_network_chart_octet(
 
 _MATPLOTLIB_RENDERERS: dict[str, Renderer] = {
     "bar": fplot_bar,
-    "histogram": fplot_histogram_kde,
+    "histogram": fplot_histogram,
     "box_violin": fplot_box_violin,
     "heatmap": fplot_heatmap,
     "correlation_matrix": fplot_correlation_matrix,

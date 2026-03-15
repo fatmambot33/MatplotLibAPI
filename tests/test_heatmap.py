@@ -18,8 +18,10 @@ def test_fplot_heatmap(load_sample_df):
 def test_fplot_correlation_matrix(load_sample_df):
     """Render a correlation matrix from sample data."""
 
-    df = load_sample_df("correlation.csv")
+    df = load_sample_df("heatmap.csv")
 
-    fig = fplot_correlation_matrix(pd_df=df)
+    fig = fplot_correlation_matrix(
+        pd_df=df, x="month", y="channel", value="engagements"
+    )
 
     assert isinstance(fig, Figure)

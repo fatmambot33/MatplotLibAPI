@@ -20,7 +20,7 @@ from .style_template import (
 )
 from .utils import _get_axis, _wrap_aplot
 
-__all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_histogram_kde", "fplot_histogram_kde"]
+__all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_histogram", "fplot_histogram"]
 
 
 class Histogram(BasePlot):
@@ -79,7 +79,7 @@ class Histogram(BasePlot):
         )
 
 
-def aplot_histogram_kde(
+def aplot_histogram(
     pd_df: pd.DataFrame,
     column: str,
     bins: int = 20,
@@ -123,7 +123,7 @@ def aplot_histogram_kde(
     )
 
 
-def fplot_histogram_kde(
+def fplot_histogram(
     pd_df: pd.DataFrame,
     column: str,
     bins: int = 20,

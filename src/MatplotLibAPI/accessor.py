@@ -22,7 +22,7 @@ from .heatmap import (
     fplot_correlation_matrix,
     fplot_heatmap,
 )
-from .histogram import aplot_histogram_kde, fplot_histogram_kde
+from .histogram import aplot_histogram, fplot_histogram
 from .network import (
     NETWORK_STYLE_TEMPLATE,
     aplot_network,
@@ -472,7 +472,7 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the histogram.
         """
-        return aplot_histogram_kde(
+        return aplot_histogram(
             pd_df=self._obj,
             column=column,
             bins=bins,
@@ -513,7 +513,7 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the histogram.
         """
-        return fplot_histogram_kde(
+        return fplot_histogram(
             pd_df=self._obj,
             column=column,
             bins=bins,
@@ -1319,14 +1319,9 @@ class DataFrameAccessor:
 
     def aplot_network(
         self,
-        node_col: str = "node",
-        node_weight_col: str = "weight",
         edge_source_col: str = "source",
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        node_df: Optional[pd.DataFrame] = None,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         layout_seed: Optional[int] = None,
@@ -1384,14 +1379,9 @@ class DataFrameAccessor:
     def aplot_network_node(
         self,
         node: Any,
-        node_col: str = "node",
-        node_weight_col: str = "weight",
         edge_source_col: str = "source",
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        node_df: Optional[pd.DataFrame] = None,
         layout_seed: Optional[int] = None,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
@@ -1445,14 +1435,9 @@ class DataFrameAccessor:
         return aplot_network_node(
             pd_df=self._obj,
             node=node,
-            node_col=node_col,
-            node_weight_col=node_weight_col,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
-            sort_by=sort_by,
-            ascending=ascending,
-            node_df=node_df,
             title=title,
             style=style,
             ax=ax,
@@ -1461,14 +1446,11 @@ class DataFrameAccessor:
 
     def aplot_network_components(
         self,
-        node_col: str = "node",
-        node_weight_col: str = "weight",
         edge_source_col: str = "source",
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
         sort_by: Optional[str] = None,
         ascending: bool = False,
-        node_df: Optional[pd.DataFrame] = None,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         layout_seed: Optional[int] = None,
@@ -1509,14 +1491,11 @@ class DataFrameAccessor:
 
         aplot_network_components(
             pd_df=self._obj,
-            node_col=node_col,
-            node_weight_col=node_weight_col,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             sort_by=sort_by,
             ascending=ascending,
-            node_df=node_df,
             title=title,
             style=style,
             axes=axes,
@@ -1525,14 +1504,9 @@ class DataFrameAccessor:
 
     def fplot_network(
         self,
-        node_col: str = "node",
-        node_weight_col: str = "weight",
         edge_source_col: str = "source",
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        node_df: Optional[pd.DataFrame] = None,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         layout_seed: Optional[int] = None,
@@ -1590,14 +1564,9 @@ class DataFrameAccessor:
     def fplot_network_node(
         self,
         node: Any,
-        node_col: str = "node",
-        node_weight_col: str = "weight",
         edge_source_col: str = "source",
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        node_df: Optional[pd.DataFrame] = None,
         layout_seed: Optional[int] = None,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
@@ -1651,14 +1620,9 @@ class DataFrameAccessor:
         return fplot_network_node(
             pd_df=self._obj,
             node=node,
-            node_col=node_col,
-            node_weight_col=node_weight_col,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
-            sort_by=sort_by,
-            ascending=ascending,
-            node_df=node_df,
             title=title,
             style=style,
             figsize=figsize,
@@ -1667,14 +1631,9 @@ class DataFrameAccessor:
 
     def fplot_network_components(
         self,
-        node_col: str = "node",
-        node_weight_col: str = "weight",
         edge_source_col: str = "source",
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        node_df: Optional[pd.DataFrame] = None,
         title: Optional[str] = None,
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         layout_seed: Optional[int] = None,
@@ -1723,14 +1682,9 @@ class DataFrameAccessor:
 
         return fplot_network_components(
             pd_df=self._obj,
-            node_col=node_col,
-            node_weight_col=node_weight_col,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
-            sort_by=sort_by,
-            ascending=ascending,
-            node_df=node_df,
             title=title,
             style=style,
             figsize=figsize,

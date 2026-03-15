@@ -74,7 +74,7 @@ def test_layout_handles_graph_without_edges():
 
     nx_graph = nx.Graph()
     nx_graph.add_nodes_from(["a", "b"])
-    graph = NetworkGraph(nx_graph)
+    graph = NetworkGraph(nx_graph=nx_graph)
 
     node_sizes, edge_widths, fonts_size = graph.layout()
 
@@ -120,7 +120,7 @@ def test_compute_positions_is_reproducible_with_seed():
 
     nx_graph = nx.Graph()
     nx_graph.add_edges_from([(1, 2), (2, 3), (3, 1)])
-    graph = NetworkGraph(nx_graph)
+    graph = NetworkGraph(nx_graph=nx_graph)
 
     seeded_positions = graph.compute_positions(seed=7)
     reseeded_positions = graph.compute_positions(seed=7)

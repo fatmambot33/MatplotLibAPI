@@ -1646,14 +1646,9 @@ def aplot_network(
 def aplot_network_node(
     pd_df: pd.DataFrame,
     node: Any,
-    node_col: str = "node",
-    node_weight_col: str = "weight",
     edge_source_col: str = "source",
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    node_df: Optional[pd.DataFrame] = None,
     title: Optional[str] = None,
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     ax: Optional[Axes] = None,
@@ -1702,15 +1697,11 @@ def aplot_network_node(
     ValueError
         If ``node`` is not present in the prepared graph.
     """
-    graph = _prepare_network_graph(
-        pd_df,
-        node_col=node_col,
-        node_weight_col=node_weight_col,
-        edge_source_col=edge_source_col,
-        edge_target_col=edge_target_col,
-        edge_weight_col=edge_weight_col,
-        sort_by=sort_by,
-        node_df=node_df,
+    graph = NetworkGraph(
+        pd_df=pd_df,
+        source=edge_source_col,
+        target=edge_target_col,
+        weight=edge_weight_col,
     )
     component_graph = graph.get_component_subgraph(node)
     resolved_title = title if title is not None else string_formatter(node)
@@ -1850,20 +1841,13 @@ def fplot_network(
 def fplot_network_node(
     pd_df: pd.DataFrame,
     node: Any,
-    node_col: str = "node",
-    node_weight_col: str = "weight",
     edge_source_col: str = "source",
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    node_df: Optional[pd.DataFrame] = None,
     title: Optional[str] = None,
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = FIG_SIZE,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a figure with the component containing ``node``.
 
@@ -1918,41 +1902,27 @@ def fplot_network_node(
     ax = aplot_network_node(
         pd_df,
         node=node,
-        node_col=node_col,
-        node_weight_col=node_weight_col,
         edge_source_col=edge_source_col,
         edge_target_col=edge_target_col,
         edge_weight_col=edge_weight_col,
-        sort_by=sort_by,
-        ascending=ascending,
-        node_df=node_df,
         title=title,
         style=style,
         ax=ax,
         layout_seed=layout_seed,
     )
-    if save_path:
-        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig
 
 
 def fplot_network_components(
     pd_df: pd.DataFrame,
-    node_col: str = "node",
-    node_weight_col: str = "weight",
     edge_source_col: str = "source",
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    node_df: Optional[pd.DataFrame] = None,
     title: Optional[str] = None,
     style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     figsize: Tuple[float, float] = FIG_SIZE,
     n_cols: Optional[int] = None,
-    save_path: Optional[str] = None,
-    savefig_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Figure:
     """Return a figure showing individual network components.
 
@@ -2002,24 +1972,16 @@ def fplot_network_components(
         If ``node_df`` is provided but none of its nodes appear as sources or
         targets in ``pd_df``.
     """
-    graph = _prepare_network_graph(
-        pd_df,
-        node_col=node_col,
-        node_weight_col=node_weight_col,
-        edge_source_col=edge_source_col,
-        edge_target_col=edge_target_col,
-        edge_weight_col=edge_weight_col,
-        sort_by=sort_by,
-        node_df=node_df,
+    graph = NetworkGraph(
+        pd_df=pd_df,
+        source=edge_source_col,
+        target=edge_target_col,
+        weight=edge_weight_col,
     )
-
-    working_graph = graph
     isolated_nodes = list(nx.isolates(graph._nx_graph))
     if isolated_nodes:
-        working_graph = NetworkGraph(nx_graph=graph._nx_graph.copy())
-        working_graph._nx_graph.remove_nodes_from(isolated_nodes)
-
-    connected_components = list(nx.connected_components(working_graph._nx_graph))
+        graph._nx_graph.remove_nodes_from(isolated_nodes)
+    connected_components = graph.connected_components
 
     n_components = max(1, len(connected_components))
     n_cols_local = int(np.ceil(np.sqrt(n_components))) if n_cols is None else n_cols
@@ -2050,6 +2012,4 @@ def fplot_network_components(
 
     plt.tight_layout(rect=(0, 0.03, 1, 0.95))
 
-    if save_path:
-        fig.savefig(save_path, **(savefig_kwargs or {}))
     return fig
