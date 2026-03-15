@@ -33,16 +33,16 @@ class AreaChart(BasePlot):
         label: Optional[str] = None,
         stacked: bool = True,
     ):
-        cols = [self.x, self.y]
-        if self.label:
-            cols.append(self.label)
-        validate_dataframe(self._obj, cols=cols)
-
         super().__init__(pd_df=pd_df)
         self.x = x
         self.y = y
         self.label = label
         self.stacked = stacked
+
+        cols = [self.x, self.y]
+        if self.label:
+            cols.append(self.label)
+        validate_dataframe(self._obj, cols=cols)
 
     def aplot(
         self,

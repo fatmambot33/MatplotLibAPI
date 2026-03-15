@@ -22,10 +22,10 @@ class PieChart(BasePlot):
     """Class for plotting pie and donut charts."""
 
     def __init__(self, pd_df: pd.DataFrame, category: str, value: str):
-        validate_dataframe(self._obj, cols=[self.category, self.value])
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
+        validate_dataframe(self._obj, cols=[self.category, self.value])
 
     def aplot(
         self,
@@ -63,7 +63,7 @@ class PieChart(BasePlot):
     ) -> Figure:
         fig, ax = plt.subplots(figsize=figsize)
         fig.patch.set_facecolor(style.background_color)
-        self.aplot(title=title, style=style, ax=ax)
+        self.aplot(donut=donut, title=title, style=style, ax=ax)
         return fig
 
 
