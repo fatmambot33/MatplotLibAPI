@@ -4,6 +4,7 @@ from typing import Any, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 import pandas as pd
+
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -137,17 +138,14 @@ class PivotBarChart(BasePlot):
         figsize: Tuple[float, float] = FIG_SIZE,
         **kwargs: Any,
     ) -> Figure:
-        return _wrap_aplot(
-            self.aplot,
-            pd_df=self._obj,
-            title=title,
-            style=style,
-            sort_by=sort_by,
-            ascending=ascending,
-            ax=ax,
-            figsize=figsize,
-            **kwargs,
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot(
+            title=title, style=style, sort_by=sort_by, ascending=ascending, ax=ax
         )
+        return fig
 
 
 def aplot_pivoted_bars(

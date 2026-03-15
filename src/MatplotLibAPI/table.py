@@ -1,6 +1,6 @@
 """Table plotting helpers."""
 
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, List, Optional, Tuple, cast
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -110,16 +110,17 @@ class TablePlot(BasePlot):
         max_values: int = 20,
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
-        return _wrap_aplot(
-            self.aplot,
-            pd_df=self._obj,
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot(
             title=title,
             style=style,
             sort_by=sort_by,
             ascending=ascending,
             max_values=max_values,
-            figsize=figsize,
+            ax=ax,
         )
+        return fig
 
 
 def aplot_table(

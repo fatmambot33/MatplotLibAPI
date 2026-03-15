@@ -1,6 +1,6 @@
 """Sunburst chart plotting utilities."""
 
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import pandas as pd
 import plotly.graph_objects as go

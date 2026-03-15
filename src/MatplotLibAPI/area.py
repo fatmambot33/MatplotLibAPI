@@ -1,8 +1,10 @@
 """Area chart helpers."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
+from pandas.api.extensions import register_dataframe_accessor
+import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -19,6 +21,7 @@ from .utils import _get_axis, _wrap_aplot
 __all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 
 
+@register_dataframe_accessor("area")
 class AreaChart(BasePlot):
     """Class for plotting area charts."""
 
@@ -73,16 +76,11 @@ class AreaChart(BasePlot):
         title: Optional[str] = None,
         style: StyleTemplate = AREA_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
-        **kwargs: Any,
     ) -> Figure:
-        return _wrap_aplot(
-            self.aplot,
-            pd_df=self._obj,
-            figsize=figsize,
-            title=title,
-            style=style,
-            **kwargs,
-        )
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot(title=title, style=style, ax=ax)
+        return fig
 
 
 def aplot_area(

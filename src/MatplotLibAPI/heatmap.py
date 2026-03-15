@@ -1,9 +1,10 @@
 """Heatmap and correlation matrix helpers."""
 
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Optional, Sequence, Tuple
 
-import numpy as np
 import pandas as pd
+from pandas.api.extensions import register_dataframe_accessor
+import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -28,6 +29,7 @@ __all__ = [
 ]
 
 
+@register_dataframe_accessor("heatmap")
 class Heatmap(BasePlot):
     """Class for plotting heatmaps and correlation matrices."""
 
@@ -70,13 +72,10 @@ class Heatmap(BasePlot):
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
-        return _wrap_aplot(
-            self.aplot,
-            pd_df=self._obj,
-            title=title,
-            style=style,
-            figsize=figsize,
-        )
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot(title=title, style=style, ax=ax)
+        return fig
 
     def aplot_correlation_matrix(
         self,

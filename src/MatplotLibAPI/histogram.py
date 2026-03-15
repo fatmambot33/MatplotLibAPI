@@ -3,6 +3,7 @@
 from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
+from pandas.api.extensions import register_dataframe_accessor
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -23,6 +24,7 @@ from .utils import _get_axis, _wrap_aplot
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_histogram", "fplot_histogram"]
 
 
+@register_dataframe_accessor("histogram")
 class Histogram(BasePlot):
     """Class for plotting histograms with optional KDE."""
 

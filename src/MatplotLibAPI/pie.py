@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from pandas.api.extensions import register_dataframe_accessor
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -16,6 +17,7 @@ from .utils import _get_axis, _wrap_aplot
 __all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie_donut", "fplot_pie_donut"]
 
 
+@register_dataframe_accessor("pie")
 class PieChart(BasePlot):
     """Class for plotting pie and donut charts."""
 
@@ -59,14 +61,10 @@ class PieChart(BasePlot):
         style: StyleTemplate = PIE_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (8, 8),
     ) -> Figure:
-        return _wrap_aplot(
-            self.aplot,
-            pd_df=self._obj,
-            donut=donut,
-            title=title,
-            style=style,
-            figsize=figsize,
-        )
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot(title=title, style=style, ax=ax)
+        return fig
 
 
 def aplot_pie_donut(

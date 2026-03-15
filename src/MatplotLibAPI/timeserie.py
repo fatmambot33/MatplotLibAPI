@@ -9,12 +9,11 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from .base_plot import BasePlot
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 from .style_template import (
     TIMESERIE_STYLE_TEMPLATE,
     FIG_SIZE,
     StyleTemplate,
-    bmk_formatter,
     format_func,
     string_formatter,
     validate_dataframe,

@@ -3,6 +3,7 @@
 from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -115,13 +116,10 @@ class BarChart(BasePlot):
         Figure
             The Matplotlib Figure object containing the plot.
         """
-        return _wrap_aplot(
-            self.aplot,
-            pd_df=self._obj,
-            figsize=figsize,
-            title=title,
-            style=style,
-        )
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.patch.set_facecolor(style.background_color)
+        self.aplot(title=title, style=style, ax=ax)
+        return fig
 
 
 def aplot_bar(

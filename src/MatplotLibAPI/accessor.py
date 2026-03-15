@@ -1752,10 +1752,6 @@ class DataFrameAccessor:
         values: str,
         style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
         title: Optional[str] = None,
-        sort_by: Optional[str] = None,
-        max_values: int = 100,
-        ascending: bool = False,
-        fig: Optional[go.Figure] = None,
     ) -> go.Figure:
         """Plot a sunburst chart on a new Plotly figure.
 
@@ -1791,11 +1787,7 @@ class DataFrameAccessor:
             parents=parents,
             values=values,
             title=title,
-            style=style,
-            sort_by=sort_by,
-            ascending=ascending,
-            max_values=max_values,
-            fig=fig,
+            style=style
         )
 
     def fplot_composite_treemap(

@@ -1,6 +1,6 @@
 """Waffle chart helpers."""
 
-from typing import Any, Dict, Optional, Tuple, cast
+from typing import Any, Optional, Tuple, cast
 
 import pandas as pd
 import seaborn as sns
@@ -12,7 +12,7 @@ from matplotlib.patches import Rectangle
 from .base_plot import BasePlot
 
 from .style_template import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
 
 class WaffleChart(BasePlot):

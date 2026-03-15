@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, cast
+from typing import Any, Dict, Iterable, Optional, Sequence, Tuple
 
 from matplotlib.transforms import BboxBase
 import numpy as np
@@ -16,7 +16,7 @@ from wordcloud import WordCloud
 
 from .base_plot import BasePlot
 
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
 from .style_template import (
     FIG_SIZE,
