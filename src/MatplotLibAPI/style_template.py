@@ -215,7 +215,7 @@ def generate_ticks(
     min_val: Union[float, str, pd.Timestamp],
     max_val: Union[float, str, pd.Timestamp],
     num_ticks: int = 5,
-) -> Union[np.ndarray, pd.DatetimeIndex]:
+) -> Union[np.ndarray, pd.DatetimeIndex, pd.Timestamp]:
     """Generate evenly spaced ticks between min and max.
 
     Parameters
