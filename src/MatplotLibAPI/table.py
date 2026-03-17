@@ -110,8 +110,12 @@ class TablePlot(BasePlot):
         max_values: int = 20,
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
-        fig, ax = plt.subplots(figsize=figsize)
-        fig.set_facecolor(style.background_color)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
         self.aplot(
             title=title,
             style=style,

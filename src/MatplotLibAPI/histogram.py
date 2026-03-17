@@ -72,7 +72,12 @@ class Histogram(BasePlot):
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
-        fig, ax = plt.subplots(figsize=figsize)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
         self.aplot(
             title=title,
             style=style,

@@ -117,7 +117,12 @@ class BoxViolinPlot(BasePlot):
         Figure
             The Matplotlib figure containing the distribution chart.
         """
-        fig, ax = plt.subplots(figsize=figsize)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
         self.aplot(
             column=self.column,
             by=self.by,

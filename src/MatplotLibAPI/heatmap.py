@@ -72,8 +72,12 @@ class Heatmap(BasePlot):
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
-        fig, ax = plt.subplots(figsize=figsize)
-        fig.set_facecolor(style.background_color)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
         self.aplot(title=title, style=style, ax=ax)
         return fig
 
@@ -102,7 +106,12 @@ class Heatmap(BasePlot):
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
-        fig, ax = plt.subplots(figsize=figsize)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
         self.aplot(
             title=title,
             style=style,

@@ -816,7 +816,12 @@ class NetworkGraph(BasePlot):
         Figure
             Matplotlib figure with the plotted network.
         """
-        fig, ax = plt.subplots(figsize=figsize)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
         self.aplot(
             title=title,
             style=style,
@@ -824,7 +829,6 @@ class NetworkGraph(BasePlot):
             layout_seed=layout_seed,
             ax=ax,
         )
-        fig.set_facecolor(style.background_color)
         return fig
 
     def aplot_connected_components(

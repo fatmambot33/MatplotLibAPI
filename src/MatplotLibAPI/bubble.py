@@ -487,8 +487,12 @@ class Bubble(BasePlot):
         >>> fig = Bubble.fplot(df, label='country', x='gdp_per_capita',
         ...                    y='life_expectancy', z='population')
         """
-        fig, ax = plt.subplots(figsize=figsize)
-        fig.set_facecolor(style.background_color)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
 
         self.aplot(
             title=title,
