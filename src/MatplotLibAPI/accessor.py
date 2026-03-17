@@ -550,7 +550,7 @@ class DataFrameAccessor:
             group=group,
             stacked=stacked,
             title=title,
-            style=style or heatmap_style_template,
+            style=style or DISTRIBUTION_STYLE_TEMPLATE,
             ax=ax,
         )
 
@@ -802,7 +802,7 @@ class DataFrameAccessor:
             y=y,
             value=value,
             title=title,
-            style=style or heatmap_style_template,
+            style=style or DISTRIBUTION_STYLE_TEMPLATE,
             ax=ax,
         )
 
@@ -884,7 +884,7 @@ class DataFrameAccessor:
             columns=columns,
             method=method,
             title=title,
-            style=style or heatmap_style_template,
+            style=style or DISTRIBUTION_STYLE_TEMPLATE,
             ax=ax,
         )
 
@@ -1219,7 +1219,7 @@ class DataFrameAccessor:
             pd_df=self._obj,
             cols=cols,
             title=title,
-            style=style or bubble_style_template,
+            style=style or TABLE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
@@ -1264,7 +1264,7 @@ class DataFrameAccessor:
             pd_df=self._obj,
             cols=cols,
             title=title,
-            style=style or bubble_style_template,
+            style=style or TABLE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
@@ -1320,7 +1320,7 @@ class DataFrameAccessor:
             x=x,
             y=y,
             title=title,
-            style=style or bubble_style_template,
+            style=style or TIMESERIE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
@@ -1377,7 +1377,7 @@ class DataFrameAccessor:
             x=x,
             y=y,
             title=title,
-            style=style or bubble_style_template,
+            style=style or TIMESERIE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
