@@ -106,7 +106,7 @@ class PieChart(BasePlot):
             The Matplotlib figure containing the pie or donut chart.
         """
         fig, ax = plt.subplots(figsize=figsize)
-        fig.patch.set_facecolor(style.background_color)
+        fig.set_facecolor(style.background_color)
         self.aplot(donut=donut, title=title, style=style, ax=ax)
         return fig
 

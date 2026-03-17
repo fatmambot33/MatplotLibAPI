@@ -824,7 +824,7 @@ class NetworkGraph(BasePlot):
             layout_seed=layout_seed,
             ax=ax,
         )
-        fig.patch.set_facecolor(style.background_color)
+        fig.set_facecolor(style.background_color)
         return fig
 
     def aplot_connected_components(
@@ -931,7 +931,7 @@ class NetworkGraph(BasePlot):
         """
         fig, ax = plt.subplots(figsize=FIG_SIZE)
         fig = cast(Figure, fig)
-        fig.patch.set_facecolor(style.background_color)
+        fig.set_facecolor(style.background_color)
         self.aplot_connected_components(
             title=title,
             style=style,
@@ -1348,7 +1348,7 @@ def _compute_network_grid(
     n_rows = int(np.ceil(n_components / n_cols))
     fig, axes_grid = plt.subplots(n_rows, n_cols, figsize=FIG_SIZE)
     fig = cast(Figure, fig)
-    fig.patch.set_facecolor(style.background_color)
+    fig.set_facecolor(style.background_color)
     if not isinstance(axes_grid, np.ndarray):
         axes = np.array([axes_grid])
     else:

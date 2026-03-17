@@ -82,7 +82,7 @@ def plot_composite_bubble(
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
 
     fig = cast(Figure, plt.figure(figsize=figsize))
-    fig.patch.set_facecolor(style.background_color)
+    fig.set_facecolor(style.background_color)
     grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
     ax = fig.add_subplot(grid[0, 0:])
     ax = Bubble(
@@ -258,7 +258,7 @@ def fplot_wordcloud_network(
     wordcloud_style = wordcloud_style or style
     network_style = network_style or style
 
-    fig.patch.set_facecolor(style.background_color)
+    fig.set_facecolor(style.background_color)
     if title:
         fig.suptitle(
             title,

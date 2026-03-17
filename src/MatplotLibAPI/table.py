@@ -111,7 +111,7 @@ class TablePlot(BasePlot):
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         fig, ax = plt.subplots(figsize=figsize)
-        fig.patch.set_facecolor(style.background_color)
+        fig.set_facecolor(style.background_color)
         self.aplot(
             title=title,
             style=style,

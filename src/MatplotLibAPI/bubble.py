@@ -488,7 +488,7 @@ class Bubble(BasePlot):
         ...                    y='life_expectancy', z='population')
         """
         fig, ax = plt.subplots(figsize=figsize)
-        fig.patch.set_facecolor(style.background_color)
+        fig.set_facecolor(style.background_color)
 
         self.aplot(
             title=title,

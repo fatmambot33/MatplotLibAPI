@@ -479,7 +479,7 @@ def fplot_network_node(
         If ``node`` is not present in the prepared graph.
     """
     fig = cast(Figure, plt.figure(figsize=figsize))
-    fig.patch.set_facecolor(style.background_color)
+    fig.set_facecolor(style.background_color)
     ax = fig.add_subplot()
     ax = aplot_network_node(
         pd_df,
@@ -571,7 +571,7 @@ def fplot_network_components(
 
     fig, axes_grid = plt.subplots(n_rows, n_cols_local, figsize=figsize)
     fig = cast(Figure, fig)
-    fig.patch.set_facecolor(style.background_color)
+    fig.set_facecolor(style.background_color)
     if not isinstance(axes_grid, np.ndarray):
         axes = np.array([axes_grid])
     else:

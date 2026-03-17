@@ -73,7 +73,7 @@ class Heatmap(BasePlot):
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
         fig, ax = plt.subplots(figsize=figsize)
-        fig.patch.set_facecolor(style.background_color)
+        fig.set_facecolor(style.background_color)
         self.aplot(title=title, style=style, ax=ax)
         return fig
 
