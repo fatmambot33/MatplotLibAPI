@@ -244,6 +244,16 @@ def _plot_words(
 
 
 class WordCloudPlot(BasePlot):
+    """Represent a word-cloud plot builder.
+
+    Methods
+    -------
+    aplot
+        Plot the word cloud on an existing Matplotlib axes.
+    fplot
+        Plot the word cloud on a new Matplotlib figure.
+    """
+
     def __init__(self, pd_df: pd.DataFrame, text_column: str, weight_column: str):
         validate_dataframe(pd_df, cols=[text_column], sort_by=weight_column)
         super().__init__(pd_df=pd_df)
@@ -261,6 +271,32 @@ class WordCloudPlot(BasePlot):
         mask: Optional[np.ndarray] = None,
         **kwargs: Any,
     ) -> Axes:
+        """Plot the configured word cloud on existing axes.
+
+        Parameters
+        ----------
+        title : str, optional
+            Plot title.
+        style : StyleTemplate, optional
+            Style configuration. The default is ``WORDCLOUD_STYLE_TEMPLATE``.
+        max_words : int, optional
+            Maximum number of words to include. The default is ``MAX_RESULTS``.
+        stopwords : Iterable[str], optional
+            Words to exclude from the cloud.
+        random_state : int, optional
+            Random seed used by word-cloud placement.
+        ax : Axes, optional
+            Matplotlib axes to draw on. If None, use the current axes.
+        mask : np.ndarray, optional
+            Binary mask controlling drawable pixels.
+        **kwargs : Any
+            Additional keyword arguments reserved for compatibility.
+
+        Returns
+        -------
+        Axes
+            Matplotlib axes containing the rendered word cloud.
+        """
         words, weights = _prepare_word_frequencies(
             pd_df=self._obj,
             text_column=self.text_column,
@@ -289,6 +325,30 @@ class WordCloudPlot(BasePlot):
         figsize: Tuple[float, float] = FIG_SIZE,
         mask: Optional[np.ndarray] = None,
     ) -> Figure:
+        """Plot the configured word cloud on a new figure.
+
+        Parameters
+        ----------
+        title : str, optional
+            Plot title.
+        style : StyleTemplate, optional
+            Style configuration. The default is ``WORDCLOUD_STYLE_TEMPLATE``.
+        max_words : int, optional
+            Maximum number of words to include. The default is ``MAX_RESULTS``.
+        stopwords : Iterable[str], optional
+            Words to exclude from the cloud.
+        random_state : int, optional
+            Random seed used by word-cloud placement.
+        figsize : tuple[float, float], optional
+            Figure size. The default is ``FIG_SIZE``.
+        mask : np.ndarray, optional
+            Binary mask controlling drawable pixels.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure containing the rendered word cloud.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         self.aplot(
             title=title,

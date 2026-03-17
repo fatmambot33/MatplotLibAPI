@@ -31,7 +31,8 @@ class SunburstData:
         parents_col: str,
         values_col: str,
     ) -> "SunburstData":
-        """Create SunburstData from a DataFrame.
+        """Create ``SunburstData`` from a DataFrame.
+
         Parameters
         ----------
         edges_df : pd.DataFrame
@@ -61,6 +62,7 @@ class SunburstData:
         title: Optional[str] = None,
     ) -> go.Figure:
         """Return a figure containing the sunburst plot.
+
         Parameters
         ----------
         style : StyleTemplate, optional
@@ -124,7 +126,6 @@ def fplot_sunburst(
     go.Figure
         Figure containing the sunburst plot.
     """
-
     return SunburstData.from_pandas(
         edges_df=pd_df,
         labels_col=labels,
