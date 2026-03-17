@@ -28,7 +28,7 @@ class PieChart(BasePlot):
     """
 
     def __init__(self, pd_df: pd.DataFrame, category: str, value: str):
-        validate_dataframe(pd_df, cols=[self.category, self.value])
+        validate_dataframe(pd_df, cols=[category, value])
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
