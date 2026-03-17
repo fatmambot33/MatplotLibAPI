@@ -135,10 +135,13 @@ class PivotBarChart(BasePlot):
         figsize: Tuple[float, float] = FIG_SIZE,
         **kwargs: Any,
     ) -> Figure:
-        import matplotlib.pyplot as plt
 
-        fig, ax = plt.subplots(figsize=figsize)
-        fig.set_facecolor(style.background_color)
+        fig = Figure(
+            figsize=figsize,
+            facecolor=style.background_color,
+            edgecolor=style.background_color,
+        )
+        ax = Axes(fig=fig, facecolor=style.background_color)
         self.aplot(
             title=title, style=style, sort_by=sort_by, ascending=ascending, ax=ax
         )
