@@ -125,7 +125,7 @@ class BarChart(BasePlot):
             The Matplotlib Figure object containing the plot.
         """
         fig, ax = plt.subplots(figsize=figsize)
-        fig.patch.set_facecolor(style.background_color)
+        fig.set_facecolor(style.background_color)
         self.aplot(title=title, style=style, ax=ax)
         return fig
 
