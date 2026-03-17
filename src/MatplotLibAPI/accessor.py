@@ -1,39 +1,16 @@
 """Pandas accessor exposing MatplotLibAPI plotting helpers."""
 
-from typing import Any, Dict, List, Optional, Tuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from pandas.api.extensions import register_dataframe_accessor
 
 from .base_plot import BasePlot
-from .area import aplot_area, fplot_area
-from .bar import aplot_bar, fplot_bar
-from .box_violin import aplot_box_violin, fplot_box_violin
-from .bubble import BUBBLE_STYLE_TEMPLATE, Bubble
-from .composite import plot_composite_bubble, plot_composite_treemap
-from .heatmap import (
-    HEATMAP_STYLE_TEMPLATE,
-    aplot_correlation_matrix,
-    aplot_heatmap,
-    fplot_correlation_matrix,
-    fplot_heatmap,
-)
-from .histogram import aplot_histogram, fplot_histogram
-from .network import (
-    NETWORK_STYLE_TEMPLATE,
-    aplot_network,
-    aplot_network_node,
-    aplot_network_components,
-    fplot_network_node,
-    fplot_network_components,
-    fplot_network,
-)
-from .pie import aplot_pie_donut, fplot_pie_donut
-from .sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
 from .style_template import (
     FIG_SIZE,
     AREA_STYLE_TEMPLATE,
@@ -45,12 +22,187 @@ from .style_template import (
     StyleTemplate,
 )
 from .typing import CorrelationMethod
-from .table import aplot_table, fplot_table
-from .timeserie import aplot_timeserie, fplot_timeserie
-from .sunburst import fplot_sunburst
-from .treemap import fplot_treemap
-from .waffle import aplot_waffle, fplot_waffle
-from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
+
+if TYPE_CHECKING:
+    import plotly.graph_objects as go
+
+
+def _bubble_imports() -> tuple[StyleTemplate, type]:
+    from .bubble import BUBBLE_STYLE_TEMPLATE, Bubble
+
+    return BUBBLE_STYLE_TEMPLATE, Bubble
+
+
+def _heatmap_imports() -> tuple[StyleTemplate, Any, Any, Any, Any]:
+    from .heatmap import (
+        HEATMAP_STYLE_TEMPLATE,
+        aplot_correlation_matrix,
+        aplot_heatmap,
+        fplot_correlation_matrix,
+        fplot_heatmap,
+    )
+
+    return (
+        HEATMAP_STYLE_TEMPLATE,
+        aplot_correlation_matrix,
+        aplot_heatmap,
+        fplot_correlation_matrix,
+        fplot_heatmap,
+    )
+
+
+def _network_imports() -> tuple[StyleTemplate, Any, Any, Any, Any, Any, Any]:
+    from .network import (
+        NETWORK_STYLE_TEMPLATE,
+        aplot_network,
+        aplot_network_node,
+        aplot_network_components,
+        fplot_network,
+        fplot_network_node,
+        fplot_network_components,
+    )
+
+    return (
+        NETWORK_STYLE_TEMPLATE,
+        aplot_network,
+        aplot_network_node,
+        aplot_network_components,
+        fplot_network,
+        fplot_network_node,
+        fplot_network_components,
+    )
+
+
+def _wordcloud_imports() -> tuple[StyleTemplate, Any, Any]:
+    from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
+
+    return WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
+
+
+def _sankey_imports() -> tuple[StyleTemplate, Any]:
+    from .sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
+
+    return SANKEY_STYLE_TEMPLATE, fplot_sankey
+
+
+def aplot_area(*args: Any, **kwargs: Any) -> Axes:
+    from .area import aplot_area as _aplot_area
+
+    return _aplot_area(*args, **kwargs)
+
+
+def fplot_area(*args: Any, **kwargs: Any) -> Figure:
+    from .area import fplot_area as _fplot_area
+
+    return _fplot_area(*args, **kwargs)
+
+
+def aplot_bar(*args: Any, **kwargs: Any) -> Axes:
+    from .bar import aplot_bar as _aplot_bar
+
+    return _aplot_bar(*args, **kwargs)
+
+
+def fplot_bar(*args: Any, **kwargs: Any) -> Figure:
+    from .bar import fplot_bar as _fplot_bar
+
+    return _fplot_bar(*args, **kwargs)
+
+
+def aplot_box_violin(*args: Any, **kwargs: Any) -> Axes:
+    from .box_violin import aplot_box_violin as _aplot_box_violin
+
+    return _aplot_box_violin(*args, **kwargs)
+
+
+def fplot_box_violin(*args: Any, **kwargs: Any) -> Figure:
+    from .box_violin import fplot_box_violin as _fplot_box_violin
+
+    return _fplot_box_violin(*args, **kwargs)
+
+
+def aplot_histogram(*args: Any, **kwargs: Any) -> Axes:
+    from .histogram import aplot_histogram as _aplot_histogram
+
+    return _aplot_histogram(*args, **kwargs)
+
+
+def fplot_histogram(*args: Any, **kwargs: Any) -> Figure:
+    from .histogram import fplot_histogram as _fplot_histogram
+
+    return _fplot_histogram(*args, **kwargs)
+
+
+def aplot_pie_donut(*args: Any, **kwargs: Any) -> Axes:
+    from .pie import aplot_pie_donut as _aplot_pie_donut
+
+    return _aplot_pie_donut(*args, **kwargs)
+
+
+def fplot_pie_donut(*args: Any, **kwargs: Any) -> Figure:
+    from .pie import fplot_pie_donut as _fplot_pie_donut
+
+    return _fplot_pie_donut(*args, **kwargs)
+
+
+def aplot_table(*args: Any, **kwargs: Any) -> Axes:
+    from .table import aplot_table as _aplot_table
+
+    return _aplot_table(*args, **kwargs)
+
+
+def fplot_table(*args: Any, **kwargs: Any) -> Figure:
+    from .table import fplot_table as _fplot_table
+
+    return _fplot_table(*args, **kwargs)
+
+
+def aplot_timeserie(*args: Any, **kwargs: Any) -> Axes:
+    from .timeserie import aplot_timeserie as _aplot_timeserie
+
+    return _aplot_timeserie(*args, **kwargs)
+
+
+def fplot_timeserie(*args: Any, **kwargs: Any) -> Figure:
+    from .timeserie import fplot_timeserie as _fplot_timeserie
+
+    return _fplot_timeserie(*args, **kwargs)
+
+
+def aplot_waffle(*args: Any, **kwargs: Any) -> Axes:
+    from .waffle import aplot_waffle as _aplot_waffle
+
+    return _aplot_waffle(*args, **kwargs)
+
+
+def fplot_waffle(*args: Any, **kwargs: Any) -> Figure:
+    from .waffle import fplot_waffle as _fplot_waffle
+
+    return _fplot_waffle(*args, **kwargs)
+
+
+def fplot_treemap(*args: Any, **kwargs: Any) -> go.Figure:
+    from .treemap import fplot_treemap as _fplot_treemap
+
+    return _fplot_treemap(*args, **kwargs)
+
+
+def fplot_sunburst(*args: Any, **kwargs: Any) -> go.Figure:
+    from .sunburst import fplot_sunburst as _fplot_sunburst
+
+    return _fplot_sunburst(*args, **kwargs)
+
+
+def plot_composite_bubble(*args: Any, **kwargs: Any) -> Figure:
+    from .composite import plot_composite_bubble as _plot_composite_bubble
+
+    return _plot_composite_bubble(*args, **kwargs)
+
+
+def plot_composite_treemap(*args: Any, **kwargs: Any) -> Optional[go.Figure]:
+    from .composite import plot_composite_treemap as _plot_composite_treemap
+
+    return _plot_composite_treemap(*args, **kwargs)
 
 
 @register_dataframe_accessor("mpl")
@@ -146,7 +298,7 @@ class DataFrameAccessor:
         y: str,
         z: str,
         title: Optional[str] = None,
-        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         max_values: int = 50,
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
@@ -191,6 +343,8 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
+        bubble_style_template, Bubble = _bubble_imports()
+
         return Bubble(
             pd_df=self._obj,
             label=label,
@@ -203,7 +357,7 @@ class DataFrameAccessor:
             ascending=ascending,
         ).aplot(
             title=title,
-            style=style,
+            style=style or bubble_style_template,
             hline=hline,
             vline=vline,
             ax=ax,
@@ -216,7 +370,7 @@ class DataFrameAccessor:
         y: str,
         z: str,
         title: Optional[str] = None,
-        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         max_values: int = 50,
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
@@ -261,6 +415,8 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the plot.
         """
+        bubble_style_template, Bubble = _bubble_imports()
+
         return Bubble(
             pd_df=self._obj,
             label=label,
@@ -277,7 +433,7 @@ class DataFrameAccessor:
             y=y,
             z=z,
             title=title,
-            style=style,
+            style=style or bubble_style_template,
             max_values=max_values,
             center_to_mean=center_to_mean,
             sort_by=sort_by,
@@ -294,7 +450,7 @@ class DataFrameAccessor:
         y: str,
         z: str,
         title: Optional[str] = None,
-        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         max_values: int = 100,
         center_to_mean: bool = False,
         sort_by: Optional[str] = None,
@@ -336,6 +492,8 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the composite plot.
         """
+        bubble_style_template, _ = _bubble_imports()
+
         return plot_composite_bubble(
             pd_df=self._obj,
             label=label,
@@ -343,7 +501,7 @@ class DataFrameAccessor:
             y=y,
             z=z,
             title=title,
-            style=style,
+            style=style or bubble_style_template,
             max_values=max_values,
             center_to_mean=center_to_mean,
             sort_by=sort_by,
@@ -392,7 +550,7 @@ class DataFrameAccessor:
             group=group,
             stacked=stacked,
             title=title,
-            style=style,
+            style=style or DISTRIBUTION_STYLE_TEMPLATE,
             ax=ax,
         )
 
@@ -611,7 +769,7 @@ class DataFrameAccessor:
         y: str,
         value: str,
         title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         ax: Optional[Axes] = None,
     ) -> Axes:
         """Plot a heatmap for dense categorical combinations.
@@ -636,13 +794,15 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the heatmap.
         """
+        heatmap_style_template, _, aplot_heatmap, _, _ = _heatmap_imports()
+
         return aplot_heatmap(
             pd_df=self._obj,
             x=x,
             y=y,
             value=value,
             title=title,
-            style=style,
+            style=style or DISTRIBUTION_STYLE_TEMPLATE,
             ax=ax,
         )
 
@@ -652,7 +812,7 @@ class DataFrameAccessor:
         y: str,
         value: str,
         title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot a heatmap on a new figure.
@@ -677,13 +837,15 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the heatmap.
         """
+        heatmap_style_template, _, _, _, fplot_heatmap = _heatmap_imports()
+
         return fplot_heatmap(
             pd_df=self._obj,
             x=x,
             y=y,
             value=value,
             title=title,
-            style=style,
+            style=style or heatmap_style_template,
             figsize=figsize,
         )
 
@@ -692,7 +854,7 @@ class DataFrameAccessor:
         columns: Optional[List[str]] = None,
         method: CorrelationMethod = "pearson",
         title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         ax: Optional[Axes] = None,
     ) -> Axes:
         """Plot a correlation matrix heatmap.
@@ -715,12 +877,14 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the correlation matrix.
         """
+        heatmap_style_template, aplot_correlation_matrix, _, _, _ = _heatmap_imports()
+
         return aplot_correlation_matrix(
             pd_df=self._obj,
             columns=columns,
             method=method,
             title=title,
-            style=style,
+            style=style or DISTRIBUTION_STYLE_TEMPLATE,
             ax=ax,
         )
 
@@ -984,7 +1148,7 @@ class DataFrameAccessor:
         target: str,
         value: str,
         title: Optional[str] = None,
-        style: StyleTemplate = SANKEY_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
     ) -> go.Figure:
         """Plot a Sankey diagram for flow data.
 
@@ -1006,13 +1170,15 @@ class DataFrameAccessor:
         go.Figure
             The Plotly Sankey figure.
         """
+        sankey_style_template, fplot_sankey = _sankey_imports()
+
         return fplot_sankey(
             pd_df=self._obj,
             source=source,
             target=target,
             value=value,
             title=title,
-            style=style,
+            style=style or sankey_style_template,
         )
 
     def aplot_table(
@@ -1053,7 +1219,7 @@ class DataFrameAccessor:
             pd_df=self._obj,
             cols=cols,
             title=title,
-            style=style,
+            style=style or TABLE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
@@ -1098,7 +1264,7 @@ class DataFrameAccessor:
             pd_df=self._obj,
             cols=cols,
             title=title,
-            style=style,
+            style=style or TABLE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
@@ -1154,7 +1320,7 @@ class DataFrameAccessor:
             x=x,
             y=y,
             title=title,
-            style=style,
+            style=style or TIMESERIE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
@@ -1211,7 +1377,7 @@ class DataFrameAccessor:
             x=x,
             y=y,
             title=title,
-            style=style,
+            style=style or TIMESERIE_STYLE_TEMPLATE,
             max_values=max_values,
             sort_by=sort_by,
             ascending=ascending,
@@ -1224,7 +1390,7 @@ class DataFrameAccessor:
         text_column: str,
         weight_column: str,
         title: Optional[str] = None,
-        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         max_words: int = 50,
         stopwords: Optional[List[str]] = None,
         random_state: Optional[int] = None,
@@ -1256,12 +1422,14 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
+        wordcloud_style_template, aplot_wordcloud, _ = _wordcloud_imports()
+
         return aplot_wordcloud(
             pd_df=self._obj,
             text_column=text_column,
             weight_column=weight_column,
             title=title,
-            style=style,
+            style=style or wordcloud_style_template,
             max_words=max_words,
             stopwords=stopwords,
             random_state=random_state,
@@ -1273,7 +1441,7 @@ class DataFrameAccessor:
         text_column: str,
         weight_column: str,
         title: Optional[str] = None,
-        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         max_words: int = 50,
         stopwords: Optional[List[str]] = None,
         random_state: Optional[int] = None,
@@ -1305,12 +1473,14 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the plot.
         """
+        wordcloud_style_template, _, fplot_wordcloud = _wordcloud_imports()
+
         return fplot_wordcloud(
             pd_df=self._obj,
             text_column=text_column,
             weight_column=weight_column,
             title=title,
-            style=style,
+            style=style or wordcloud_style_template,
             max_words=max_words,
             stopwords=stopwords,
             random_state=random_state,
@@ -1323,7 +1493,7 @@ class DataFrameAccessor:
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         layout_seed: Optional[int] = None,
         ax: Optional[Axes] = None,
     ) -> Axes:
@@ -1365,13 +1535,15 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
+        network_style_template, aplot_network, _, _, _, _, _ = _network_imports()
+
         return aplot_network(
             pd_df=self._obj,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style,
+            style=style or network_style_template,
             ax=ax,
             **kwargs,
         )
@@ -1384,7 +1556,7 @@ class DataFrameAccessor:
         edge_weight_col: str = "weight",
         layout_seed: Optional[int] = None,
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         ax: Optional[Axes] = None,
     ) -> Axes:
         """Plot the connected component containing ``node``.
@@ -1432,6 +1604,8 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
+        network_style_template, _, aplot_network_node, _, _, _, _ = _network_imports()
+
         return aplot_network_node(
             pd_df=self._obj,
             node=node,
@@ -1439,7 +1613,7 @@ class DataFrameAccessor:
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style,
+            style=style or network_style_template,
             ax=ax,
             **kwargs,
         )
@@ -1452,7 +1626,7 @@ class DataFrameAccessor:
         sort_by: Optional[str] = None,
         ascending: bool = False,
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         layout_seed: Optional[int] = None,
         axes: Optional[np.ndarray] = None,
     ) -> None:
@@ -1489,6 +1663,10 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
+        network_style_template, _, _, aplot_network_components, _, _, _ = (
+            _network_imports()
+        )
+
         aplot_network_components(
             pd_df=self._obj,
             edge_source_col=edge_source_col,
@@ -1497,7 +1675,7 @@ class DataFrameAccessor:
             sort_by=sort_by,
             ascending=ascending,
             title=title,
-            style=style,
+            style=style or network_style_template,
             axes=axes,
             **kwargs,
         )
@@ -1508,7 +1686,7 @@ class DataFrameAccessor:
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         layout_seed: Optional[int] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
@@ -1550,13 +1728,15 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
+        network_style_template, _, _, _, fplot_network, _, _ = _network_imports()
+
         return fplot_network(
             pd_df=self._obj,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style,
+            style=style or network_style_template,
             figsize=figsize,
             **kwargs,
         )
@@ -1569,7 +1749,7 @@ class DataFrameAccessor:
         edge_weight_col: str = "weight",
         layout_seed: Optional[int] = None,
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot the connected component containing ``node`` on a new figure.
@@ -1617,6 +1797,8 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
+        network_style_template, _, _, _, _, fplot_network_node, _ = _network_imports()
+
         return fplot_network_node(
             pd_df=self._obj,
             node=node,
@@ -1624,7 +1806,7 @@ class DataFrameAccessor:
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style,
+            style=style or network_style_template,
             figsize=figsize,
             **kwargs,
         )
@@ -1635,7 +1817,7 @@ class DataFrameAccessor:
         edge_target_col: str = "target",
         edge_weight_col: str = "weight",
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         layout_seed: Optional[int] = None,
         figsize: Tuple[float, float] = FIG_SIZE,
         n_cols: Optional[int] = None,
@@ -1680,13 +1862,17 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
+        network_style_template, _, _, _, _, _, fplot_network_components = (
+            _network_imports()
+        )
+
         return fplot_network_components(
             pd_df=self._obj,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style,
+            style=style or network_style_template,
             figsize=figsize,
             n_cols=n_cols,
             **kwargs,
