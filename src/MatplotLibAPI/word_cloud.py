@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, Union
 
 from matplotlib.transforms import BboxBase
 import numpy as np
@@ -194,7 +194,7 @@ def _plot_words(
     if not isinstance(fig_raw, (Figure, SubFigure)):
         raise RuntimeError("Axes is not associated with a Figure.")
 
-    fig_obj: Figure | SubFigure = fig_raw
+    fig_obj: Union[Figure, SubFigure] = fig_raw
     canvas: FigureCanvasBase = fig_obj.canvas
     if canvas is None:
         raise RuntimeError("Figure does not have an attached canvas.")
