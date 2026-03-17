@@ -11,9 +11,9 @@ from matplotlib.figure import Figure
 from .base_plot import BasePlot
 
 from .style_template import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
-__all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie_donut", "fplot_pie_donut"]
+__all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie", "fplot_pie"]
 
 
 class PieChart(BasePlot):
@@ -28,10 +28,10 @@ class PieChart(BasePlot):
     """
 
     def __init__(self, pd_df: pd.DataFrame, category: str, value: str):
+        validate_dataframe(pd_df, cols=[self.category, self.value])
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
-        validate_dataframe(self._obj, cols=[self.category, self.value])
 
     def aplot(
         self,
@@ -111,7 +111,7 @@ class PieChart(BasePlot):
         return fig
 
 
-def aplot_pie_donut(
+def aplot_pie(
     pd_df: pd.DataFrame,
     category: str,
     value: str,
@@ -131,7 +131,7 @@ def aplot_pie_donut(
     )
 
 
-def fplot_pie_donut(
+def fplot_pie(
     pd_df: pd.DataFrame,
     category: str,
     value: str,

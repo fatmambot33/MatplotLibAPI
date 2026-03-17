@@ -9,7 +9,7 @@ from ..bar import fplot_bar
 from ..box_violin import fplot_box_violin
 from ..heatmap import fplot_correlation_matrix, fplot_heatmap
 from ..histogram import fplot_histogram
-from ..pie import fplot_pie_donut
+from ..pie import fplot_pie
 from ..sankey import fplot_sankey
 from ..sunburst import fplot_sunburst
 from ..table import fplot_table
@@ -27,7 +27,7 @@ MATPLOTLIB_RENDERERS: Dict[str, Renderer] = {
     "heatmap": fplot_heatmap,
     "correlation_matrix": fplot_correlation_matrix,
     "area": fplot_area,
-    "pie": fplot_pie_donut,
+    "pie": fplot_pie,
     "waffle": fplot_waffle,
     "table": fplot_table,
     "timeserie": fplot_timeserie,

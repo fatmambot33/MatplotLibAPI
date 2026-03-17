@@ -1,6 +1,6 @@
 """Table plotting helpers."""
 
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, List, Optional, Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -10,7 +10,7 @@ from matplotlib.table import Table
 
 from .base_plot import BasePlot
 
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
 from .style_template import (
     FIG_SIZE,
@@ -235,19 +235,11 @@ def fplot_table(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_table(df, cols=['col1', 'col2'])
     """
-    return _wrap_aplot(
-        aplot_table,
-        pd_df=pd_df,
-        cols=cols,
+    return TablePlot(pd_df=pd_df, cols=cols).fplot(
         title=title,
         style=style,
-        max_values=max_values,
         sort_by=sort_by,
         ascending=ascending,
+        max_values=max_values,
         figsize=figsize,
     )
-    fig = cast(Figure, plt.figure(figsize=figsize))
-    fig.patch.set_facecolor(style.background_color)
-    ax = fig.add_subplot()
-    ax = aplot_table(pd_df, cols, title, style, max_values, sort_by, ascending, ax)
-    return fig

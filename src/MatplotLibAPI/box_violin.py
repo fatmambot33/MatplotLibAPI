@@ -1,9 +1,10 @@
 """Box and violin plot helpers."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -15,7 +16,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_box_violin", "fplot_box_violin"]
 
@@ -38,15 +39,14 @@ class BoxViolinPlot(BasePlot):
         by: Optional[str] = None,
         violin: bool = False,
     ):
-        super().__init__(pd_df=pd_df)
-        self.column = column
-        self.by = by
-        self.violin = violin
-
         cols = [self.column]
         if self.by:
             cols.append(self.by)
         validate_dataframe(self._obj, cols=cols)
+        super().__init__(pd_df=pd_df)
+        self.column = column
+        self.by = by
+        self.violin = violin
 
     def aplot(
         self,
@@ -117,16 +117,16 @@ class BoxViolinPlot(BasePlot):
         Figure
             The Matplotlib figure containing the distribution chart.
         """
-        return _wrap_aplot(
-            aplot_box_violin,
-            pd_df=self._obj,
-            figsize=figsize,
+        fig, ax = plt.subplots(figsize=figsize)
+        self.aplot(
             column=self.column,
             by=self.by,
             violin=self.violin,
             title=title,
             style=style,
+            ax=ax,
         )
+        return fig
 
 
 def aplot_box_violin(

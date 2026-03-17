@@ -10,14 +10,11 @@ from matplotlib.figure import Figure
 
 from .base_plot import BasePlot
 
-from .utils import _wrap_aplot
 
 from .style_template import (
     FIG_SIZE,
     PIVOTBARS_STYLE_TEMPLATE,
-    PIVOTLINES_STYLE_TEMPLATE,
     StyleTemplate,
-    format_func,
     string_formatter,
     validate_dataframe,
 )

@@ -17,7 +17,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 from .typing import CorrelationMethod
 
 __all__ = [
@@ -102,13 +102,13 @@ class Heatmap(BasePlot):
         style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
-        return _wrap_aplot(
-            self.aplot_correlation_matrix,
-            pd_df=self._obj,
+        fig, ax = plt.subplots(figsize=figsize)
+        self.aplot(
             title=title,
             style=style,
-            figsize=figsize,
+            ax=ax,
         )
+        return fig
 
 
 def _prepare_data(

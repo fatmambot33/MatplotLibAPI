@@ -27,10 +27,10 @@ class WaffleChart(BasePlot):
     """
 
     def __init__(self, pd_df: pd.DataFrame, category: str, value: str):
+        validate_dataframe(self._obj, cols=[category, value])
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
-        validate_dataframe(self._obj, cols=[self.category, self.value])
 
     def aplot(
         self,

@@ -1,14 +1,14 @@
 """Histogram and KDE plotting helpers."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 from pandas.api.extensions import register_dataframe_accessor
 import seaborn as sns
+import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .network import _DEFAULT
 
 from .base_plot import BasePlot
 
@@ -19,7 +19,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_histogram", "fplot_histogram"]
 
@@ -72,13 +72,13 @@ class Histogram(BasePlot):
         style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
-        return _wrap_aplot(
-            self.aplot,
-            pd_df=self._obj,
+        fig, ax = plt.subplots(figsize=figsize)
+        self.aplot(
             title=title,
             style=style,
-            figsize=figsize,
+            ax=ax,
         )
+        return fig
 
 
 def aplot_histogram(

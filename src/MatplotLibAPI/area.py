@@ -15,7 +15,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
 __all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 

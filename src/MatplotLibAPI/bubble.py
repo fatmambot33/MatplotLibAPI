@@ -428,7 +428,6 @@ class Bubble(BasePlot):
         hline: bool = False,
         vline: bool = False,
         figsize: Tuple[float, float] = FIG_SIZE,
-        **kwargs: Any,
     ) -> Figure:
         """Plot a bubble chart on a new figure.
 
@@ -462,8 +461,7 @@ class Bubble(BasePlot):
             Draw vertical line at mean x. The default is False.
         figsize : tuple[float, float], optional
             Size of the figure. The default is FIG_SIZE.
-        **kwargs : Any
-            Additional keyword arguments (unused, for interface compatibility).
+
 
         Returns
         -------

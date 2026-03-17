@@ -2,7 +2,7 @@
 
 from matplotlib.figure import Figure
 
-from MatplotLibAPI.pie import fplot_pie_donut
+from MatplotLibAPI.pie import fplot_pie
 
 
 def test_fplot_pie_donut(load_sample_df):
@@ -10,6 +10,6 @@ def test_fplot_pie_donut(load_sample_df):
 
     df = load_sample_df("pie.csv")
 
-    fig = fplot_pie_donut(pd_df=df, category="device", value="sessions", donut=True)
+    fig = fplot_pie(pd_df=df, category="device", value="sessions", donut=True)
 
     assert isinstance(fig, Figure)

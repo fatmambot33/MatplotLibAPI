@@ -1,6 +1,6 @@
 """Bar and stacked bar chart helpers."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _wrap_aplot
+from .utils import _get_axis
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_bar", "fplot_bar"]
 
@@ -40,16 +40,15 @@ class BarChart(BasePlot):
         group: Optional[str] = None,
         stacked: bool = False,
     ):
+        cols = [self.category, self.value]
+        if self.group:
+            cols.append(self.group)
+        validate_dataframe(self._obj, cols=cols)
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
         self.group = group
         self.stacked = stacked
-
-        cols = [self.category, self.value]
-        if self.group:
-            cols.append(self.group)
-        validate_dataframe(self._obj, cols=cols)
 
     def aplot(
         self,

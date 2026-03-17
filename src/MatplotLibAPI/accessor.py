@@ -134,13 +134,13 @@ def fplot_histogram(*args: Any, **kwargs: Any) -> Figure:
 
 
 def aplot_pie_donut(*args: Any, **kwargs: Any) -> Axes:
-    from .pie import aplot_pie_donut as _aplot_pie_donut
+    from .pie import aplot_pie as _aplot_pie_donut
 
     return _aplot_pie_donut(*args, **kwargs)
 
 
 def fplot_pie_donut(*args: Any, **kwargs: Any) -> Figure:
-    from .pie import fplot_pie_donut as _fplot_pie_donut
+    from .pie import fplot_pie as _fplot_pie_donut
 
     return _fplot_pie_donut(*args, **kwargs)
 

@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import MatplotLibAPI
 from MatplotLibAPI.network import (
     NetworkGraph,
     _WEIGHT_PERCENTILES,
