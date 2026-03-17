@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -12,92 +12,20 @@ from matplotlib.figure import Figure
 
 from .style_template import BUBBLE_STYLE_TEMPLATE, StyleTemplate
 
-from .area import fplot_area
-from .bar import fplot_bar
-from .box_violin import fplot_box_violin
 from .bubble import Bubble
-from .heatmap import fplot_correlation_matrix, fplot_heatmap
-from .histogram import fplot_histogram
 from .network import fplot_network
-from .pie import fplot_pie_donut
-from .sankey import fplot_sankey
-from .sunburst import fplot_sunburst
-from .table import fplot_table
-from .timeserie import fplot_timeserie
-from .treemap import fplot_treemap
-from .waffle import fplot_waffle
-from .word_cloud import fplot_wordcloud
+from .mcp.metadata import (
+    DEDICATED_PLOT_TOOLS,
+    PLOT_MODULE_PARAMETER_HINTS,
+    SHARED_INPUT_CONTRACT,
+)
+from .mcp.renderers import (
+    MATPLOTLIB_RENDERERS,
+    PLOTLY_RENDERERS,
+    SUPPORTED_PLOT_MODULES,
+)
 
 TableRecords = List[Dict[str, Any]]
-Renderer = Callable[..., Any]
-
-SHARED_INPUT_CONTRACT: Dict[str, str] = {
-    "csv_path": "Path to a CSV file with source data.",
-    "table": "In-memory table as list[dict[str, Any]] records.",
-    "return": "PNG bytes suitable for application/octet-stream.",
-}
-
-PLOT_MODULE_PARAMETER_HINTS: Dict[str, Dict[str, str]] = {
-    "bubble": {
-        "label": "Bubble label column name.",
-        "x": "X-axis column name.",
-        "y": "Y-axis column name.",
-        "z": "Bubble size column name.",
-    },
-    "network": {
-        "edge_source_col": "Source-node column name (default: source).",
-        "edge_target_col": "Target-node column name (default: target).",
-        "edge_weight_col": "Edge-weight column name (default: weight).",
-    },
-    "bar": {
-        "category": "Category column name.",
-        "value": "Numeric value column name.",
-    },
-    "histogram": {"value": "Numeric value column name."},
-    "box_violin": {"y": "Numeric value column name."},
-    "heatmap": {
-        "x": "X-axis category column name.",
-        "y": "Y-axis category column name.",
-        "value": "Cell value column name.",
-    },
-    "correlation_matrix": {
-        "features": "List of numeric columns used in correlation matrix.",
-    },
-    "area": {
-        "x": "X-axis column name.",
-        "y": "List of stacked y-axis columns.",
-    },
-    "pie": {
-        "label": "Category label column name.",
-        "value": "Numeric value column name.",
-    },
-    "waffle": {
-        "label": "Category label column name.",
-        "value": "Numeric value column name.",
-    },
-    "sankey": {
-        "source": "Source-node column name.",
-        "target": "Target-node column name.",
-        "value": "Flow/weight column name.",
-    },
-    "table": {},
-    "timeserie": {
-        "x": "Datetime or ordered x-axis column name.",
-        "y": "List of y-axis series columns.",
-    },
-    "wordcloud": {
-        "text_column": "Text/token column name.",
-        "weight_column": "Weight/frequency column name (optional).",
-    },
-    "treemap": {
-        "path": "Hierarchy column names in order.",
-        "values": "Numeric value column name.",
-    },
-    "sunburst": {
-        "path": "Hierarchy column names in order.",
-        "values": "Numeric value column name.",
-    },
-}
 
 
 def _load_dataframe(
@@ -368,51 +296,6 @@ def render_network_chart_octet(
     return _figure_to_png_bytes(fig)
 
 
-_MATPLOTLIB_RENDERERS: Dict[str, Renderer] = {
-    "bar": fplot_bar,
-    "histogram": fplot_histogram,
-    "box_violin": fplot_box_violin,
-    "heatmap": fplot_heatmap,
-    "correlation_matrix": fplot_correlation_matrix,
-    "area": fplot_area,
-    "pie": fplot_pie_donut,
-    "waffle": fplot_waffle,
-    "table": fplot_table,
-    "timeserie": fplot_timeserie,
-    "wordcloud": fplot_wordcloud,
-}
-
-_PLOTLY_RENDERERS: Dict[str, Renderer] = {
-    "sankey": fplot_sankey,
-    "treemap": fplot_treemap,
-    "sunburst": fplot_sunburst,
-}
-
-_SUPPORTED_PLOT_MODULES = sorted(
-    ["bubble", "network", *_MATPLOTLIB_RENDERERS.keys(), *_PLOTLY_RENDERERS.keys()]
-)
-
-
-_DEDICATED_PLOT_TOOLS = {
-    "plot_bubble": "bubble",
-    "plot_network": "network",
-    "plot_bar": "bar",
-    "plot_histogram": "histogram",
-    "plot_box_violin": "box_violin",
-    "plot_heatmap": "heatmap",
-    "plot_correlation_matrix": "correlation_matrix",
-    "plot_area": "area",
-    "plot_pie": "pie",
-    "plot_waffle": "waffle",
-    "plot_sankey": "sankey",
-    "plot_table": "table",
-    "plot_timeserie": "timeserie",
-    "plot_wordcloud": "wordcloud",
-    "plot_treemap": "treemap",
-    "plot_sunburst": "sunburst",
-}
-
-
 def get_plot_module_metadata() -> Dict[str, Any]:
     """Return MCP metadata for module discoverability and exploration.
 
@@ -423,10 +306,10 @@ def get_plot_module_metadata() -> Dict[str, Any]:
         contract, and parameter hints per module.
     """
     return {
-        "supported_plot_modules": _SUPPORTED_PLOT_MODULES,
+        "supported_plot_modules": SUPPORTED_PLOT_MODULES,
         "shared_input_contract": SHARED_INPUT_CONTRACT,
         "parameter_hints": PLOT_MODULE_PARAMETER_HINTS,
-        "dedicated_tools": _DEDICATED_PLOT_TOOLS,
+        "dedicated_tools": DEDICATED_PLOT_TOOLS,
     }
 
 
@@ -466,20 +349,20 @@ def render_plot_module_octet(
 
     pd_df = _load_dataframe(csv_path=csv_path, table=table)
 
-    if plot_module in _MATPLOTLIB_RENDERERS:
-        fig = _MATPLOTLIB_RENDERERS[plot_module](pd_df=pd_df, **params)
+    if plot_module in MATPLOTLIB_RENDERERS:
+        fig = MATPLOTLIB_RENDERERS[plot_module](pd_df=pd_df, **params)
         return _figure_to_png_bytes(fig)
 
-    if plot_module in _PLOTLY_RENDERERS:
-        fig = _PLOTLY_RENDERERS[plot_module](pd_df=pd_df, **params)
+    if plot_module in PLOTLY_RENDERERS:
+        fig = PLOTLY_RENDERERS[plot_module](pd_df=pd_df, **params)
         return bytes(fig.to_image(format="png"))
 
     raise ValueError(
-        f"Unsupported plot_module '{plot_module}'. Supported: {_SUPPORTED_PLOT_MODULES}"
+        f"Unsupported plot_module '{plot_module}'. Supported: {SUPPORTED_PLOT_MODULES}"
     )
 
 
-def create_bubble_mcp_server() -> Any:
+def create_mcp_server() -> Any:
     """Create an MCP server exposing MatplotLibAPI plotting tools.
 
     Returns
@@ -735,25 +618,8 @@ def create_bubble_mcp_server() -> Any:
 
 def main() -> None:
     """Run the MCP server over stdio transport."""
-    server = create_bubble_mcp_server()
+    server = create_mcp_server()
     server.run(transport="stdio")
-
-
-main_bubble = main
-main_network = main
-main_bar = main
-main_histogram = main
-main_box_violin = main
-main_heatmap = main
-main_area = main
-main_pie = main
-main_waffle = main
-main_sankey = main
-main_table = main
-main_timeserie = main
-main_wordcloud = main
-main_treemap = main
-main_sunburst = main
 
 
 if __name__ == "__main__":  # pragma: no cover

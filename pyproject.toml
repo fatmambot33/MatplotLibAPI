@@ -34,21 +34,8 @@ mcp = [
 ]
 
 [project.scripts]
-matplotlibapi-mcp-bubble = "MatplotLibAPI.mcp_server:main_bubble"
-matplotlibapi-mcp-network = "MatplotLibAPI.mcp_server:main_network"
-matplotlibapi-mcp-bar = "MatplotLibAPI.mcp_server:main_bar"
-matplotlibapi-mcp-histogram = "MatplotLibAPI.mcp_server:main_histogram"
-matplotlibapi-mcp-box-violin = "MatplotLibAPI.mcp_server:main_box_violin"
-matplotlibapi-mcp-heatmap = "MatplotLibAPI.mcp_server:main_heatmap"
-matplotlibapi-mcp-area = "MatplotLibAPI.mcp_server:main_area"
-matplotlibapi-mcp-pie = "MatplotLibAPI.mcp_server:main_pie"
-matplotlibapi-mcp-waffle = "MatplotLibAPI.mcp_server:main_waffle"
-matplotlibapi-mcp-sankey = "MatplotLibAPI.mcp_server:main_sankey"
-matplotlibapi-mcp-table = "MatplotLibAPI.mcp_server:main_table"
-matplotlibapi-mcp-timeserie = "MatplotLibAPI.mcp_server:main_timeserie"
-matplotlibapi-mcp-wordcloud = "MatplotLibAPI.mcp_server:main_wordcloud"
-matplotlibapi-mcp-treemap = "MatplotLibAPI.mcp_server:main_treemap"
-matplotlibapi-mcp-sunburst = "MatplotLibAPI.mcp_server:main_sunburst"
+matplotlibapi-mcp = "MatplotLibAPI.mcp_server:main"
+
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/MatplotLibAPI"]

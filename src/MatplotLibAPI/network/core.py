@@ -11,9 +11,11 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from .utils import _wrap_aplot
-from .base_plot import BasePlot
-from .style_template import (
+from ..utils import _wrap_aplot
+from ..base_plot import BasePlot
+from .constants import _DEFAULT, _WEIGHT_PERCENTILES
+from .scaling import _scale_weights, _softmax
+from ..style_template import (
     NETWORK_STYLE_TEMPLATE,
     FIG_SIZE,
     TITLE_SCALE_FACTOR,
@@ -21,21 +23,6 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-
-_DEFAULT = {
-    "MAX_EDGES": 100,
-    "MAX_NODES": 30,
-    "MIN_NODE_SIZE": 100,
-    "MAX_NODE_SIZE": 2000,
-    "MAX_EDGE_WIDTH": 10,
-    "GRAPH_SCALE": 2,
-    "MAX_FONT_SIZE": 20,
-    "MIN_FONT_SIZE": 8,
-    "SPRING_LAYOUT_K": 1.0,
-    "SPRING_LAYOUT_SEED": 42,
-}
-
-_WEIGHT_PERCENTILES = np.arange(10, 100, 10)
 
 __all__ = [
     "NETWORK_STYLE_TEMPLATE",
@@ -47,68 +34,6 @@ __all__ = [
     "fplot_network_node",
     "fplot_network_components",
 ]
-
-
-def _softmax(x: Iterable[float]) -> np.ndarray:
-    """Private helper to compute softmax values for array ``x``.
-
-    Not part of the public API; used internally for edge weight scaling.
-
-    Parameters
-    ----------
-    x : Iterable[float]
-        Input values.
-
-    Returns
-    -------
-    np.ndarray
-        Softmax-transformed values.
-    """
-    x_arr = np.array(x)
-    shifted = x_arr - np.max(x_arr)
-    exp_shifted = np.exp(shifted)
-    return exp_shifted / exp_shifted.sum()
-
-
-def _scale_weights(
-    weights: Iterable[float],
-    scale_min: float = 0,
-    scale_max: float = 1,
-    deciles: Optional[np.ndarray] = None,
-) -> List[float]:
-    """Private helper to scale weights into deciles within the given range.
-
-    This helper is internal to plotting utilities and is not part of the
-    supported public interface.
-
-    Parameters
-    ----------
-    weights : Iterable[float]
-        Sequence of weights to scale.
-    scale_min : float, optional
-        Minimum of the output range. The default is 0.
-    scale_max : float, optional
-        Maximum of the output range. The default is 1.
-    deciles : np.ndarray, optional
-        Precomputed percentile breakpoints to reuse. The default is ``None``.
-
-    Returns
-    -------
-    list[float]
-        Scaled weights or an empty list when ``weights`` is empty.
-    """
-    weights_arr = np.array(weights)
-    if weights_arr.size == 0:
-        return []
-
-    percentiles = (
-        np.percentile(weights_arr, _WEIGHT_PERCENTILES) if deciles is None else deciles
-    )
-    outs = np.atleast_1d(np.searchsorted(percentiles, weights_arr))
-    scaled = [
-        out * (scale_max - scale_min) / len(percentiles) + scale_min for out in outs
-    ]
-    return scaled
 
 
 class NodeView(nx.classes.reportviews.NodeView):

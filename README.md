@@ -59,7 +59,7 @@ pip install -e .[mcp]
 2. Start the MCP server over stdio:
 
 ```bash
-matplotlibapi-mcp-bubble
+matplotlibapi-mcp
 ```
 
 ### Tool surface
@@ -112,7 +112,7 @@ Example payload for `plot_module` with in-memory table records:
 }
 ```
 
-Dedicated MCP entry points are also available per module, for example `matplotlibapi-mcp-bubble`, `matplotlibapi-mcp-network`, `matplotlibapi-mcp-bar`, and `matplotlibapi-mcp-heatmap`.
+The package exposes a single MCP entry point: `matplotlibapi-mcp`.
 
 ## Plot Types
 

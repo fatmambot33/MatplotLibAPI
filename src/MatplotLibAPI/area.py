@@ -3,7 +3,6 @@
 from typing import Any, Optional, Tuple
 
 import pandas as pd
-from pandas.api.extensions import register_dataframe_accessor
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -21,9 +20,16 @@ from .utils import _get_axis, _wrap_aplot
 __all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 
 
-@register_dataframe_accessor("area")
 class AreaChart(BasePlot):
-    """Class for plotting area charts."""
+    """Plot area charts from tabular data.
+
+    Methods
+    -------
+    aplot
+        Plot an area chart on an existing Matplotlib axes.
+    fplot
+        Plot an area chart on a new Matplotlib figure.
+    """
 
     def __init__(
         self,
@@ -33,16 +39,16 @@ class AreaChart(BasePlot):
         label: Optional[str] = None,
         stacked: bool = True,
     ):
-        cols = [self.x, self.y]
-        if self.label:
-            cols.append(self.label)
-        validate_dataframe(self._obj, cols=cols)
-
         super().__init__(pd_df=pd_df)
         self.x = x
         self.y = y
         self.label = label
         self.stacked = stacked
+
+        cols = [self.x, self.y]
+        if self.label:
+            cols.append(self.label)
+        validate_dataframe(self._obj, cols=cols)
 
     def aplot(
         self,
@@ -51,6 +57,24 @@ class AreaChart(BasePlot):
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
+        """Plot an area chart on the provided axis.
+
+        Parameters
+        ----------
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is AREA_STYLE_TEMPLATE.
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, use the current axes.
+        **kwargs : Any
+            Additional keyword arguments reserved for compatibility.
+
+        Returns
+        -------
+        Axes
+            The Matplotlib axes containing the area chart.
+        """
         plot_ax = _get_axis(ax)
 
         if self.label:
@@ -77,6 +101,22 @@ class AreaChart(BasePlot):
         style: StyleTemplate = AREA_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
+        """Plot an area chart on a new figure.
+
+        Parameters
+        ----------
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is AREA_STYLE_TEMPLATE.
+        figsize : tuple[float, float], optional
+            Figure size. The default is (10, 6).
+
+        Returns
+        -------
+        Figure
+            The Matplotlib figure containing the area chart.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         fig.patch.set_facecolor(style.background_color)
         self.aplot(title=title, style=style, ax=ax)

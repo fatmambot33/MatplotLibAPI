@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from pandas.api.extensions import register_dataframe_accessor
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -17,15 +16,22 @@ from .utils import _get_axis, _wrap_aplot
 __all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie_donut", "fplot_pie_donut"]
 
 
-@register_dataframe_accessor("pie")
 class PieChart(BasePlot):
-    """Class for plotting pie and donut charts."""
+    """Plot pie and donut charts from categorical aggregates.
+
+    Methods
+    -------
+    aplot
+        Plot a pie or donut chart on an existing Matplotlib axes.
+    fplot
+        Plot a pie or donut chart on a new Matplotlib figure.
+    """
 
     def __init__(self, pd_df: pd.DataFrame, category: str, value: str):
-        validate_dataframe(self._obj, cols=[self.category, self.value])
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
+        validate_dataframe(self._obj, cols=[self.category, self.value])
 
     def aplot(
         self,
@@ -35,6 +41,26 @@ class PieChart(BasePlot):
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
+        """Plot a pie or donut chart on the provided axis.
+
+        Parameters
+        ----------
+        donut : bool, optional
+            If True, render a donut chart. The default is False.
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is PIE_STYLE_TEMPLATE.
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, use the current axes.
+        **kwargs : Any
+            Additional keyword arguments reserved for compatibility.
+
+        Returns
+        -------
+        Axes
+            The Matplotlib axes containing the pie or donut chart.
+        """
         labels = self._obj[self.category].astype(str).tolist()
         sizes = self._obj[self.value]
         plot_ax = _get_axis(ax)
@@ -61,9 +87,27 @@ class PieChart(BasePlot):
         style: StyleTemplate = PIE_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (8, 8),
     ) -> Figure:
+        """Plot a pie or donut chart on a new figure.
+
+        Parameters
+        ----------
+        donut : bool, optional
+            If True, render a donut chart. The default is False.
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is PIE_STYLE_TEMPLATE.
+        figsize : tuple[float, float], optional
+            Figure size. The default is (8, 8).
+
+        Returns
+        -------
+        Figure
+            The Matplotlib figure containing the pie or donut chart.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         fig.patch.set_facecolor(style.background_color)
-        self.aplot(title=title, style=style, ax=ax)
+        self.aplot(donut=donut, title=title, style=style, ax=ax)
         return fig
 
 

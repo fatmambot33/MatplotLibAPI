@@ -16,13 +16,21 @@ from .utils import _get_axis
 
 
 class WaffleChart(BasePlot):
-    """Class for plotting waffle charts."""
+    """Plot waffle charts from categorical proportions.
+
+    Methods
+    -------
+    aplot
+        Plot a waffle chart on an existing Matplotlib axes.
+    fplot
+        Plot a waffle chart on a new Matplotlib figure.
+    """
 
     def __init__(self, pd_df: pd.DataFrame, category: str, value: str):
-        validate_dataframe(self._obj, cols=[self.category, self.value])
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
+        validate_dataframe(self._obj, cols=[self.category, self.value])
 
     def aplot(
         self,
@@ -32,6 +40,26 @@ class WaffleChart(BasePlot):
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
+        """Plot a waffle chart on the provided axis.
+
+        Parameters
+        ----------
+        rows : int, optional
+            Number of rows and columns in the waffle grid. The default is 10.
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is PIE_STYLE_TEMPLATE.
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, use the current axes.
+        **kwargs : Any
+            Additional keyword arguments reserved for compatibility.
+
+        Returns
+        -------
+        Axes
+            The Matplotlib axes containing the waffle chart.
+        """
         value_series = cast(pd.Series, self._obj[self.value])
         category_series = cast(pd.Series, self._obj[self.category])
         total = float(value_series.sum())
@@ -75,6 +103,24 @@ class WaffleChart(BasePlot):
         style: StyleTemplate = PIE_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (8, 8),
     ) -> Figure:
+        """Plot a waffle chart on a new figure.
+
+        Parameters
+        ----------
+        rows : int, optional
+            Number of rows and columns in the waffle grid. The default is 10.
+        title : str, optional
+            Title for the plot. The default is None.
+        style : StyleTemplate, optional
+            Style template for the plot. The default is PIE_STYLE_TEMPLATE.
+        figsize : tuple[float, float], optional
+            Figure size. The default is (8, 8).
+
+        Returns
+        -------
+        Figure
+            The Matplotlib figure containing the waffle chart.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         self.aplot(
             title=title,

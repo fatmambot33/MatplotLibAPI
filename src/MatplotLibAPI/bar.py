@@ -22,7 +22,15 @@ __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_bar", "fplot_bar"]
 
 
 class BarChart(BasePlot):
-    """Class for plotting bar charts."""
+    """Plot grouped and stacked bar charts from tabular data.
+
+    Methods
+    -------
+    aplot
+        Plot a bar chart on an existing Matplotlib axes.
+    fplot
+        Plot a bar chart on a new Matplotlib figure.
+    """
 
     def __init__(
         self,
@@ -32,15 +40,16 @@ class BarChart(BasePlot):
         group: Optional[str] = None,
         stacked: bool = False,
     ):
-        cols = [self.category, self.value]
-        if self.group:
-            cols.append(self.group)
-        validate_dataframe(self._obj, cols=cols)
         super().__init__(pd_df=pd_df)
         self.category = category
         self.value = value
         self.group = group
         self.stacked = stacked
+
+        cols = [self.category, self.value]
+        if self.group:
+            cols.append(self.group)
+        validate_dataframe(self._obj, cols=cols)
 
     def aplot(
         self,
