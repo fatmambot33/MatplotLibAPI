@@ -897,6 +897,7 @@ class DataFrameAccessor:
         title: Optional[str] = None,
         style: StyleTemplate = AREA_STYLE_TEMPLATE,
         ax: Optional[Axes] = None,
+        **kwargs: Any,
     ) -> Axes:
         """Plot an area chart on existing axes.
 
@@ -916,6 +917,8 @@ class DataFrameAccessor:
             Styling template. The default is ``AREA_STYLE_TEMPLATE``.
         ax : Axes, optional
             Matplotlib axes to plot on. If None, uses the current axes.
+        **kwargs : Any
+            Additional keyword arguments forwarded to the underlying area plot call.
 
         Returns
         -------
@@ -931,6 +934,7 @@ class DataFrameAccessor:
             title=title,
             style=style,
             ax=ax,
+            **kwargs,
         )
 
     def fplot_area(
@@ -942,6 +946,7 @@ class DataFrameAccessor:
         title: Optional[str] = None,
         style: StyleTemplate = AREA_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = FIG_SIZE,
+        **kwargs: Any,
     ) -> Figure:
         """Plot an area chart on a new figure.
 
@@ -961,6 +966,8 @@ class DataFrameAccessor:
             Styling template. The default is ``AREA_STYLE_TEMPLATE``.
         figsize : tuple[float, float], optional
             Figure size. The default is FIG_SIZE.
+        **kwargs : Any
+            Additional keyword arguments forwarded to the underlying area plot call.
 
         Returns
         -------
@@ -976,6 +983,7 @@ class DataFrameAccessor:
             title=title,
             style=style,
             figsize=figsize,
+            **kwargs,
         )
 
     def aplot_pie_donut(

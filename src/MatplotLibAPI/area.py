@@ -151,6 +151,7 @@ class AreaChart(BasePlot):
         title: Optional[str] = None,
         style: StyleTemplate = AREA_STYLE_TEMPLATE,
         figsize: Tuple[float, float] = (10, 6),
+        **kwargs: Any,
     ) -> Figure:
         """Plot an area chart on a new figure.
 
@@ -163,6 +164,9 @@ class AreaChart(BasePlot):
         figsize : tuple[float, float], optional
             Figure size. The default is (10, 6).
 
+        **kwargs : Any
+            Additional keyword arguments forwarded to ``aplot``.
+
         Returns
         -------
         Figure
@@ -171,7 +175,7 @@ class AreaChart(BasePlot):
         fig = Figure(figsize=figsize)
         fig.set_facecolor(style.background_color)
         ax = fig.add_subplot(111)
-        self.aplot(title=title, style=style, ax=ax)
+        self.aplot(title=title, style=style, ax=ax, **kwargs)
         return fig
 
 
@@ -210,6 +214,7 @@ def fplot_area(
     title: Optional[str] = None,
     style: StyleTemplate = AREA_STYLE_TEMPLATE,
     figsize: Tuple[float, float] = (10, 6),
+    **kwargs: Any,
 ) -> Figure:
     """Plot area charts on a new figure."""
     return AreaChart(
@@ -222,4 +227,5 @@ def fplot_area(
         title=title,
         style=style,
         figsize=figsize,
+        **kwargs,
     )
