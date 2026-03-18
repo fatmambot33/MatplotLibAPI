@@ -149,6 +149,9 @@ class PivotBarChart(BasePlot):
             edgecolor=style.background_color,
         )
         ax = fig.add_subplot(111)
+        if ax is None:
+            msg = "Failed to create subplot axes."
+            raise RuntimeError(msg)
         ax.set_facecolor(style.background_color)
         self.aplot(
             title=title, style=style, sort_by=sort_by, ascending=ascending, ax=ax
