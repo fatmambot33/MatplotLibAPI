@@ -1,9 +1,8 @@
-"""Area chart helpers."""
+"""Area chart helpers for Matplotlib-based area visualizations."""
 
 from typing import Any, Optional, Tuple
 
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -39,6 +38,21 @@ class AreaChart(BasePlot):
         label: Optional[str] = None,
         stacked: bool = True,
     ):
+        """Initialize an area chart plotter.
+
+        Parameters
+        ----------
+        pd_df : pd.DataFrame
+            DataFrame containing the data to visualize.
+        x : str
+            Column name used for the x-axis.
+        y : str
+            Column name used for the y-axis values.
+        label : str, optional
+            Column used to split the area into groups. The default is None.
+        stacked : bool, optional
+            Whether grouped areas are stacked. The default is True.
+        """
         super().__init__(pd_df=pd_df)
         self.x = x
         self.y = y
@@ -49,6 +63,48 @@ class AreaChart(BasePlot):
         if self.label:
             cols.append(self.label)
         validate_dataframe(self._obj, cols=cols)
+
+    def _plot_grouped_area(
+        self,
+        plot_ax: Axes,
+        **kwargs: Any,
+    ) -> None:
+        """Plot grouped area data using a pivoted dataframe."""
+        pivot_df = self._obj.pivot_table(
+            index=self.x,
+            columns=self.label,
+            values=self.y,
+            aggfunc="sum",
+        ).sort_index()
+
+        pivot_df.plot(
+            kind="area",
+            stacked=self.stacked,
+            alpha=0.7,
+            ax=plot_ax,
+            **kwargs,
+        )
+
+        legend = plot_ax.get_legend()
+        if legend is not None:
+            legend.set_title(string_formatter(self.label or ""))
+
+    def _plot_single_area(
+        self,
+        plot_ax: Axes,
+        style: StyleTemplate,
+        **kwargs: Any,
+    ) -> None:
+        """Plot a single-series area chart."""
+        sorted_df = self._obj.sort_values(by=self.x)
+        plot_ax.fill_between(
+            sorted_df[self.x],
+            sorted_df[self.y],
+            color=style.font_color,
+            alpha=0.4,
+            **kwargs,
+        )
+        plot_ax.plot(sorted_df[self.x], sorted_df[self.y], color=style.font_color)
 
     def aplot(
         self,
@@ -68,7 +124,7 @@ class AreaChart(BasePlot):
         ax : Axes, optional
             Matplotlib axes to plot on. If None, use the current axes.
         **kwargs : Any
-            Additional keyword arguments reserved for compatibility.
+            Additional keyword arguments forwarded to the area plotting call.
 
         Returns
         -------
@@ -76,21 +132,16 @@ class AreaChart(BasePlot):
             The Matplotlib axes containing the area chart.
         """
         plot_ax = _get_axis(ax)
+        plot_ax.set_facecolor(style.background_color)
 
         if self.label:
-            pivot_df = self._obj.pivot_table(
-                index=self.x, columns=self.label, values=self.y, aggfunc="sum"
-            ).sort_index()
-            pivot_df.plot(kind="area", stacked=self.stacked, alpha=0.7, ax=plot_ax)
+            self._plot_grouped_area(plot_ax=plot_ax, **kwargs)
         else:
-            sorted_df = self._obj.sort_values(by=self.x)
-            plot_ax.fill_between(
-                sorted_df[self.x], sorted_df[self.y], color=style.font_color, alpha=0.4
-            )
-            plot_ax.plot(sorted_df[self.x], sorted_df[self.y], color=style.font_color)
+            self._plot_single_area(plot_ax=plot_ax, style=style, **kwargs)
 
         plot_ax.set_xlabel(string_formatter(self.x))
         plot_ax.set_ylabel(string_formatter(self.y))
+        plot_ax.tick_params(axis="x", labelrotation=45)
         if title:
             plot_ax.set_title(title)
         return plot_ax
@@ -117,12 +168,9 @@ class AreaChart(BasePlot):
         Figure
             The Matplotlib figure containing the area chart.
         """
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        fig = Figure(figsize=figsize)
+        fig.set_facecolor(style.background_color)
+        ax = fig.add_subplot(111)
         self.aplot(title=title, style=style, ax=ax)
         return fig
 
