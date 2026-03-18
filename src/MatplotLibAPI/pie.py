@@ -110,7 +110,8 @@ class PieChart(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(style.background_color)
         fig.set_facecolor(style.background_color)
         self.aplot(donut=donut, title=title, style=style, ax=ax)
         return fig

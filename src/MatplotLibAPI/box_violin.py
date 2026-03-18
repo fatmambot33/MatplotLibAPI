@@ -122,7 +122,8 @@ class BoxViolinPlot(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(style.background_color)
         self.aplot(
             column=self.column,
             by=self.by,
