@@ -926,9 +926,9 @@ class DataFrameAccessor:
             The Matplotlib axes object with the area chart.
         """
         return aplot_area(
-            pd_df=self._obj,
-            x=x,
-            y=y,
+            self._obj,
+            x,
+            y,
             label=label,
             stacked=stacked,
             title=title,
@@ -975,9 +975,9 @@ class DataFrameAccessor:
             The new Matplotlib figure with the area chart.
         """
         return fplot_area(
-            pd_df=self._obj,
-            x=x,
-            y=y,
+            self._obj,
+            x,
+            y,
             label=label,
             stacked=stacked,
             title=title,
