@@ -1,8 +1,14 @@
 """Tests for heatmap and correlation matrix visualizations."""
 
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from MatplotLibAPI.heatmap import aplot_heatmap, fplot_heatmap, fplot_correlation_matrix
+from MatplotLibAPI.heatmap import (
+    aplot_correlation_matrix,
+    aplot_heatmap,
+    fplot_heatmap,
+    fplot_correlation_matrix,
+)
 
 
 def test_fplot_heatmap(load_sample_df):
@@ -41,3 +47,17 @@ def test_aplot_heatmap_allows_overriding_colormap(load_sample_df):
     )
 
     assert ax.collections
+
+
+def test_aplot_correlation_matrix_accepts_method(load_sample_df):
+    """Compute and render a spearman correlation matrix without forwarding errors."""
+
+    df = load_sample_df("heatmap.csv")
+
+    ax = aplot_correlation_matrix(
+        pd_df=df,
+        columns=["engagements", "month"],
+        method="spearman",
+    )
+
+    assert isinstance(ax, Axes)
