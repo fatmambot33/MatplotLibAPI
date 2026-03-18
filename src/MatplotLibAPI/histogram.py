@@ -50,15 +50,17 @@ class Histogram(BasePlot):
 
         validate_dataframe(self._obj, cols=[self.column])
         plot_ax = _get_axis(ax)
-        sns.histplot(
-            data=self._obj,
-            x=self.column,
-            bins=self.bins,
-            kde=self.kde,
-            color=style.font_color,
-            edgecolor=style.background_color,
-            ax=plot_ax,
-        )
+        histplot_kwargs: dict[str, Any] = {
+            "data": self._obj,
+            "x": self.column,
+            "bins": self.bins,
+            "kde": self.kde,
+            "color": style.font_color,
+            "edgecolor": style.background_color,
+            "ax": plot_ax,
+        }
+        histplot_kwargs.update(kwargs)
+        sns.histplot(**histplot_kwargs)
         plot_ax.set_facecolor(style.background_color)
         plot_ax.set_xlabel(string_formatter(self.column))
         plot_ax.set_ylabel("Frequency")
@@ -77,7 +79,8 @@ class Histogram(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(style.background_color)
         self.aplot(
             title=title,
             style=style,

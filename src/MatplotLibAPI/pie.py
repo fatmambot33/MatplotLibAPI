@@ -67,14 +67,16 @@ class PieChart(BasePlot):
         wedgeprops: Optional[Dict[str, Any]] = None
         if donut:
             wedgeprops = {"width": 0.3}
-        plot_ax.pie(
-            sizes,
-            labels=labels,
-            autopct="%1.1f%%",
-            colors=sns.color_palette(style.palette),
-            wedgeprops=wedgeprops,
-            textprops={"color": style.font_color, "fontsize": style.font_size},
-        )
+        pie_kwargs: Dict[str, Any] = {
+            "labels": labels,
+            "autopct": "%1.1f%%",
+            "colors": sns.color_palette(style.palette),
+            "wedgeprops": wedgeprops,
+            "textprops": {"color": style.font_color, "fontsize": style.font_size},
+        }
+        pie_kwargs.update(kwargs)
+
+        plot_ax.pie(sizes, **pie_kwargs)
         plot_ax.axis("equal")
         if title:
             plot_ax.set_title(title)
@@ -110,7 +112,8 @@ class PieChart(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(style.background_color)
         fig.set_facecolor(style.background_color)
         self.aplot(donut=donut, title=title, style=style, ax=ax)
         return fig

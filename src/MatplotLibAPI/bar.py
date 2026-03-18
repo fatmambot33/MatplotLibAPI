@@ -84,15 +84,24 @@ class BarChart(BasePlot):
                 values=self.value,
                 aggfunc="sum",
             )
-            pivot_df.plot(kind="bar", stacked=self.stacked, ax=plot_ax, alpha=0.85)
+            plot_kwargs: dict[str, Any] = {
+                "kind": "bar",
+                "stacked": self.stacked,
+                "ax": plot_ax,
+                "alpha": 0.85,
+            }
+            plot_kwargs.update(kwargs)
+            pivot_df.plot(**plot_kwargs)
         else:
-            sns.barplot(
-                data=self._obj,
-                x=self.category,
-                y=self.value,
-                palette=style.palette,
-                ax=plot_ax,
-            )
+            barplot_kwargs: dict[str, Any] = {
+                "data": self._obj,
+                "x": self.category,
+                "y": self.value,
+                "palette": style.palette,
+                "ax": plot_ax,
+            }
+            barplot_kwargs.update(kwargs)
+            sns.barplot(**barplot_kwargs)
 
         plot_ax.set_facecolor(style.background_color)
         plot_ax.set_xlabel(string_formatter(self.category))
@@ -129,7 +138,8 @@ class BarChart(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(style.background_color)
         fig.set_facecolor(style.background_color)
         self.aplot(title=title, style=style, ax=ax)
         return fig
