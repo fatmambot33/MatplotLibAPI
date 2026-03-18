@@ -17,7 +17,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis
+from .utils import _get_axis, _merge_kwargs
 from .typing import CorrelationMethod
 
 __all__ = [
@@ -58,7 +58,12 @@ class Heatmap(BasePlot):
         **kwargs: Any,
     ) -> Axes:
         plot_ax = _get_axis(ax)
-        sns.heatmap(self._obj, cmap=style.palette, ax=plot_ax)
+        heatmap_kwargs: dict[str, Any] = {
+            "data": self._obj,
+            "cmap": style.palette,
+            "ax": plot_ax,
+        }
+        sns.heatmap(**_merge_kwargs(heatmap_kwargs, kwargs))
 
         plot_ax.set_xlabel(string_formatter(self.x))
         plot_ax.set_ylabel(string_formatter(self.y))
@@ -77,7 +82,8 @@ class Heatmap(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(style.background_color)
         self.aplot(title=title, style=style, ax=ax)
         return fig
 
@@ -89,13 +95,14 @@ class Heatmap(BasePlot):
         **kwargs: Any,
     ) -> Axes:
         plot_ax = _get_axis(ax)
-        sns.heatmap(
-            self.correlation_matrix,
-            cmap=style.palette,
-            annot=True,
-            fmt=".2f",
-            ax=plot_ax,
-        )
+        heatmap_kwargs: dict[str, Any] = {
+            "data": self.correlation_matrix,
+            "cmap": style.palette,
+            "annot": True,
+            "fmt": ".2f",
+            "ax": plot_ax,
+        }
+        sns.heatmap(**_merge_kwargs(heatmap_kwargs, kwargs))
         if title:
             plot_ax.set_title(title)
         return plot_ax
@@ -111,7 +118,8 @@ class Heatmap(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = Axes(fig=fig, facecolor=style.background_color)
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(style.background_color)
         self.aplot(
             title=title,
             style=style,

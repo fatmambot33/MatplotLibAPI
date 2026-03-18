@@ -20,6 +20,29 @@ def _get_axis(ax: Optional[Axes] = None) -> Axes:
     return ax if ax is not None else plt.gca()
 
 
+def _merge_kwargs(
+    defaults: Dict[str, Any], overrides: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """Return a merged kwargs dictionary with caller overrides taking precedence.
+
+    Parameters
+    ----------
+    defaults : dict[str, Any]
+        Default keyword arguments.
+    overrides : dict[str, Any], optional
+        Caller-provided keyword arguments that should override defaults.
+
+    Returns
+    -------
+    dict[str, Any]
+        Merged keyword arguments.
+    """
+    merged = defaults.copy()
+    if overrides:
+        merged.update(overrides)
+    return merged
+
+
 def _wrap_aplot(
     plot_func: _AplotFunc,
     pd_df: Any,
