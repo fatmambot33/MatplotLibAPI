@@ -480,7 +480,7 @@ def fplot_network_node(
     """
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.set_facecolor(style.background_color)
-    ax = fig.add_subplot()
+    ax = fig.add_subplot(111)
     ax = aplot_network_node(
         pd_df,
         node=node,
