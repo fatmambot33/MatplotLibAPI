@@ -9,7 +9,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from .base_plot import BasePlot
-
+from .utils import _merge_kwargs
 
 from .style_template import (
     FIG_SIZE,
@@ -116,8 +116,7 @@ class PivotBarChart(BasePlot):
             "ax": ax,
             "alpha": 0.7,
         }
-        plot_kwargs.update(kwargs)
-        pivot_df.plot(**plot_kwargs)
+        pivot_df.plot(**_merge_kwargs(plot_kwargs, kwargs))
 
         ax.set_ylabel(string_formatter(self.y))
         ax.set_xlabel(string_formatter(self.x))

@@ -19,7 +19,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis
+from .utils import _get_axis, _merge_kwargs
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_histogram", "fplot_histogram"]
 
@@ -59,8 +59,7 @@ class Histogram(BasePlot):
             "edgecolor": style.background_color,
             "ax": plot_ax,
         }
-        histplot_kwargs.update(kwargs)
-        sns.histplot(**histplot_kwargs)
+        sns.histplot(**_merge_kwargs(histplot_kwargs, kwargs))
         plot_ax.set_facecolor(style.background_color)
         plot_ax.set_xlabel(string_formatter(self.column))
         plot_ax.set_ylabel("Frequency")

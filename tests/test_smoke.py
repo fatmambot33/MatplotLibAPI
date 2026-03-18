@@ -70,3 +70,25 @@ def test_dataframe_accessor_aplot_bubble():
     # Check if the title is set correctly
     assert ax.get_title() == "GDP vs. Life Expectancy"
     plt.close()
+
+
+def test_dataframe_accessor_fplot_bubble():
+    """Test that the pandas accessor for fplot_bubble works."""
+    data = {
+        "country": ["A", "B", "C", "D"],
+        "gdp_per_capita": [45000, 42000, 52000, 48000],
+        "life_expectancy": [81, 78, 83, 82],
+        "population": [10, 20, 5, 30],
+    }
+    df = pd.DataFrame(data)
+
+    fig = df.mpl.fplot_bubble(
+        label="country",
+        x="gdp_per_capita",
+        y="life_expectancy",
+        z="population",
+        title="GDP vs. Life Expectancy",
+    )
+
+    assert fig is not None
+    plt.close(fig)
