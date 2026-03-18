@@ -77,13 +77,14 @@ class AreaChart(BasePlot):
             aggfunc="sum",
         ).sort_index()
 
-        pivot_df.plot(
-            kind="area",
-            stacked=self.stacked,
-            alpha=0.7,
-            ax=plot_ax,
-            **kwargs,
-        )
+        plot_kwargs: dict[str, Any] = {
+            "kind": "area",
+            "stacked": self.stacked,
+            "alpha": 0.7,
+            "ax": plot_ax,
+        }
+        plot_kwargs.update(kwargs)
+        pivot_df.plot(**plot_kwargs)
 
         legend = plot_ax.get_legend()
         if legend is not None:
@@ -97,12 +98,16 @@ class AreaChart(BasePlot):
     ) -> None:
         """Plot a single-series area chart."""
         sorted_df = self._obj.sort_values(by=self.x)
+        fill_between_kwargs: dict[str, Any] = {
+            "color": style.font_color,
+            "alpha": 0.4,
+        }
+        fill_between_kwargs.update(kwargs)
+
         plot_ax.fill_between(
             sorted_df[self.x],
             sorted_df[self.y],
-            color=style.font_color,
-            alpha=0.4,
-            **kwargs,
+            **fill_between_kwargs,
         )
         plot_ax.plot(sorted_df[self.x], sorted_df[self.y], color=style.font_color)
 
