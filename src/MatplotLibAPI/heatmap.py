@@ -58,7 +58,13 @@ class Heatmap(BasePlot):
         **kwargs: Any,
     ) -> Axes:
         plot_ax = _get_axis(ax)
-        sns.heatmap(self._obj, cmap=style.palette, ax=plot_ax)
+        heatmap_kwargs: dict[str, Any] = {
+            "data": self._obj,
+            "cmap": style.palette,
+            "ax": plot_ax,
+        }
+        heatmap_kwargs.update(kwargs)
+        sns.heatmap(**heatmap_kwargs)
 
         plot_ax.set_xlabel(string_formatter(self.x))
         plot_ax.set_ylabel(string_formatter(self.y))
@@ -90,13 +96,15 @@ class Heatmap(BasePlot):
         **kwargs: Any,
     ) -> Axes:
         plot_ax = _get_axis(ax)
-        sns.heatmap(
-            self.correlation_matrix,
-            cmap=style.palette,
-            annot=True,
-            fmt=".2f",
-            ax=plot_ax,
-        )
+        heatmap_kwargs: dict[str, Any] = {
+            "data": self.correlation_matrix,
+            "cmap": style.palette,
+            "annot": True,
+            "fmt": ".2f",
+            "ax": plot_ax,
+        }
+        heatmap_kwargs.update(kwargs)
+        sns.heatmap(**heatmap_kwargs)
         if title:
             plot_ax.set_title(title)
         return plot_ax

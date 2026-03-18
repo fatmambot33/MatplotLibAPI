@@ -82,10 +82,18 @@ class BoxViolinPlot(BasePlot):
             "palette": style.palette,
         }
 
+        plot_kwargs: dict[str, Any] = {
+            **common_kwargs,
+            "hue": self.by,
+            "legend": False,
+            "ax": plot_ax,
+        }
+        plot_kwargs.update(kwargs)
+
         if self.violin:
-            sns.violinplot(**common_kwargs, hue=self.by, legend=False, ax=plot_ax)
+            sns.violinplot(**plot_kwargs)
         else:
-            sns.boxplot(**common_kwargs, hue=self.by, legend=False, ax=plot_ax)
+            sns.boxplot(**plot_kwargs)
 
         plot_ax.set_facecolor(style.background_color)
         plot_ax.set_ylabel(string_formatter(self.column))
@@ -125,9 +133,6 @@ class BoxViolinPlot(BasePlot):
         ax = fig.add_subplot(111)
         ax.set_facecolor(style.background_color)
         self.aplot(
-            column=self.column,
-            by=self.by,
-            violin=self.violin,
             title=title,
             style=style,
             ax=ax,

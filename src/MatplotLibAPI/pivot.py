@@ -109,7 +109,15 @@ class PivotBarChart(BasePlot):
         if pd.api.types.is_datetime64_any_dtype(pivot_df[self.x]):
             pivot_df[self.x] = pivot_df[self.x].dt.strftime("%Y-%m-%d")
 
-        pivot_df.plot(kind="bar", x=self.x, stacked=self.stacked, ax=ax, alpha=0.7)
+        plot_kwargs: dict[str, Any] = {
+            "kind": "bar",
+            "x": self.x,
+            "stacked": self.stacked,
+            "ax": ax,
+            "alpha": 0.7,
+        }
+        plot_kwargs.update(kwargs)
+        pivot_df.plot(**plot_kwargs)
 
         ax.set_ylabel(string_formatter(self.y))
         ax.set_xlabel(string_formatter(self.x))
