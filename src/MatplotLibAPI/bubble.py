@@ -330,7 +330,7 @@ class Bubble(BasePlot):
     def aplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         hline: bool = False,
         vline: bool = False,
         ax: Optional[Axes] = None,
@@ -397,6 +397,8 @@ class Bubble(BasePlot):
         >>> Bubble.aplot(df, label='country', x='gdp_per_capita',
         ...              y='life_expectancy', z='population', ax=ax)
         """
+        if not style:
+            style = BUBBLE_STYLE_TEMPLATE
         if ax is None:
             ax = cast(Axes, plt.gca())
 
@@ -424,7 +426,7 @@ class Bubble(BasePlot):
     def fplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         hline: bool = False,
         vline: bool = False,
         figsize: Tuple[float, float] = FIG_SIZE,
@@ -487,6 +489,8 @@ class Bubble(BasePlot):
         >>> fig = Bubble.fplot(df, label='country', x='gdp_per_capita',
         ...                    y='life_expectancy', z='population')
         """
+        if not style:
+            style = BUBBLE_STYLE_TEMPLATE
         fig = Figure(
             figsize=figsize,
             facecolor=style.background_color,
@@ -503,67 +507,3 @@ class Bubble(BasePlot):
             ax=ax,
         )
         return fig
-
-
-def aplot_bubble(
-    pd_df: pd.DataFrame,
-    label: str,
-    x: str,
-    y: str,
-    z: str,
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    max_values: int = MAX_RESULTS,
-    center_to_mean: bool = False,
-    title: Optional[str] = None,
-    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
-    hline: bool = False,
-    vline: bool = False,
-    ax: Optional[Axes] = None,
-    **kwargs: Any,
-) -> Axes:
-    """Plot a bubble chart on existing axes."""
-    return Bubble(
-        pd_df=pd_df,
-        label=label,
-        x=x,
-        y=y,
-        z=z,
-        sort_by=sort_by,
-        ascending=ascending,
-        max_values=max_values,
-        center_to_mean=center_to_mean,
-    ).aplot(title=title, style=style, hline=hline, vline=vline, ax=ax, **kwargs)
-
-
-def fplot_bubble(
-    pd_df: pd.DataFrame,
-    label: str,
-    x: str,
-    y: str,
-    z: str,
-    sort_by: Optional[str] = None,
-    ascending: bool = False,
-    max_values: int = MAX_RESULTS,
-    center_to_mean: bool = False,
-    title: Optional[str] = None,
-    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
-    hline: bool = False,
-    vline: bool = False,
-    figsize: Tuple[float, float] = FIG_SIZE,
-    **kwargs: Any,
-) -> Figure:
-    """Plot a bubble chart on a new figure."""
-    return Bubble(
-        pd_df=pd_df,
-        label=label,
-        x=x,
-        y=y,
-        z=z,
-        sort_by=sort_by,
-        ascending=ascending,
-        max_values=max_values,
-        center_to_mean=center_to_mean,
-    ).fplot(
-        title=title, style=style, hline=hline, vline=vline, figsize=figsize, **kwargs
-    )

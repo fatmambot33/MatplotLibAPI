@@ -10,6 +10,7 @@ from matplotlib.figure import Figure
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from MatplotLibAPI.network import NetworkGraph
 
 
 def generate_sample_network_data() -> pd.DataFrame:
@@ -25,7 +26,6 @@ def generate_sample_network_data() -> pd.DataFrame:
 
 def plot_sample_network_data() -> Figure:
     """Load a sample DataFrame for testing."""
-    from MatplotLibAPI.network import NetworkGraph
 
     pd_df = generate_sample_network_data()
     graph = NetworkGraph.from_pandas_edgelist(
@@ -37,5 +37,8 @@ def plot_sample_network_data() -> Figure:
 
 
 if __name__ == "__main__":
+    plot_df = generate_sample_network_data()
+    f = plot_df.mpl.fplot_network(
+        source="city_a", target="city_b", edge_weight_col="distance_km"
+    )
     plot_fig = plot_sample_network_data()
-    plot_fig.show()

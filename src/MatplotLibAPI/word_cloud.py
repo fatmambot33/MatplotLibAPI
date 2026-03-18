@@ -263,7 +263,7 @@ class WordCloudPlot(BasePlot):
     def aplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         max_words: int = MAX_RESULTS,
         stopwords: Optional[Iterable[str]] = None,
         random_state: Optional[int] = None,
@@ -297,6 +297,8 @@ class WordCloudPlot(BasePlot):
         Axes
             Matplotlib axes containing the rendered word cloud.
         """
+        if not style:
+            style = WORDCLOUD_STYLE_TEMPLATE
         words, weights = _prepare_word_frequencies(
             pd_df=self._obj,
             text_column=self.text_column,
@@ -318,7 +320,7 @@ class WordCloudPlot(BasePlot):
     def fplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         max_words: int = MAX_RESULTS,
         stopwords: Optional[Iterable[str]] = None,
         random_state: Optional[int] = None,
@@ -349,6 +351,8 @@ class WordCloudPlot(BasePlot):
         Figure
             Matplotlib figure containing the rendered word cloud.
         """
+        if not style:
+            style = WORDCLOUD_STYLE_TEMPLATE
         fig = Figure(
             figsize=figsize,
             facecolor=style.background_color,
@@ -373,7 +377,7 @@ def aplot_wordcloud(
     text_column: str,
     weight_column: str,
     title: Optional[str] = None,
-    style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
     random_state: Optional[int] = None,

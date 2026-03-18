@@ -32,7 +32,7 @@ def plot_composite_bubble(
     y: str,
     z: str,
     title: Optional[str] = None,
-    style: StyleTemplate = BUBBLE_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     max_values: int = 50,
     center_to_mean: bool = False,
     filter_by: Optional[str] = None,
@@ -80,7 +80,8 @@ def plot_composite_bubble(
         Matplotlib figure containing the composite bubble chart and tables.
     """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
-
+    if not style:
+        style = BUBBLE_STYLE_TEMPLATE
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.set_facecolor(style.background_color)
     grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
@@ -133,7 +134,7 @@ def plot_composite_bubble(
 def plot_composite_treemap(
     pd_dfs: Dict[str, pd.DataFrame],
     values: str,
-    style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     title: Optional[str] = None,
     color: Optional[str] = None,
     sort_by: Optional[str] = None,
@@ -205,7 +206,7 @@ def fplot_wordcloud_network(
     max_words: int = MAX_RESULTS,
     stopwords: Optional[Iterable[str]] = None,
     title: Optional[str] = None,
-    style: StyleTemplate = WORDCLOUD_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     wordcloud_style: Optional[StyleTemplate] = None,
     network_style: Optional[StyleTemplate] = None,
     figsize: Tuple[float, float] = FIG_SIZE,
@@ -246,6 +247,8 @@ def fplot_wordcloud_network(
     Figure
         Matplotlib figure containing the word cloud on top and network below.
     """
+    if not style:
+        style = WORDCLOUD_STYLE_TEMPLATE
     fig_raw, axes_raw = plt.subplots(
         2,
         1,

@@ -113,7 +113,7 @@ class AreaChart(BasePlot):
     def aplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = AREA_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
@@ -135,6 +135,8 @@ class AreaChart(BasePlot):
         Axes
             The Matplotlib axes containing the area chart.
         """
+        if not style:
+            style = AREA_STYLE_TEMPLATE
         plot_ax = _get_axis(ax)
         plot_ax.set_facecolor(style.background_color)
 
@@ -153,7 +155,7 @@ class AreaChart(BasePlot):
     def fplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = AREA_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         figsize: Tuple[float, float] = (10, 6),
         **kwargs: Any,
     ) -> Figure:
@@ -176,6 +178,8 @@ class AreaChart(BasePlot):
         Figure
             The Matplotlib figure containing the area chart.
         """
+        if not style:
+            style = AREA_STYLE_TEMPLATE
         fig = Figure(figsize=figsize)
         fig.set_facecolor(style.background_color)
         ax = fig.add_subplot(111)
@@ -190,7 +194,7 @@ def aplot_area(
     label: Optional[str] = None,
     stacked: bool = True,
     title: Optional[str] = None,
-    style: StyleTemplate = AREA_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     ax: Optional[Axes] = None,
     **kwargs: Any,
 ) -> Axes:

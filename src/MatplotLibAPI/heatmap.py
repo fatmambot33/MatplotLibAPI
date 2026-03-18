@@ -51,11 +51,13 @@ class Heatmap(BasePlot):
     def aplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
         """Plot a heatmap on an existing Matplotlib axes."""
+        if not style:
+            style = HEATMAP_STYLE_TEMPLATE
         plot_ax = _get_axis(ax)
         heatmap_kwargs: dict[str, Any] = {
             "data": self._obj,
@@ -73,10 +75,12 @@ class Heatmap(BasePlot):
     def fplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
         """Plot a heatmap on a new Matplotlib figure."""
+        if not style:
+            style = HEATMAP_STYLE_TEMPLATE
         fig = Figure(
             figsize=figsize,
             facecolor=style.background_color,
@@ -90,11 +94,13 @@ class Heatmap(BasePlot):
     def aplot_correlation_matrix(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
         """Plot a correlation matrix heatmap on existing axes."""
+        if not style:
+            style = HEATMAP_STYLE_TEMPLATE
         plot_ax = _get_axis(ax)
         heatmap_kwargs: dict[str, Any] = {
             "data": self.correlation_matrix,
@@ -111,10 +117,12 @@ class Heatmap(BasePlot):
     def fplot_correlation_matrix(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
         """Plot a correlation matrix heatmap on a new figure."""
+        if not style:
+            style = HEATMAP_STYLE_TEMPLATE
         fig = Figure(
             figsize=figsize,
             facecolor=style.background_color,
@@ -163,7 +171,7 @@ def aplot_heatmap(
     y: str,
     value: str,
     title: Optional[str] = None,
-    style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     ax: Optional[Axes] = None,
     **kwargs: Any,
 ) -> Axes:
@@ -186,11 +194,13 @@ def aplot_correlation_matrix(
     columns: Optional[Sequence[str]] = None,
     method: CorrelationMethod = "pearson",
     title: Optional[str] = None,
-    style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     ax: Optional[Axes] = None,
     **kwargs: Any,
 ) -> Axes:
     """Plot a correlation matrix heatmap for numeric columns."""
+    if not style:
+        style = HEATMAP_STYLE_TEMPLATE
     corr_df = _compute_correlation_matrix(pd_df=pd_df, columns=columns, method=method)
     plot_ax = _get_axis(ax)
     heatmap_kwargs: dict[str, Any] = {
@@ -212,7 +222,7 @@ def fplot_heatmap(
     y: str,
     value: str,
     title: Optional[str] = None,
-    style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot a matrix heatmap on a new figure."""
@@ -234,7 +244,7 @@ def fplot_correlation_matrix(
     y: str,
     value: str,
     title: Optional[str] = None,
-    style: StyleTemplate = HEATMAP_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     figsize: Tuple[float, float] = (10, 6),
 ) -> Figure:
     """Plot a correlation matrix heatmap on a new figure."""

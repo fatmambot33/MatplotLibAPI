@@ -683,7 +683,7 @@ class NetworkGraph(BasePlot):
     def aplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
         ax: Optional[Axes] = None,
@@ -709,6 +709,8 @@ class NetworkGraph(BasePlot):
         Axes
             Matplotlib axes with the plotted network.
         """
+        if not style:
+            style = NETWORK_STYLE_TEMPLATE
         sns.set_palette(style.palette)
         if ax is None:
             ax = cast(Axes, plt.gca())
@@ -794,7 +796,7 @@ class NetworkGraph(BasePlot):
     def fplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
         figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
@@ -816,6 +818,8 @@ class NetworkGraph(BasePlot):
         Figure
             Matplotlib figure with the plotted network.
         """
+        if not style:
+            style = NETWORK_STYLE_TEMPLATE
         fig = Figure(
             figsize=figsize,
             facecolor=style.background_color,
@@ -835,7 +839,7 @@ class NetworkGraph(BasePlot):
     def aplot_connected_components(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
         axes: Optional[np.ndarray] = None,
@@ -864,6 +868,8 @@ class NetworkGraph(BasePlot):
             or created, the flattened array of axes is returned; otherwise, a
             single Axes is returned.
         """
+        if not style:
+            style = NETWORK_STYLE_TEMPLATE
         sns.set_palette(style.palette)
 
         graph = self
@@ -912,7 +918,7 @@ class NetworkGraph(BasePlot):
     def fplot_connected_components(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ) -> Figure:
@@ -934,6 +940,8 @@ class NetworkGraph(BasePlot):
         Figure
             Matplotlib figure with the plotted network.
         """
+        if not style:
+            style = NETWORK_STYLE_TEMPLATE
         fig, ax = plt.subplots(figsize=FIG_SIZE)
         fig = cast(Figure, fig)
         fig.set_facecolor(style.background_color)

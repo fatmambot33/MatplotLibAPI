@@ -38,8 +38,6 @@ class BasePlot(ABC):
 
         Parameters
         ----------
-        pd_df : pd.DataFrame
-            The input DataFrame to plot.
         *args : Any
             Plot-specific positional arguments.
         **kwargs : Any
@@ -67,8 +65,6 @@ class BasePlot(ABC):
 
         Parameters
         ----------
-        pd_df : pd.DataFrame
-            The input DataFrame to plot.
         *args : Any
             Plot-specific positional arguments.
         **kwargs : Any

@@ -182,7 +182,7 @@ def aplot_network(
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
     title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     ax: Optional[Axes] = None,
 ) -> Axes:
@@ -233,7 +233,7 @@ def aplot_network_node(
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
     title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     ax: Optional[Axes] = None,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
 ) -> Axes:
@@ -308,7 +308,7 @@ def aplot_network_components(
     ascending: bool = False,
     node_df: Optional[pd.DataFrame] = None,
     title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     axes: Optional[np.ndarray] = None,
 ) -> None:
@@ -368,7 +368,7 @@ def fplot_network(
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
     title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     figsize: Tuple[float, float] = FIG_SIZE,
 ) -> Figure:
@@ -427,7 +427,7 @@ def fplot_network_node(
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
     title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     figsize: Tuple[float, float] = FIG_SIZE,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
 ) -> Figure:
@@ -478,6 +478,8 @@ def fplot_network_node(
     ValueError
         If ``node`` is not present in the prepared graph.
     """
+    if not style:
+        style = NETWORK_STYLE_TEMPLATE
     fig = cast(Figure, plt.figure(figsize=figsize))
     fig.set_facecolor(style.background_color)
     ax = fig.add_subplot(111)
@@ -501,7 +503,7 @@ def fplot_network_components(
     edge_target_col: str = "target",
     edge_weight_col: str = "weight",
     title: Optional[str] = None,
-    style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
     figsize: Tuple[float, float] = FIG_SIZE,
     n_cols: Optional[int] = None,
@@ -554,6 +556,8 @@ def fplot_network_components(
         If ``node_df`` is provided but none of its nodes appear as sources or
         targets in ``pd_df``.
     """
+    if not style:
+        style = NETWORK_STYLE_TEMPLATE
     graph = NetworkGraph(
         pd_df=pd_df,
         source=edge_source_col,

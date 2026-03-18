@@ -19,7 +19,7 @@ def aplot_treemap(
     pd_df: pd.DataFrame,
     path: str,
     values: str,
-    style: StyleTemplate = TREEMAP_STYLE_TEMPLATE,
+    style: Optional[StyleTemplate] = None,
     title: Optional[str] = None,
     color: Optional[str] = None,
     sort_by: Optional[str] = None,
@@ -62,6 +62,8 @@ def aplot_treemap(
 
     sort_col = sort_by or values
     df = pd_df.sort_values(by=sort_col, ascending=ascending)[cols].head(max_values)
+    if not style:
+        style = TREEMAP_STYLE_TEMPLATE
     data: Dict[str, Any] = {
         "labels": df[path],
         "parents": [""] * len(df),

@@ -27,12 +27,6 @@ if TYPE_CHECKING:
     import plotly.graph_objects as go
 
 
-def _bubble_imports() -> tuple[StyleTemplate, type]:
-    from .bubble import BUBBLE_STYLE_TEMPLATE, Bubble
-
-    return BUBBLE_STYLE_TEMPLATE, Bubble
-
-
 def _heatmap_imports() -> tuple[StyleTemplate, Any, Any, Any, Any]:
     from .heatmap import (
         HEATMAP_STYLE_TEMPLATE,
@@ -83,42 +77,6 @@ def _sankey_imports() -> tuple[StyleTemplate, Any]:
     from .sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
 
     return SANKEY_STYLE_TEMPLATE, fplot_sankey
-
-
-def aplot_area(*args: Any, **kwargs: Any) -> Axes:
-    from .area import aplot_area as _aplot_area
-
-    return _aplot_area(*args, **kwargs)
-
-
-def fplot_area(*args: Any, **kwargs: Any) -> Figure:
-    from .area import fplot_area as _fplot_area
-
-    return _fplot_area(*args, **kwargs)
-
-
-def aplot_bar(*args: Any, **kwargs: Any) -> Axes:
-    from .bar import aplot_bar as _aplot_bar
-
-    return _aplot_bar(*args, **kwargs)
-
-
-def fplot_bar(*args: Any, **kwargs: Any) -> Figure:
-    from .bar import fplot_bar as _fplot_bar
-
-    return _fplot_bar(*args, **kwargs)
-
-
-def aplot_box_violin(*args: Any, **kwargs: Any) -> Axes:
-    from .box_violin import aplot_box_violin as _aplot_box_violin
-
-    return _aplot_box_violin(*args, **kwargs)
-
-
-def fplot_box_violin(*args: Any, **kwargs: Any) -> Figure:
-    from .box_violin import fplot_box_violin as _fplot_box_violin
-
-    return _fplot_box_violin(*args, **kwargs)
 
 
 def aplot_histogram(*args: Any, **kwargs: Any) -> Axes:
@@ -343,7 +301,7 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
-        bubble_style_template, Bubble = _bubble_imports()
+        from .bubble import Bubble, BUBBLE_STYLE_TEMPLATE
 
         return Bubble(
             pd_df=self._obj,
@@ -357,7 +315,7 @@ class DataFrameAccessor:
             ascending=ascending,
         ).aplot(
             title=title,
-            style=style or bubble_style_template,
+            style=style or BUBBLE_STYLE_TEMPLATE,
             hline=hline,
             vline=vline,
             ax=ax,
@@ -415,7 +373,7 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the plot.
         """
-        bubble_style_template, Bubble = _bubble_imports()
+        from .bubble import Bubble, BUBBLE_STYLE_TEMPLATE
 
         return Bubble(
             pd_df=self._obj,
@@ -429,7 +387,7 @@ class DataFrameAccessor:
             center_to_mean=center_to_mean,
         ).fplot(
             title=title,
-            style=style or bubble_style_template,
+            style=style or BUBBLE_STYLE_TEMPLATE,
             hline=hline,
             vline=vline,
             figsize=figsize,
@@ -484,111 +442,21 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the composite plot.
         """
-        bubble_style_template, _ = _bubble_imports()
+        from .composite import plot_composite_bubble as _plot_composite_bubble
 
-        return plot_composite_bubble(
+        return _plot_composite_bubble(
             pd_df=self._obj,
             label=label,
             x=x,
             y=y,
             z=z,
             title=title,
-            style=style or bubble_style_template,
+            style=style,
             max_values=max_values,
             center_to_mean=center_to_mean,
             sort_by=sort_by,
             ascending=ascending,
             table_rows=table_rows,
-        )
-
-    def aplot_bar(
-        self,
-        category: str,
-        value: str,
-        group: Optional[str] = None,
-        stacked: bool = False,
-        title: Optional[str] = None,
-        style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
-        ax: Optional[Axes] = None,
-    ) -> Axes:
-        """Plot bar or stacked bar charts on existing axes.
-
-        Parameters
-        ----------
-        category : str
-            Column to plot along the x-axis.
-        value : str
-            Column representing bar heights.
-        group : str, optional
-            Optional grouping column for multiple series.
-        stacked : bool, optional
-            Whether to stack grouped bars. The default is ``False``.
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is ``DISTRIBUTION_STYLE_TEMPLATE``.
-        ax : Axes, optional
-            Matplotlib axes to plot on. If None, uses the current axes.
-
-        Returns
-        -------
-        Axes
-            The Matplotlib axes object with the bar chart.
-        """
-        return aplot_bar(
-            pd_df=self._obj,
-            category=category,
-            value=value,
-            group=group,
-            stacked=stacked,
-            title=title,
-            style=style or DISTRIBUTION_STYLE_TEMPLATE,
-            ax=ax,
-        )
-
-    def fplot_bar(
-        self,
-        category: str,
-        value: str,
-        group: Optional[str] = None,
-        stacked: bool = False,
-        title: Optional[str] = None,
-        style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = FIG_SIZE,
-    ) -> Figure:
-        """Plot bar or stacked bar charts on a new figure.
-
-        Parameters
-        ----------
-        category : str
-            Column to plot along the x-axis.
-        value : str
-            Column representing bar heights.
-        group : str, optional
-            Optional grouping column for multiple series.
-        stacked : bool, optional
-            Whether to stack grouped bars. The default is ``False``.
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is ``DISTRIBUTION_STYLE_TEMPLATE``.
-        figsize : tuple[float, float], optional
-            Figure size. The default is FIG_SIZE.
-
-        Returns
-        -------
-        Figure
-            The new Matplotlib figure with the bar chart.
-        """
-        return fplot_bar(
-            pd_df=self._obj,
-            category=category,
-            value=value,
-            group=group,
-            stacked=stacked,
-            title=title,
-            style=style,
-            figsize=figsize,
         )
 
     def aplot_histogram_kde(
@@ -673,88 +541,6 @@ class DataFrameAccessor:
             figsize=figsize,
         )
 
-    def aplot_box_violin(
-        self,
-        column: str,
-        by: Optional[str] = None,
-        violin: bool = False,
-        title: Optional[str] = None,
-        style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
-        ax: Optional[Axes] = None,
-    ) -> Axes:
-        """Plot box or violin charts on existing axes.
-
-        Parameters
-        ----------
-        column : str
-            Column to summarize.
-        by : str, optional
-            Optional grouping column.
-        violin : bool, optional
-            Whether to draw a violin plot. The default is ``False``.
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is ``DISTRIBUTION_STYLE_TEMPLATE``.
-        ax : Axes, optional
-            Matplotlib axes to plot on. If None, uses the current axes.
-
-        Returns
-        -------
-        Axes
-            The Matplotlib axes object with the distribution summary.
-        """
-        return aplot_box_violin(
-            pd_df=self._obj,
-            column=column,
-            by=by,
-            violin=violin,
-            title=title,
-            style=style,
-            ax=ax,
-        )
-
-    def fplot_box_violin(
-        self,
-        column: str,
-        by: Optional[str] = None,
-        violin: bool = False,
-        title: Optional[str] = None,
-        style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = FIG_SIZE,
-    ) -> Figure:
-        """Plot box or violin charts on a new figure.
-
-        Parameters
-        ----------
-        column : str
-            Column to summarize.
-        by : str, optional
-            Optional grouping column.
-        violin : bool, optional
-            Whether to draw a violin plot. The default is ``False``.
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is ``DISTRIBUTION_STYLE_TEMPLATE``.
-        figsize : tuple[float, float], optional
-            Figure size. The default is FIG_SIZE.
-
-        Returns
-        -------
-        Figure
-            The new Matplotlib figure with the distribution summary.
-        """
-        return fplot_box_violin(
-            pd_df=self._obj,
-            column=column,
-            by=by,
-            violin=violin,
-            title=title,
-            style=style,
-            figsize=figsize,
-        )
-
     def aplot_heatmap(
         self,
         x: str,
@@ -786,9 +572,9 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the heatmap.
         """
-        heatmap_style_template, _, aplot_heatmap, _, _ = _heatmap_imports()
+        from .heatmap import aplot_heatmap as _aplot_heatmap
 
-        return aplot_heatmap(
+        return _aplot_heatmap(
             pd_df=self._obj,
             x=x,
             y=y,
@@ -829,15 +615,15 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the heatmap.
         """
-        heatmap_style_template, _, _, _, fplot_heatmap = _heatmap_imports()
+        from .heatmap import fplot_heatmap as _fplot_heatmap
 
-        return fplot_heatmap(
+        return _fplot_heatmap(
             pd_df=self._obj,
             x=x,
             y=y,
             value=value,
             title=title,
-            style=style or heatmap_style_template,
+            style=style,
             figsize=figsize,
         )
 
@@ -869,113 +655,55 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the correlation matrix.
         """
-        heatmap_style_template, aplot_correlation_matrix, _, _, _ = _heatmap_imports()
+        from .heatmap import aplot_correlation_matrix as _aplot_correlation_matrix
 
-        return aplot_correlation_matrix(
+        return _aplot_correlation_matrix(
             pd_df=self._obj,
             columns=columns,
             method=method,
             title=title,
-            style=style or DISTRIBUTION_STYLE_TEMPLATE,
+            style=style,
             ax=ax,
         )
 
-    def aplot_area(
+    def fplot_correlation_matrix(
         self,
         x: str,
         y: str,
-        label: Optional[str] = None,
-        stacked: bool = True,
+        value: str,
+        method: CorrelationMethod = "pearson",
         title: Optional[str] = None,
-        style: StyleTemplate = AREA_STYLE_TEMPLATE,
-        ax: Optional[Axes] = None,
-        **kwargs: Any,
-    ) -> Axes:
-        """Plot an area chart on existing axes.
+        style: Optional[StyleTemplate] = None,
+    ) -> Figure:
+        """Plot a correlation matrix heatmap.
 
         Parameters
         ----------
-        x : str
-            Column for the x-axis.
-        y : str
-            Column for the area heights.
-        label : str, optional
-            Optional grouping column.
-        stacked : bool, optional
-            Whether to stack grouped areas. The default is ``True``.
+        columns : list[str], optional
+            Numeric columns to include. The default is ``None`` for all numeric columns.
+        method : CorrelationMethod, optional
+            Correlation method. The default is "pearson".
         title : str, optional
             Chart title.
         style : StyleTemplate, optional
-            Styling template. The default is ``AREA_STYLE_TEMPLATE``.
+            Styling template. The default is ``HEATMAP_STYLE_TEMPLATE``.
         ax : Axes, optional
             Matplotlib axes to plot on. If None, uses the current axes.
-        **kwargs : Any
-            Additional keyword arguments forwarded to the underlying area plot call.
 
         Returns
         -------
         Axes
-            The Matplotlib axes object with the area chart.
+            The Matplotlib axes object with the correlation matrix.
         """
-        return aplot_area(
-            self._obj,
-            x,
-            y,
-            label=label,
-            stacked=stacked,
+        from .heatmap import fplot_correlation_matrix as _fplot_correlation_matrix
+
+        return _fplot_correlation_matrix(
+            pd_df=self._obj,
+            x=x,
+            y=y,
+            value=value,
             title=title,
             style=style,
-            ax=ax,
-            **kwargs,
-        )
-
-    def fplot_area(
-        self,
-        x: str,
-        y: str,
-        label: Optional[str] = None,
-        stacked: bool = True,
-        title: Optional[str] = None,
-        style: StyleTemplate = AREA_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = FIG_SIZE,
-        **kwargs: Any,
-    ) -> Figure:
-        """Plot an area chart on a new figure.
-
-        Parameters
-        ----------
-        x : str
-            Column for the x-axis.
-        y : str
-            Column for the area heights.
-        label : str, optional
-            Optional grouping column.
-        stacked : bool, optional
-            Whether to stack grouped areas. The default is ``True``.
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is ``AREA_STYLE_TEMPLATE``.
-        figsize : tuple[float, float], optional
-            Figure size. The default is FIG_SIZE.
-        **kwargs : Any
-            Additional keyword arguments forwarded to the underlying area plot call.
-
-        Returns
-        -------
-        Figure
-            The new Matplotlib figure with the area chart.
-        """
-        return fplot_area(
-            self._obj,
-            x,
-            y,
-            label=label,
-            stacked=stacked,
-            title=title,
-            style=style,
-            figsize=figsize,
-            **kwargs,
         )
 
     def aplot_pie_donut(
@@ -1487,67 +1215,6 @@ class DataFrameAccessor:
             figsize=figsize,
         )
 
-    def aplot_network(
-        self,
-        edge_source_col: str = "source",
-        edge_target_col: str = "target",
-        edge_weight_col: str = "weight",
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        layout_seed: Optional[int] = None,
-        ax: Optional[Axes] = None,
-    ) -> Axes:
-        """Plot a network graph on a Matplotlib axes.
-
-        Parameters
-        ----------
-        node_col : str, optional
-            Column for node identifiers. The default is "node".
-        node_weight_col : str, optional
-            Column for node weights. The default is "weight".
-        edge_source_col : str, optional
-            Column for source nodes. The default is "source".
-        edge_target_col : str, optional
-            Column for target nodes. The default is "target".
-        edge_weight_col : str, optional
-            Column for edge weights. The default is "weight".
-        sort_by : str, optional
-            Column to sort by.
-        ascending : bool, optional
-            Sort order. The default is `False`.
-        node_df : pd.DataFrame, optional
-            DataFrame containing ``node`` and ``weight`` columns for weighting.
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
-        layout_seed : int, optional
-            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
-        ax : Axes, optional
-            Matplotlib axes to plot on. If None, uses the current axes.
-
-        Returns
-        -------
-        Axes
-            The Matplotlib axes object with the plot.
-        """
-        kwargs: Dict[str, Any] = {}
-        if layout_seed is not None:
-            kwargs["layout_seed"] = layout_seed
-
-        network_style_template, aplot_network, _, _, _, _, _ = _network_imports()
-
-        return aplot_network(
-            pd_df=self._obj,
-            edge_source_col=edge_source_col,
-            edge_target_col=edge_target_col,
-            edge_weight_col=edge_weight_col,
-            title=title,
-            style=style or network_style_template,
-            ax=ax,
-            **kwargs,
-        )
-
     def aplot_network_node(
         self,
         node: Any,
@@ -1677,67 +1344,6 @@ class DataFrameAccessor:
             title=title,
             style=style or network_style_template,
             axes=axes,
-            **kwargs,
-        )
-
-    def fplot_network(
-        self,
-        edge_source_col: str = "source",
-        edge_target_col: str = "target",
-        edge_weight_col: str = "weight",
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        layout_seed: Optional[int] = None,
-        figsize: Tuple[float, float] = FIG_SIZE,
-    ) -> Figure:
-        """Plot a network graph on a new figure.
-
-        Parameters
-        ----------
-        node_col : str, optional
-            Column for node identifiers. The default is "node".
-        node_weight_col : str, optional
-            Column for node weights. The default is "weight".
-        edge_source_col : str, optional
-            Column for source nodes. The default is "source".
-        edge_target_col : str, optional
-            Column for target nodes. The default is "target".
-        edge_weight_col : str, optional
-            Column for edge weights. The default is "weight".
-        sort_by : str, optional
-            Column to sort by.
-        ascending : bool, optional
-            Sort order. The default is `False`.
-        node_df : pd.DataFrame, optional
-            DataFrame containing ``node`` and ``weight`` columns for weighting.
-        title : str, optional
-            Chart title.
-        style : StyleTemplate, optional
-            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
-        layout_seed : int, optional
-            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
-        figsize : tuple[float, float], optional
-            Figure size. The default is FIG_SIZE.
-
-        Returns
-        -------
-        Figure
-            The new Matplotlib figure with the plot.
-        """
-        kwargs: Dict[str, Any] = {}
-        if layout_seed is not None:
-            kwargs["layout_seed"] = layout_seed
-
-        network_style_template, _, _, _, fplot_network, _, _ = _network_imports()
-
-        return fplot_network(
-            pd_df=self._obj,
-            edge_source_col=edge_source_col,
-            edge_target_col=edge_target_col,
-            edge_weight_col=edge_weight_col,
-            title=title,
-            style=style or network_style_template,
-            figsize=figsize,
             **kwargs,
         )
 

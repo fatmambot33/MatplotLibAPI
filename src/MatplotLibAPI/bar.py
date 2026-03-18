@@ -112,7 +112,7 @@ class BarChart(BasePlot):
     def fplot(
         self,
         title: Optional[str] = None,
-        style: StyleTemplate = DISTRIBUTION_STYLE_TEMPLATE,
+        style: Optional[StyleTemplate] = None,
         figsize: Tuple[float, float] = (10, 6),
     ) -> Figure:
         """Plot bar or stacked bar charts on a new figure.
@@ -131,6 +131,8 @@ class BarChart(BasePlot):
         Figure
             The Matplotlib Figure object containing the plot.
         """
+        if not style:
+            style = DISTRIBUTION_STYLE_TEMPLATE
         fig = Figure(
             figsize=figsize,
             facecolor=style.background_color,
