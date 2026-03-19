@@ -101,32 +101,6 @@ class TablePlot(BasePlot):
             plot_ax.title.set_position((0.5, 1.05))
         return plot_ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: StyleTemplate = TABLE_STYLE_TEMPLATE,
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        max_values: int = 20,
-        figsize: Tuple[float, float] = FIG_SIZE,
-    ) -> Figure:
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            sort_by=sort_by,
-            ascending=ascending,
-            max_values=max_values,
-            ax=ax,
-        )
-        return fig
-
 
 def aplot_table(
     pd_df: pd.DataFrame,
@@ -240,7 +214,7 @@ def fplot_table(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_table(df, cols=['col1', 'col2'])
     """
-    return TablePlot(pd_df=pd_df, cols=cols).fplot(
+    return TablePlot(pd_df=pd_df, cols=cols).fplot_w(
         title=title,
         style=style,
         sort_by=sort_by,

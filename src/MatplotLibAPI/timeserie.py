@@ -222,34 +222,6 @@ class TimeSeriePlot(BasePlot):
             )
         return plot_ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: StyleTemplate = TIMESERIE_STYLE_TEMPLATE,
-        max_values: int = 100,
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        std: bool = False,
-        figsize: Tuple[float, float] = FIG_SIZE,
-    ) -> Figure:
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            max_values=max_values,
-            sort_by=sort_by,
-            ascending=ascending,
-            std=std,
-            ax=ax,
-        )
-        return fig
-
 
 def aplot_timeserie(
     pd_df: pd.DataFrame,
@@ -390,7 +362,7 @@ def fplot_timeserie(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_timeserie(df, label="category", x="date", y="value")
     """
-    return TimeSeriePlot(pd_df=pd_df, label=label, x=x, y=y).fplot(
+    return TimeSeriePlot(pd_df=pd_df, label=label, x=x, y=y).fplot_w(
         title=title,
         style=style,
         max_values=max_values,

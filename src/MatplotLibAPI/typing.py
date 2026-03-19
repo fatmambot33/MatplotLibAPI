@@ -6,7 +6,4 @@ from typing_extensions import TypeAlias
 
 # ``DataFrame.corr`` supports the three built-in correlation methods or a callable
 # that operates on two array-like inputs and returns a float.
-CorrelationMethod: TypeAlias = Union[
-    Literal["pearson", "kendall", "spearman"],
-    Callable[[Sequence[float], Sequence[float]], float],
-]
+CorrelationMethod: TypeAlias = Literal["pearson", "kendall", "spearman"]

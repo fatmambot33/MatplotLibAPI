@@ -96,46 +96,6 @@ class WaffleChart(BasePlot):
         )
         return plot_ax
 
-    def fplot(
-        self,
-        rows: int = 10,
-        title: Optional[str] = None,
-        style: StyleTemplate = PIE_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (8, 8),
-    ) -> Figure:
-        """Plot a waffle chart on a new figure.
-
-        Parameters
-        ----------
-        rows : int, optional
-            Number of rows and columns in the waffle grid. The default is 10.
-        title : str, optional
-            Title for the plot. The default is None.
-        style : StyleTemplate, optional
-            Style template for the plot. The default is PIE_STYLE_TEMPLATE.
-        figsize : tuple[float, float], optional
-            Figure size. The default is (8, 8).
-
-        Returns
-        -------
-        Figure
-            The Matplotlib figure containing the waffle chart.
-        """
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            rows=rows,
-            ax=ax,
-        )
-        return fig
-
 
 def aplot_waffle(
     pd_df: pd.DataFrame,
@@ -166,7 +126,7 @@ def fplot_waffle(
     figsize: Tuple[float, float] = (8, 8),
 ) -> Figure:
     """Plot waffle charts on a new figure."""
-    return WaffleChart(pd_df=pd_df, category=category, value=value).fplot(
+    return WaffleChart(pd_df=pd_df, category=category, value=value).fplot_w(
         title=title,
         style=style,
         rows=rows,

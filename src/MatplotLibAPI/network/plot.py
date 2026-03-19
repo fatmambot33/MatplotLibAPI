@@ -413,7 +413,7 @@ def fplot_network(
         source=edge_source_col,
         target=edge_target_col,
         weight=edge_weight_col,
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         figsize=figsize,

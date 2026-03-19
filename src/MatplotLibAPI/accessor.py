@@ -385,7 +385,7 @@ class DataFrameAccessor:
             ascending=ascending,
             max_values=max_values,
             center_to_mean=center_to_mean,
-        ).fplot(
+        ).fplot_w(
             title=title,
             style=style or BUBBLE_STYLE_TEMPLATE,
             hline=hline,
@@ -629,7 +629,9 @@ class DataFrameAccessor:
 
     def aplot_correlation_matrix(
         self,
-        columns: Optional[List[str]] = None,
+        x: str,
+        y: str,
+        value: str,
         method: CorrelationMethod = "pearson",
         title: Optional[str] = None,
         style: Optional[StyleTemplate] = None,
@@ -659,7 +661,9 @@ class DataFrameAccessor:
 
         return _aplot_correlation_matrix(
             pd_df=self._obj,
-            columns=columns,
+            x=x,
+            y=y,
+            value=value,
             method=method,
             title=title,
             style=style,
@@ -704,6 +708,7 @@ class DataFrameAccessor:
             value=value,
             title=title,
             style=style,
+            correlation_method=method,
         )
 
     def aplot_pie_donut(

@@ -67,26 +67,6 @@ class Histogram(BasePlot):
             plot_ax.set_title(title)
         return plot_ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: StyleTemplate = NETWORK_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (10, 6),
-    ) -> Figure:
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            ax=ax,
-        )
-        return fig
-
 
 def aplot_histogram(
     pd_df: pd.DataFrame,
@@ -165,7 +145,7 @@ def fplot_histogram(
         column=column,
         bins=bins,
         kde=kde,
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         figsize=figsize,

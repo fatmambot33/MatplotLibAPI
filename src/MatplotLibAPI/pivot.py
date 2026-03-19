@@ -132,29 +132,6 @@ class PivotBarChart(BasePlot):
         ax.tick_params(axis="x", rotation=90)
         return ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: StyleTemplate = PIVOTBARS_STYLE_TEMPLATE,
-        sort_by: Optional[str] = None,
-        ascending: bool = False,
-        ax: Optional[Axes] = None,
-        figsize: Tuple[float, float] = FIG_SIZE,
-        **kwargs: Any,
-    ) -> Figure:
-
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = cast(Axes, fig.add_subplot(111))
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title, style=style, sort_by=sort_by, ascending=ascending, ax=ax
-        )
-        return fig
-
 
 def aplot_pivoted_bars(
     data: pd.DataFrame,
@@ -272,7 +249,7 @@ def fplot_pivoted_bars(
         y=y,
         agg=agg,
         stacked=stacked,
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         sort_by=sort_by,

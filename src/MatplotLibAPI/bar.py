@@ -3,7 +3,6 @@
 from typing import Any, Optional, Tuple
 
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -109,41 +108,6 @@ class BarChart(BasePlot):
         plot_ax.tick_params(axis="x", labelrotation=45)
         return plot_ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        figsize: Tuple[float, float] = (10, 6),
-    ) -> Figure:
-        """Plot bar or stacked bar charts on a new figure.
-
-        Parameters
-        ----------
-        title : str, optional
-            Title for the plot, by default None.
-        style : StyleTemplate, optional
-            Style template for the plot, by default DISTRIBUTION_STYLE_TEMPLATE.
-        figsize : tuple[float, float], optional
-            The size of the figure, by default (10, 6).
-
-        Returns
-        -------
-        Figure
-            The Matplotlib Figure object containing the plot.
-        """
-        if not style:
-            style = DISTRIBUTION_STYLE_TEMPLATE
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        fig.set_facecolor(style.background_color)
-        self.aplot(title=title, style=style, ax=ax)
-        return fig
-
 
 def aplot_bar(
     pd_df: pd.DataFrame,
@@ -188,7 +152,7 @@ def fplot_bar(
         value=value,
         group=group,
         stacked=stacked,
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         figsize=figsize,

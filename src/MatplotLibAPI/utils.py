@@ -43,6 +43,19 @@ def _merge_kwargs(
     return merged
 
 
+def create_fig(
+    figsize: Tuple[float, float], style: StyleTemplate
+) -> Tuple[Figure, Axes]:
+    fig = Figure(
+        figsize=figsize,
+        facecolor=style.background_color,
+        edgecolor=style.background_color,
+    )
+    ax = fig.add_subplot(111)
+    ax.set_facecolor(style.background_color)
+    return fig, ax
+
+
 def _wrap_aplot(
     plot_func: _AplotFunc,
     pd_df: Any,

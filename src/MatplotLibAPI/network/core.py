@@ -718,6 +718,7 @@ class NetworkGraph(BasePlot):
         isolated_nodes = list(nx.isolates(self._nx_graph))
         graph_nx = self._nx_graph
         if isolated_nodes:
+
             graph_nx = graph_nx.copy()
             graph_nx.remove_nodes_from(isolated_nodes)
 
@@ -792,49 +793,6 @@ class NetworkGraph(BasePlot):
         ax.set_axis_off()
 
         return ax
-
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
-        figsize: Tuple[float, float] = FIG_SIZE,
-    ) -> Figure:
-        """Plot the graph using node and edge weights.
-
-        Parameters
-        ----------
-        title : str, optional
-            Plot title.
-        style : StyleTemplate, optional
-            Style configuration. The default is `NETWORK_STYLE_TEMPLATE`.
-        edge_weight_col : str, optional
-            Edge attribute used for weighting. The default is "weight".
-        layout_seed : int, optional
-            Seed for the spring layout used to place nodes. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
-
-        Returns
-        -------
-        Figure
-            Matplotlib figure with the plotted network.
-        """
-        if not style:
-            style = NETWORK_STYLE_TEMPLATE
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            edge_weight_col="",
-            layout_seed=layout_seed,
-            ax=ax,
-        )
-        return fig
 
     def aplot_connected_components(
         self,
@@ -921,6 +879,7 @@ class NetworkGraph(BasePlot):
         style: Optional[StyleTemplate] = None,
         edge_weight_col: str = "weight",
         layout_seed: Optional[int] = _DEFAULT["SPRING_LAYOUT_SEED"],
+        figsize: Tuple[float, float] = FIG_SIZE,
     ) -> Figure:
         """Plot all connected components of the graph.
 
@@ -942,9 +901,9 @@ class NetworkGraph(BasePlot):
         """
         if not style:
             style = NETWORK_STYLE_TEMPLATE
-        fig, ax = plt.subplots(figsize=FIG_SIZE)
-        fig = cast(Figure, fig)
-        fig.set_facecolor(style.background_color)
+
+        fig, ax = BasePlot.create_fig(figsize=figsize, style=style)
+
         self.aplot_connected_components(
             title=title,
             style=style,

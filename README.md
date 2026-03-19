@@ -39,7 +39,7 @@ fig = Bubble(
     x='gdp_per_capita',
     y='population',
     z='population',
-).fplot(title='Country Statistics')
+).fplot_w(title='Country Statistics')
 
 # Display the plot
 plt.show()
@@ -151,7 +151,7 @@ fig = Bubble(
     x='gdp_per_capita',
     y='life_expectancy',
     z='population',
-).fplot()
+).fplot_w()
 fig.show()
 ```
 
@@ -168,7 +168,7 @@ graph = NetworkGraph.from_pandas_edgelist(
     target='city_b',
     edge_weight_col='distance_km',
 )
-fig = graph.fplot(title='City Network', edge_weight_col='distance_km')
+fig = graph.fplot_w(title='City Network', edge_weight_col='distance_km')
 fig.show()
 ```
 

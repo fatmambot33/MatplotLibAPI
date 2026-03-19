@@ -56,8 +56,10 @@ def test_aplot_correlation_matrix_accepts_method(load_sample_df):
 
     ax = aplot_correlation_matrix(
         pd_df=df,
-        columns=["engagements", "month"],
-        method="spearman",
+        x="month",
+        y="channel",
+        value="engagements",
+        correlation_method="spearman",
     )
 
     assert isinstance(ax, Axes)

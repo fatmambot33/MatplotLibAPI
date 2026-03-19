@@ -1,6 +1,6 @@
 """Heatmap and correlation matrix helpers."""
 
-from typing import Any, Optional, Sequence, Tuple, cast
+from typing import Any, Optional, Sequence, Tuple, cast, Literal
 
 import pandas as pd
 import seaborn as sns
@@ -16,7 +16,7 @@ from .style_template import (
     validate_dataframe,
 )
 from .typing import CorrelationMethod
-from .utils import _get_axis, _merge_kwargs
+from .utils import _get_axis, _merge_kwargs, create_fig
 
 __all__ = [
     "HEATMAP_STYLE_TEMPLATE",
@@ -43,10 +43,12 @@ class Heatmap(BasePlot):
         self.y = y
         self.value = value
 
-    @property
-    def correlation_matrix(self) -> pd.DataFrame:
+    def correlation_matrix(
+        self,
+        correlation_method: CorrelationMethod = "pearson",
+    ) -> pd.DataFrame:
         """Compute the correlation matrix for the underlying DataFrame."""
-        return self._obj.corr()
+        return self._obj.corr(method=correlation_method)
 
     def aplot(
         self,
@@ -72,29 +74,11 @@ class Heatmap(BasePlot):
             plot_ax.set_title(title)
         return plot_ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        figsize: Tuple[float, float] = (10, 6),
-    ) -> Figure:
-        """Plot a heatmap on a new Matplotlib figure."""
-        if not style:
-            style = HEATMAP_STYLE_TEMPLATE
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(title=title, style=style, ax=ax)
-        return fig
-
     def aplot_correlation_matrix(
         self,
         title: Optional[str] = None,
         style: Optional[StyleTemplate] = None,
+        correlation_method: CorrelationMethod = "pearson",
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
@@ -103,7 +87,7 @@ class Heatmap(BasePlot):
             style = HEATMAP_STYLE_TEMPLATE
         plot_ax = _get_axis(ax)
         heatmap_kwargs: dict[str, Any] = {
-            "data": self.correlation_matrix,
+            "data": self.correlation_matrix(correlation_method),
             "cmap": style.palette,
             "annot": True,
             "fmt": ".2f",
@@ -119,20 +103,16 @@ class Heatmap(BasePlot):
         title: Optional[str] = None,
         style: Optional[StyleTemplate] = None,
         figsize: Tuple[float, float] = (10, 6),
+        correlation_method: CorrelationMethod = "pearson",
     ) -> Figure:
         """Plot a correlation matrix heatmap on a new figure."""
         if not style:
             style = HEATMAP_STYLE_TEMPLATE
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
+        fig, ax = create_fig(figsize=figsize, style=style)
         self.aplot_correlation_matrix(
             title=title,
             style=style,
+            correlation_method=correlation_method,
             ax=ax,
         )
         return fig
@@ -191,29 +171,23 @@ def aplot_heatmap(
 
 def aplot_correlation_matrix(
     pd_df: pd.DataFrame,
-    columns: Optional[Sequence[str]] = None,
-    method: CorrelationMethod = "pearson",
+    x: str,
+    y: str,
+    value: str,
+    correlation_method: CorrelationMethod = "pearson",
     title: Optional[str] = None,
     style: Optional[StyleTemplate] = None,
     ax: Optional[Axes] = None,
     **kwargs: Any,
 ) -> Axes:
-    """Plot a correlation matrix heatmap for numeric columns."""
-    if not style:
-        style = HEATMAP_STYLE_TEMPLATE
-    corr_df = _compute_correlation_matrix(pd_df=pd_df, columns=columns, method=method)
-    plot_ax = _get_axis(ax)
-    heatmap_kwargs: dict[str, Any] = {
-        "data": corr_df,
-        "cmap": style.palette,
-        "annot": True,
-        "fmt": ".2f",
-        "ax": plot_ax,
-    }
-    sns.heatmap(**_merge_kwargs(heatmap_kwargs, kwargs))
-    if title:
-        plot_ax.set_title(title)
-    return plot_ax
+    return Heatmap(
+        pd_df=pd_df,
+        x=x,
+        y=y,
+        value=value,
+    ).aplot_correlation_matrix(
+        title=title, style=style, correlation_method=correlation_method, ax=ax
+    )
 
 
 def fplot_heatmap(
@@ -231,7 +205,7 @@ def fplot_heatmap(
         x=x,
         y=y,
         value=value,
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         figsize=figsize,
@@ -246,6 +220,7 @@ def fplot_correlation_matrix(
     title: Optional[str] = None,
     style: Optional[StyleTemplate] = None,
     figsize: Tuple[float, float] = (10, 6),
+    correlation_method: CorrelationMethod = "pearson",
 ) -> Figure:
     """Plot a correlation matrix heatmap on a new figure."""
     return Heatmap(
@@ -253,4 +228,6 @@ def fplot_correlation_matrix(
         x=x,
         y=y,
         value=value,
-    ).fplot_correlation_matrix(title=title, style=style, figsize=figsize)
+    ).fplot_correlation_matrix(
+        title=title, style=style, figsize=figsize, correlation_method=correlation_method
+    )

@@ -317,60 +317,6 @@ class WordCloudPlot(BasePlot):
             mask=mask,
         )
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        max_words: int = MAX_RESULTS,
-        stopwords: Optional[Iterable[str]] = None,
-        random_state: Optional[int] = None,
-        figsize: Tuple[float, float] = FIG_SIZE,
-        mask: Optional[np.ndarray] = None,
-    ) -> Figure:
-        """Plot the configured word cloud on a new figure.
-
-        Parameters
-        ----------
-        title : str, optional
-            Plot title.
-        style : StyleTemplate, optional
-            Style configuration. The default is ``WORDCLOUD_STYLE_TEMPLATE``.
-        max_words : int, optional
-            Maximum number of words to include. The default is ``MAX_RESULTS``.
-        stopwords : Iterable[str], optional
-            Words to exclude from the cloud.
-        random_state : int, optional
-            Random seed used by word-cloud placement.
-        figsize : tuple[float, float], optional
-            Figure size. The default is ``FIG_SIZE``.
-        mask : np.ndarray, optional
-            Binary mask controlling drawable pixels.
-
-        Returns
-        -------
-        Figure
-            Matplotlib figure containing the rendered word cloud.
-        """
-        if not style:
-            style = WORDCLOUD_STYLE_TEMPLATE
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            max_words=max_words,
-            stopwords=stopwords,
-            random_state=random_state,
-            ax=ax,
-            mask=mask,
-        )
-        return fig
-
 
 def aplot_wordcloud(
     pd_df: pd.DataFrame,
@@ -483,7 +429,7 @@ def fplot_wordcloud(
     """
     return WordCloudPlot(
         pd_df=pd_df, text_column=text_column, weight_column=weight_column
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         max_words=max_words,

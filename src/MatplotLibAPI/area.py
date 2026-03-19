@@ -14,7 +14,7 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _merge_kwargs
+from .utils import _get_axis, _merge_kwargs, create_fig
 
 __all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 
@@ -152,40 +152,6 @@ class AreaChart(BasePlot):
             plot_ax.set_title(title)
         return plot_ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        figsize: Tuple[float, float] = (10, 6),
-        **kwargs: Any,
-    ) -> Figure:
-        """Plot an area chart on a new figure.
-
-        Parameters
-        ----------
-        title : str, optional
-            Title for the plot. The default is None.
-        style : StyleTemplate, optional
-            Style template for the plot. The default is AREA_STYLE_TEMPLATE.
-        figsize : tuple[float, float], optional
-            Figure size. The default is (10, 6).
-
-        **kwargs : Any
-            Additional keyword arguments forwarded to ``aplot``.
-
-        Returns
-        -------
-        Figure
-            The Matplotlib figure containing the area chart.
-        """
-        if not style:
-            style = AREA_STYLE_TEMPLATE
-        fig = Figure(figsize=figsize)
-        fig.set_facecolor(style.background_color)
-        ax = fig.add_subplot(111)
-        self.aplot(title=title, style=style, ax=ax, **kwargs)
-        return fig
-
 
 def aplot_area(
     pd_df: pd.DataFrame,
@@ -231,7 +197,7 @@ def fplot_area(
         y=y,
         label=label,
         stacked=stacked,
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         figsize=figsize,

@@ -4,7 +4,6 @@ from typing import Any, Optional, Tuple
 
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -105,44 +104,6 @@ class BoxViolinPlot(BasePlot):
             plot_ax.set_title(title)
         return plot_ax
 
-    def fplot(
-        self,
-        title: Optional[str] = None,
-        style: Optional[StyleTemplate] = None,
-        figsize: Tuple[float, float] = (10, 6),
-    ) -> Figure:
-        """Plot a box or violin chart on a new figure.
-
-        Parameters
-        ----------
-        title : str, optional
-            Title for the plot. The default is None.
-        style : StyleTemplate, optional
-            Style template for the plot. The default is DISTRIBUTION_STYLE_TEMPLATE.
-        figsize : tuple[float, float], optional
-            Figure size. The default is (10, 6).
-
-        Returns
-        -------
-        Figure
-            The Matplotlib figure containing the distribution chart.
-        """
-        if not style:
-            style = DISTRIBUTION_STYLE_TEMPLATE
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        self.aplot(
-            title=title,
-            style=style,
-            ax=ax,
-        )
-        return fig
-
 
 def aplot_box_violin(
     pd_df: pd.DataFrame,
@@ -183,7 +144,7 @@ def fplot_box_violin(
         column=column,
         by=by,
         violin=violin,
-    ).fplot(
+    ).fplot_w(
         title=title,
         style=style,
         figsize=figsize,

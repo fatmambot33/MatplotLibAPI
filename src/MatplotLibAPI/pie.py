@@ -80,42 +80,6 @@ class PieChart(BasePlot):
             plot_ax.set_title(title)
         return plot_ax
 
-    def fplot(
-        self,
-        donut: bool = False,
-        title: Optional[str] = None,
-        style: StyleTemplate = PIE_STYLE_TEMPLATE,
-        figsize: Tuple[float, float] = (8, 8),
-    ) -> Figure:
-        """Plot a pie or donut chart on a new figure.
-
-        Parameters
-        ----------
-        donut : bool, optional
-            If True, render a donut chart. The default is False.
-        title : str, optional
-            Title for the plot. The default is None.
-        style : StyleTemplate, optional
-            Style template for the plot. The default is PIE_STYLE_TEMPLATE.
-        figsize : tuple[float, float], optional
-            Figure size. The default is (8, 8).
-
-        Returns
-        -------
-        Figure
-            The Matplotlib figure containing the pie or donut chart.
-        """
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
-        ax.set_facecolor(style.background_color)
-        fig.set_facecolor(style.background_color)
-        self.aplot(donut=donut, title=title, style=style, ax=ax)
-        return fig
-
 
 def aplot_pie(
     pd_df: pd.DataFrame,
@@ -147,7 +111,7 @@ def fplot_pie(
     figsize: Tuple[float, float] = (8, 8),
 ) -> Figure:
     """Plot pie or donut charts on a new figure."""
-    return PieChart(pd_df=pd_df, category=category, value=value).fplot(
+    return PieChart(pd_df=pd_df, category=category, value=value).fplot_w(
         donut=donut,
         title=title,
         style=style,
