@@ -148,7 +148,7 @@ class PivotBarChart(BasePlot):
             facecolor=style.background_color,
             edgecolor=style.background_color,
         )
-        ax = fig.add_subplot(111)
+        ax = cast(Axes, fig.add_subplot(111))
         ax.set_facecolor(style.background_color)
         self.aplot(
             title=title, style=style, sort_by=sort_by, ascending=ascending, ax=ax
