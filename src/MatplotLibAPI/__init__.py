@@ -2,5 +2,4 @@
 
 from .accessor import DataFrameAccessor
 
-
 __all__ = ["DataFrameAccessor"]

@@ -7,13 +7,12 @@ import pandas as pd
 import plotly.graph_objects as go
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from matplotlib.gridspec import GridSpec
 from plotly.subplots import make_subplots
 
-from .base_plot import BasePlot
+from .base_plot import FIG_SIZE
 
-from .bubble import BUBBLE_STYLE_TEMPLATE, FIG_SIZE, Bubble
-from .network import aplot_network, NetworkGraph
+from .bubble import aplot_bubble
+from .network import NetworkGraph
 from .style_template import (
     MAX_RESULTS,
     TITLE_SCALE_FACTOR,
@@ -21,8 +20,8 @@ from .style_template import (
     validate_dataframe,
 )
 from .table import aplot_table
-from .treemap import TREEMAP_STYLE_TEMPLATE, aplot_treemap
-from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, WordCloud
+from .treemap import aplot_treemap
+from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud
 
 
 def plot_composite_bubble(
@@ -80,13 +79,20 @@ def plot_composite_bubble(
         Matplotlib figure containing the composite bubble chart and tables.
     """
     validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
-    if not style:
-        style = BUBBLE_STYLE_TEMPLATE
-    fig = cast(Figure, plt.figure(figsize=figsize))
-    fig.set_facecolor(style.background_color)
-    grid = GridSpec(2, 2, height_ratios=[2, 1], width_ratios=[1, 1])
-    ax = fig.add_subplot(grid[0, 0:])
-    ax = Bubble(
+    if style is None:
+        style = WORDCLOUD_STYLE_TEMPLATE
+    fig = plt.figure(figsize=figsize)
+    gs = fig.add_gridspec(
+        2,
+        2,
+        height_ratios=[2, 1],
+        width_ratios=[1, 1],
+    )
+    ax = fig.add_subplot(gs[0, :])
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax3 = fig.add_subplot(gs[1, 1])
+
+    aplot_bubble(
         pd_df=pd_df,
         label=label,
         x=x,
@@ -96,13 +102,11 @@ def plot_composite_bubble(
         center_to_mean=center_to_mean,
         sort_by=sort_by,
         ascending=ascending,
-    ).aplot(
         title=title,
         style=style,
         ax=ax,
     )
 
-    ax2 = fig.add_subplot(grid[1, 0])
     ax2 = aplot_table(
         pd_df=pd_df,
         cols=[label, z, y, x],
@@ -113,7 +117,7 @@ def plot_composite_bubble(
         max_values=table_rows,
         style=style,
     )
-    ax3 = fig.add_subplot(grid[1, 1])
+
     ax3 = aplot_table(
         pd_df=pd_df,
         cols=[label, z, y, x],
@@ -194,6 +198,108 @@ def plot_composite_treemap(
             max_values=max_values,
         )
         fig.add_trace(trm, row=current_row, col=1)
+    return fig
+
+
+def fplot_wordcloud_network2(
+    edges_df: pd.DataFrame,
+    edge_source_col: str = "source",
+    edge_target_col: str = "target",
+    edge_weight_col: str = "weight",
+    max_words: int = MAX_RESULTS,
+    stopwords: Optional[Iterable[str]] = None,
+    title: Optional[str] = None,
+    style: Optional[StyleTemplate] = None,
+    wordcloud_style: Optional[StyleTemplate] = None,
+    network_style: Optional[StyleTemplate] = None,
+    figsize: Tuple[float, float] = FIG_SIZE,
+) -> Figure:
+    """Plot a word cloud above a network graph.
+
+    Parameters
+    ----------
+    edges_df : pd.DataFrame
+        DataFrame containing edge connections for the network plot.
+    edge_source_col : str, optional
+        Column in ``edges_df`` containing source nodes. The default is ``"source"``.
+    edge_target_col : str, optional
+        Column in ``edges_df`` containing target nodes. The default is ``"target"``.
+    edge_weight_col : str, optional
+        Column in ``edges_df`` containing edge weights. The default is ``"weight"``.
+    max_words : int, optional
+        Maximum number of words to include in the word cloud. The default is ``50``.
+    stopwords : Iterable[str], optional
+        Stopwords to exclude from the word cloud. The default is ``None``.
+    title : str, optional
+        Title for the composite figure. The default is ``None``.
+    style : StyleTemplate, optional
+        Shared style configuration applied to the composite figure and used for
+        subplots when specialized styles are not provided. The default is
+        ``WORDCLOUD_STYLE_TEMPLATE``.
+    wordcloud_style : StyleTemplate, optional
+        Optional style configuration for the word cloud subplot. When ``None``
+        the shared ``style`` is used. The default is ``None``.
+    network_style : StyleTemplate, optional
+        Optional style configuration for the network subplot. When ``None`` the
+        shared ``style`` is used. The default is ``None``.
+    figsize : tuple[float, float], optional
+        Size of the composite figure. The default is ``FIG_SIZE``.
+
+    Returns
+    -------
+    Figure
+        Matplotlib figure containing the word cloud on top and network below.
+    """
+    if not style:
+        style = WORDCLOUD_STYLE_TEMPLATE
+    fig_raw, axes_raw = plt.subplots(
+        2,
+        1,
+        figsize=figsize,
+        gridspec_kw={"height_ratios": [1, 2]},
+    )
+    fig = cast(Figure, fig_raw)
+    wordcloud_ax, network_ax = cast(Tuple[Axes, Axes], axes_raw)
+
+    wordcloud_style = wordcloud_style or style
+    network_style = network_style or style
+
+    fig.set_facecolor(style.background_color)
+    if title:
+        fig.suptitle(
+            title,
+            color=style.font_color,
+            fontsize=style.font_size * TITLE_SCALE_FACTOR,
+            fontname=style.font_name,
+        )
+
+    network = NetworkGraph.from_pandas_edgelist(
+        edges_df=edges_df,
+        source=edge_source_col,
+        target=edge_target_col,
+        edge_weight_col=edge_weight_col,
+    )
+    network.aplot(
+        title=None,
+        style=network_style,
+        ax=network_ax,
+    )
+
+    aplot_wordcloud(
+        pd_df=network.node_view.to_dataframe(),
+        text_column="node",
+        weight_column=edge_weight_col,
+        title=None,
+        style=wordcloud_style,
+        max_words=max_words,
+        stopwords=stopwords,
+        ax=wordcloud_ax,
+    )
+
+    if title:
+        fig.tight_layout(rect=(0, 0, 1, 0.95))
+    else:
+        fig.tight_layout()
     return fig
 
 

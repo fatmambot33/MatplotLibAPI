@@ -4,7 +4,7 @@ Provides a Bubble class to create and render bubble charts using seaborn and mat
 with customizable styling via `StyleTemplate`.
 """
 
-from typing import Any, Dict, Optional, Tuple, cast
+from typing import Any, Dict, Optional, cast
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -18,7 +18,6 @@ from .base_plot import BasePlot
 
 from .style_template import (
     BUBBLE_STYLE_TEMPLATE,
-    FIG_SIZE,
     MAX_RESULTS,
     TITLE_SCALE_FACTOR,
     StyleTemplate,
@@ -29,7 +28,7 @@ from .style_template import (
     FormatterFunc,
 )
 
-__all__ = ["BUBBLE_STYLE_TEMPLATE", "Bubble"]
+__all__ = ["BUBBLE_STYLE_TEMPLATE", "Bubble", "aplot_bubble", "fplot_bubble"]
 
 
 @register_dataframe_accessor("bubble")
@@ -422,3 +421,74 @@ class Bubble(BasePlot):
             )
 
         return ax
+
+
+def aplot_bubble(
+    pd_df: pd.DataFrame,
+    label: str,
+    x: str,
+    y: str,
+    z: str,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    max_values: int = MAX_RESULTS,
+    center_to_mean: bool = False,
+    title: Optional[str] = None,
+    style: Optional[StyleTemplate] = None,
+    hline: bool = False,
+    vline: bool = False,
+    ax: Optional[Axes] = None,
+    **kwargs: Any,
+) -> Axes:
+    """Plot a matrix heatmap for multivariate pattern detection."""
+    return Bubble(
+        pd_df=pd_df,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+        sort_by=sort_by,
+        ascending=ascending,
+    ).aplot(
+        title=title,
+        style=style or BUBBLE_STYLE_TEMPLATE,
+        hline=hline,
+        vline=vline,
+        ax=ax,
+    )
+
+
+def fplot_bubble(
+    pd_df: pd.DataFrame,
+    label: str,
+    x: str,
+    y: str,
+    z: str,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    max_values: int = MAX_RESULTS,
+    center_to_mean: bool = False,
+    title: Optional[str] = None,
+    style: Optional[StyleTemplate] = None,
+    hline: bool = False,
+    vline: bool = False,
+) -> Figure:
+    """Plot a matrix heatmap for multivariate pattern detection."""
+    return Bubble(
+        pd_df=pd_df,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+        sort_by=sort_by,
+        ascending=ascending,
+    ).fplot(
+        title=title,
+        style=style or BUBBLE_STYLE_TEMPLATE,
+        hline=hline,
+        vline=vline,
+    )
