@@ -233,7 +233,7 @@ def fplot_heatmap(
         x=x,
         y=y,
         value=value,
-    ).fplot_w(
+    ).fplot(
         title=title,
         style=style,
         figsize=figsize,

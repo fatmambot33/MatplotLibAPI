@@ -57,7 +57,7 @@ class BasePlot(ABC):
             The Matplotlib axes object with the plot.
         """
 
-    def fplot_w(self, *args: Any, **kwargs: Any) -> Figure:
+    def fplot(self, *args: Any, **kwargs: Any) -> Figure:
         """Plot on a new figure using the axis-level implementation.
 
         Parameters

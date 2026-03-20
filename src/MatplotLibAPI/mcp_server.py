@@ -79,7 +79,7 @@ def _build_bubble_chart_figure(
         center_to_mean=center_to_mean,
         sort_by=sort_by,
         ascending=ascending,
-    ).fplot_w(
+    ).fplot(
         title=title,
         hline=hline,
         vline=vline,

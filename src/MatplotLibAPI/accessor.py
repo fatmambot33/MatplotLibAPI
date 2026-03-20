@@ -385,7 +385,7 @@ class DataFrameAccessor:
             ascending=ascending,
             max_values=max_values,
             center_to_mean=center_to_mean,
-        ).fplot_w(
+        ).fplot(
             title=title,
             style=style or BUBBLE_STYLE_TEMPLATE,
             hline=hline,
