@@ -152,7 +152,7 @@ def fplot_bar(
         value=value,
         group=group,
         stacked=stacked,
-    ).fplot_w(
+    ).fplot(
         title=title,
         style=style,
         figsize=figsize,

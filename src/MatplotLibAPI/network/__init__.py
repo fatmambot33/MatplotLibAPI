@@ -7,6 +7,7 @@ organizing implementation details in submodules.
 from .constants import _DEFAULT, _WEIGHT_PERCENTILES
 from .core import NETWORK_STYLE_TEMPLATE, NetworkGraph
 from .plot import (
+    trim_low_degree_nodes,
     aplot_network,
     aplot_network_node,
     aplot_network_components,
@@ -17,6 +18,7 @@ from .plot import (
 from .scaling import _scale_weights, _softmax
 
 __all__ = [
+    "trim_low_degree_nodes",
     "aplot_network",
     "aplot_network_node",
     "aplot_network_components",

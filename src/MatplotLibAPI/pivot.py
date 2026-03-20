@@ -249,7 +249,7 @@ def fplot_pivoted_bars(
         y=y,
         agg=agg,
         stacked=stacked,
-    ).fplot_w(
+    ).fplot(
         title=title,
         style=style,
         sort_by=sort_by,

@@ -126,7 +126,7 @@ def fplot_waffle(
     figsize: Tuple[float, float] = (8, 8),
 ) -> Figure:
     """Plot waffle charts on a new figure."""
-    return WaffleChart(pd_df=pd_df, category=category, value=value).fplot_w(
+    return WaffleChart(pd_df=pd_df, category=category, value=value).fplot(
         title=title,
         style=style,
         rows=rows,

@@ -111,7 +111,7 @@ def fplot_pie(
     figsize: Tuple[float, float] = (8, 8),
 ) -> Figure:
     """Plot pie or donut charts on a new figure."""
-    return PieChart(pd_df=pd_df, category=category, value=value).fplot_w(
+    return PieChart(pd_df=pd_df, category=category, value=value).fplot(
         donut=donut,
         title=title,
         style=style,

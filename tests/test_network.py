@@ -1,7 +1,6 @@
 """Tests for network visualizations."""
 
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import networkx as nx
 import numpy as np
@@ -34,6 +33,40 @@ def test_fplot_network(load_sample_df):
     )
 
     assert isinstance(fig, Figure)
+
+
+def test_fplot_network_returns_pyplot_managed_figure(load_sample_df):
+    """Return a figure that supports direct ``fig.show()`` calls."""
+
+    df = load_sample_df("network.csv")
+
+    fig = fplot_network(
+        pd_df=df,
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
+    )
+
+    assert fig.canvas.manager is not None
+    fig.show()
+
+
+def test_network_graph_fplot_returns_pyplot_managed_figure(load_sample_df):
+    """Return a pyplot-managed figure when calling ``NetworkGraph.fplot``."""
+
+    df = load_sample_df("network.csv")
+    graph = NetworkGraph.from_pandas_edgelist(
+        df,
+        source="city_a",
+        target="city_b",
+        edge_weight_col="distance_km",
+    )
+
+    fig = graph.fplot(edge_weight_col="distance_km")
+
+    assert isinstance(fig, Figure)
+    assert fig.canvas.manager is not None
+    fig.show()
 
 
 def test_accessor_fplot_network_components(load_sample_df):

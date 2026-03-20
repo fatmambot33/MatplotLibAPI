@@ -214,7 +214,7 @@ def fplot_table(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_table(df, cols=['col1', 'col2'])
     """
-    return TablePlot(pd_df=pd_df, cols=cols).fplot_w(
+    return TablePlot(pd_df=pd_df, cols=cols).fplot(
         title=title,
         style=style,
         sort_by=sort_by,

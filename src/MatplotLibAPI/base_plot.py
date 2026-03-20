@@ -1,9 +1,10 @@
 """Abstract base class for all plot types."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, cast
 
 import pandas as pd
+import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -56,13 +57,31 @@ class BasePlot(ABC):
             The Matplotlib axes object with the plot.
         """
 
-    def fplot_w(self, *args: Any, **kwargs: Any) -> Figure:
-        style: StyleTemplate = kwargs.get("style", StyleTemplate())
+    def fplot(self, *args: Any, **kwargs: Any) -> Figure:
+        """Plot on a new figure using the axis-level implementation.
+
+        Parameters
+        ----------
+        *args : Any
+            Plot-specific positional arguments forwarded to ``aplot``.
+        **kwargs : Any
+            Plot-specific keyword arguments forwarded to ``aplot``.
+            ``figsize`` is consumed to create the figure.
+
+        Returns
+        -------
+        Figure
+            The Matplotlib figure containing the rendered plot.
+        """
+        style: Optional[StyleTemplate] = kwargs.get("style")
+        if style is None:
+            style = StyleTemplate()
+        plot_kwargs = {k: v for k, v in kwargs.items() if k != "figsize"}
         fig, ax = BasePlot.create_fig(
             figsize=kwargs.get("figsize", FIG_SIZE),
             style=style,
         )
-        self.aplot(*args, {**kwargs, "ax": ax, "style": style})
+        self.aplot(*args, **{**plot_kwargs, "ax": ax, "style": style})
 
         return fig
 
@@ -70,11 +89,24 @@ class BasePlot(ABC):
     def create_fig(
         cls, figsize: Tuple[float, float], style: StyleTemplate
     ) -> Tuple[Figure, Axes]:
-        fig = Figure(
-            figsize=figsize,
-            facecolor=style.background_color,
-            edgecolor=style.background_color,
-        )
-        ax = fig.add_subplot(111)
+        """Create a figure and axis configured from the provided style.
+
+        Parameters
+        ----------
+        figsize : tuple[float, float]
+            Figure size in inches.
+        style : StyleTemplate
+            Style template used for figure and axes backgrounds.
+
+        Returns
+        -------
+        tuple[Figure, Axes]
+            Created Matplotlib figure and a single subplot axes.
+        """
+        fig_raw, ax_raw = plt.subplots(figsize=figsize)
+        fig = cast(Figure, fig_raw)
+        ax = cast(Axes, ax_raw)
+        fig.set_facecolor(style.background_color)
+        fig.set_edgecolor(style.background_color)
         ax.set_facecolor(style.background_color)
         return fig, ax

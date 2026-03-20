@@ -197,7 +197,7 @@ def fplot_area(
         y=y,
         label=label,
         stacked=stacked,
-    ).fplot_w(
+    ).fplot(
         title=title,
         style=style,
         figsize=figsize,

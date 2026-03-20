@@ -46,12 +46,25 @@ def _merge_kwargs(
 def create_fig(
     figsize: Tuple[float, float], style: StyleTemplate
 ) -> Tuple[Figure, Axes]:
-    fig = Figure(
-        figsize=figsize,
-        facecolor=style.background_color,
-        edgecolor=style.background_color,
-    )
-    ax = fig.add_subplot(111)
+    """Create a styled Matplotlib figure with a single axes.
+
+    Parameters
+    ----------
+    figsize : tuple[float, float]
+        Figure size in inches.
+    style : StyleTemplate
+        Style template applied to the figure and axes background.
+
+    Returns
+    -------
+    tuple[Figure, Axes]
+        The newly created figure and subplot axes.
+    """
+    fig_raw, ax_raw = plt.subplots(figsize=figsize)
+    fig = cast(Figure, fig_raw)
+    ax = cast(Axes, ax_raw)
+    fig.set_facecolor(style.background_color)
+    fig.set_edgecolor(style.background_color)
     ax.set_facecolor(style.background_color)
     return fig, ax
 

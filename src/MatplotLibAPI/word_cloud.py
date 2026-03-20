@@ -429,7 +429,7 @@ def fplot_wordcloud(
     """
     return WordCloudPlot(
         pd_df=pd_df, text_column=text_column, weight_column=weight_column
-    ).fplot_w(
+    ).fplot(
         title=title,
         style=style,
         max_words=max_words,

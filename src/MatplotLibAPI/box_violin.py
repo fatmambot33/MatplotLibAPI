@@ -144,7 +144,7 @@ def fplot_box_violin(
         column=column,
         by=by,
         violin=violin,
-    ).fplot_w(
+    ).fplot(
         title=title,
         style=style,
         figsize=figsize,

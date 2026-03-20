@@ -362,7 +362,7 @@ def fplot_timeserie(
     >>> df = pd.DataFrame(data)
     >>> fig = fplot_timeserie(df, label="category", x="date", y="value")
     """
-    return TimeSeriePlot(pd_df=pd_df, label=label, x=x, y=y).fplot_w(
+    return TimeSeriePlot(pd_df=pd_df, label=label, x=x, y=y).fplot(
         title=title,
         style=style,
         max_values=max_values,

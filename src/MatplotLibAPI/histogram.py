@@ -145,7 +145,7 @@ def fplot_histogram(
         column=column,
         bins=bins,
         kde=kde,
-    ).fplot_w(
+    ).fplot(
         title=title,
         style=style,
         figsize=figsize,
