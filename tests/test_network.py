@@ -51,6 +51,24 @@ def test_fplot_network_returns_pyplot_managed_figure(load_sample_df):
     fig.show()
 
 
+def test_network_graph_fplot_returns_pyplot_managed_figure(load_sample_df):
+    """Return a pyplot-managed figure when calling ``NetworkGraph.fplot``."""
+
+    df = load_sample_df("network.csv")
+    graph = NetworkGraph.from_pandas_edgelist(
+        df,
+        source="city_a",
+        target="city_b",
+        edge_weight_col="distance_km",
+    )
+
+    fig = graph.fplot(edge_weight_col="distance_km")
+
+    assert isinstance(fig, Figure)
+    assert fig.canvas.manager is not None
+    fig.show()
+
+
 def test_accessor_fplot_network_components(load_sample_df):
     """Render network component figures via the pandas accessor."""
 
