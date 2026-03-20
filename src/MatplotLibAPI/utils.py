@@ -60,9 +60,11 @@ def create_fig(
     tuple[Figure, Axes]
         The newly created figure and subplot axes.
     """
-    fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor(style.background_color)
-    fig.patch.set_edgecolor(style.background_color)
+    fig_raw, ax_raw = plt.subplots(figsize=figsize)
+    fig = cast(Figure, fig_raw)
+    ax = cast(Axes, ax_raw)
+    fig.set_facecolor(style.background_color)
+    fig.set_edgecolor(style.background_color)
     ax.set_facecolor(style.background_color)
     return fig, ax
 

@@ -1,7 +1,7 @@
 """Abstract base class for all plot types."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, cast
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -103,8 +103,10 @@ class BasePlot(ABC):
         tuple[Figure, Axes]
             Created Matplotlib figure and a single subplot axes.
         """
-        fig, ax = plt.subplots(figsize=figsize)
-        fig.patch.set_facecolor(style.background_color)
-        fig.patch.set_edgecolor(style.background_color)
+        fig_raw, ax_raw = plt.subplots(figsize=figsize)
+        fig = cast(Figure, fig_raw)
+        ax = cast(Axes, ax_raw)
+        fig.set_facecolor(style.background_color)
+        fig.set_edgecolor(style.background_color)
         ax.set_facecolor(style.background_color)
         return fig, ax
