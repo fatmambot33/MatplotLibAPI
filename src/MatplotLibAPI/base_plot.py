@@ -85,27 +85,6 @@ class BasePlot(ABC):
 
         return fig
 
-    def fplot(self, *args: Any, **kwargs: Any) -> Figure:
-        """Plot on a new pyplot-managed figure.
-
-        This is the public figure-level API. It delegates to ``fplot_w`` to
-        preserve backward compatibility while keeping figure creation
-        centralized.
-
-        Parameters
-        ----------
-        *args : Any
-            Plot-specific positional arguments forwarded to ``aplot``.
-        **kwargs : Any
-            Plot-specific keyword arguments forwarded to ``aplot``.
-
-        Returns
-        -------
-        Figure
-            The Matplotlib figure containing the rendered plot.
-        """
-        return self.fplot_w(*args, **kwargs)
-
     @classmethod
     def create_fig(
         cls, figsize: Tuple[float, float], style: StyleTemplate
