@@ -147,6 +147,29 @@ def test_scale_weights_respects_precomputed_deciles():
     assert _scale_weights(weights, deciles=deciles) == expected
 
 
+def test_network_layout_respects_precomputed_deciles() -> None:
+    """Reuse provided deciles to produce stable layout scaling."""
+
+    graph = NetworkGraph()
+    graph.add_edge("a", "b", weight=1.0)
+    graph.add_edge("a", "c", weight=5.0)
+    graph.add_edge("b", "c", weight=10.0)
+    graph.calculate_nodes(edge_weight_col="weight", k=10)
+
+    node_weights = [data.get("weight", 1) for _, data in graph.node_view(data=True)]
+    edge_weights = [data.get("weight", 1) for _, _, data in graph.edge_view(data=True)]
+    node_deciles = np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
+    edge_deciles = np.percentile(np.array(edge_weights), _WEIGHT_PERCENTILES)
+
+    expected = graph.layout(edge_weight_col="weight")
+    actual = graph.layout(
+        edge_weight_col="weight",
+        node_deciles=node_deciles,
+        edge_deciles=edge_deciles,
+    )
+    assert actual == expected
+
+
 def test_compute_positions_is_reproducible_with_seed():
     """Return identical layouts when seeded and varied layouts when not."""
 
