@@ -20,6 +20,7 @@ from ..style_template import (
 )
 
 __all__ = [
+    "trim_low_degree_nodes",
     "aplot_network",
     "aplot_network_node",
     "aplot_network_components",
@@ -27,6 +28,90 @@ __all__ = [
     "fplot_network_node",
     "fplot_network_components",
 ]
+
+
+def trim_low_degree_nodes(
+    pandas_df: pd.DataFrame,
+    source: str = "source",
+    target: str = "target",
+    min_degree: int = 2,
+    recursive: bool = True,
+) -> pd.DataFrame:
+    """Return an edge list filtered by minimum undirected node degree.
+
+    The function preserves all original columns and only filters rows (edges).
+    Degree is computed from the edge list as an undirected multigraph:
+    duplicate edges contribute repeatedly, and self-loops contribute ``2`` to
+    the node degree (once from ``source`` and once from ``target``).
+
+    Parameters
+    ----------
+    pandas_df : pd.DataFrame
+        Edge list DataFrame.
+    source : str, optional
+        Source node column name. The default is ``"source"``.
+    target : str, optional
+        Target node column name. The default is ``"target"``.
+    min_degree : int, optional
+        Minimum undirected degree required for each endpoint. The default is ``2``.
+        Use ``0`` to disable filtering.
+    recursive : bool, optional
+        Whether to recursively prune until stable. The default is ``True``.
+        If ``False``, the filter is applied in a single pass using degrees
+        from the original edge list.
+
+    Returns
+    -------
+    pd.DataFrame
+        Filtered copy of ``pandas_df``.
+
+    Raises
+    ------
+    AttributeError
+        If required columns are missing.
+    ValueError
+        If ``min_degree`` is negative.
+
+    Examples
+    --------
+    >>> trim_low_degree_nodes(df, source="src", target="dst", min_degree=2)
+    """
+    validate_dataframe(pandas_df, cols=[source, target])
+    if min_degree < 0:
+        raise ValueError("min_degree must be greater than or equal to 0.")
+
+    result = pandas_df.copy()
+    if result.empty or min_degree == 0:
+        return result
+
+    def _filter_once(edges_df: pd.DataFrame) -> pd.DataFrame:
+        valid_endpoints = edges_df[source].notna() & edges_df[target].notna()
+        valid_edges = edges_df.loc[valid_endpoints]
+        if valid_edges.empty:
+            return valid_edges.copy()
+
+        degree = cast(
+            pd.Series,
+            pd.concat(
+                [valid_edges[source], valid_edges[target]], ignore_index=True
+            ).value_counts(),
+        )
+        keep_nodes = {
+            node for node, node_degree in degree.items() if node_degree >= min_degree
+        }
+        keep_mask = valid_edges[source].isin(keep_nodes) & valid_edges[target].isin(
+            keep_nodes
+        )
+        return valid_edges.loc[keep_mask].copy()
+
+    if not recursive:
+        return _filter_once(result)
+
+    while True:
+        filtered = _filter_once(result)
+        if len(filtered) == len(result):
+            return filtered
+        result = filtered
 
 
 def _sanitize_node_dataframe(
