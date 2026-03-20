@@ -10,7 +10,6 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from pandas.api.extensions import register_dataframe_accessor
 
-from .base_plot import BasePlot
 from .style_template import (
     FIG_SIZE,
     AREA_STYLE_TEMPLATE,
@@ -25,142 +24,6 @@ from .typing import CorrelationMethod
 
 if TYPE_CHECKING:
     import plotly.graph_objects as go
-
-
-def _heatmap_imports() -> tuple[StyleTemplate, Any, Any, Any, Any]:
-    from .heatmap import (
-        HEATMAP_STYLE_TEMPLATE,
-        aplot_correlation_matrix,
-        aplot_heatmap,
-        fplot_correlation_matrix,
-        fplot_heatmap,
-    )
-
-    return (
-        HEATMAP_STYLE_TEMPLATE,
-        aplot_correlation_matrix,
-        aplot_heatmap,
-        fplot_correlation_matrix,
-        fplot_heatmap,
-    )
-
-
-def _network_imports() -> tuple[StyleTemplate, Any, Any, Any, Any, Any, Any]:
-    from .network import (
-        NETWORK_STYLE_TEMPLATE,
-        aplot_network,
-        aplot_network_node,
-        aplot_network_components,
-        fplot_network,
-        fplot_network_node,
-        fplot_network_components,
-    )
-
-    return (
-        NETWORK_STYLE_TEMPLATE,
-        aplot_network,
-        aplot_network_node,
-        aplot_network_components,
-        fplot_network,
-        fplot_network_node,
-        fplot_network_components,
-    )
-
-
-def _wordcloud_imports() -> tuple[StyleTemplate, Any, Any]:
-    from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
-
-    return WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud, fplot_wordcloud
-
-
-def _sankey_imports() -> tuple[StyleTemplate, Any]:
-    from .sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
-
-    return SANKEY_STYLE_TEMPLATE, fplot_sankey
-
-
-def aplot_histogram(*args: Any, **kwargs: Any) -> Axes:
-    from .histogram import aplot_histogram as _aplot_histogram
-
-    return _aplot_histogram(*args, **kwargs)
-
-
-def fplot_histogram(*args: Any, **kwargs: Any) -> Figure:
-    from .histogram import fplot_histogram as _fplot_histogram
-
-    return _fplot_histogram(*args, **kwargs)
-
-
-def aplot_pie_donut(*args: Any, **kwargs: Any) -> Axes:
-    from .pie import aplot_pie as _aplot_pie_donut
-
-    return _aplot_pie_donut(*args, **kwargs)
-
-
-def fplot_pie_donut(*args: Any, **kwargs: Any) -> Figure:
-    from .pie import fplot_pie as _fplot_pie_donut
-
-    return _fplot_pie_donut(*args, **kwargs)
-
-
-def aplot_table(*args: Any, **kwargs: Any) -> Axes:
-    from .table import aplot_table as _aplot_table
-
-    return _aplot_table(*args, **kwargs)
-
-
-def fplot_table(*args: Any, **kwargs: Any) -> Figure:
-    from .table import fplot_table as _fplot_table
-
-    return _fplot_table(*args, **kwargs)
-
-
-def aplot_timeserie(*args: Any, **kwargs: Any) -> Axes:
-    from .timeserie import aplot_timeserie as _aplot_timeserie
-
-    return _aplot_timeserie(*args, **kwargs)
-
-
-def fplot_timeserie(*args: Any, **kwargs: Any) -> Figure:
-    from .timeserie import fplot_timeserie as _fplot_timeserie
-
-    return _fplot_timeserie(*args, **kwargs)
-
-
-def aplot_waffle(*args: Any, **kwargs: Any) -> Axes:
-    from .waffle import aplot_waffle as _aplot_waffle
-
-    return _aplot_waffle(*args, **kwargs)
-
-
-def fplot_waffle(*args: Any, **kwargs: Any) -> Figure:
-    from .waffle import fplot_waffle as _fplot_waffle
-
-    return _fplot_waffle(*args, **kwargs)
-
-
-def fplot_treemap(*args: Any, **kwargs: Any) -> go.Figure:
-    from .treemap import fplot_treemap as _fplot_treemap
-
-    return _fplot_treemap(*args, **kwargs)
-
-
-def fplot_sunburst(*args: Any, **kwargs: Any) -> go.Figure:
-    from .sunburst import fplot_sunburst as _fplot_sunburst
-
-    return _fplot_sunburst(*args, **kwargs)
-
-
-def plot_composite_bubble(*args: Any, **kwargs: Any) -> Figure:
-    from .composite import plot_composite_bubble as _plot_composite_bubble
-
-    return _plot_composite_bubble(*args, **kwargs)
-
-
-def plot_composite_treemap(*args: Any, **kwargs: Any) -> Optional[go.Figure]:
-    from .composite import plot_composite_treemap as _plot_composite_treemap
-
-    return _plot_composite_treemap(*args, **kwargs)
 
 
 @register_dataframe_accessor("mpl")
@@ -490,7 +353,9 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the histogram.
         """
-        return aplot_histogram(
+        from .histogram import aplot_histogram as _aplot_histogram
+
+        return _aplot_histogram(
             pd_df=self._obj,
             column=column,
             bins=bins,
@@ -531,7 +396,9 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the histogram.
         """
-        return fplot_histogram(
+        from .histogram import fplot_histogram as _fplot_histogram
+
+        return _fplot_histogram(
             pd_df=self._obj,
             column=column,
             bins=bins,
@@ -844,7 +711,9 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the pie or donut chart.
         """
-        return aplot_pie_donut(
+        from .pie import aplot_pie as _aplot_pie_donut
+
+        return _aplot_pie_donut(
             pd_df=self._obj,
             category=category,
             value=value,
@@ -885,7 +754,9 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the pie or donut chart.
         """
-        return fplot_pie_donut(
+        from .pie import fplot_pie as _fplot_pie_donut
+
+        return _fplot_pie_donut(
             pd_df=self._obj,
             category=category,
             value=value,
@@ -926,7 +797,9 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the waffle chart.
         """
-        return aplot_waffle(
+        from .waffle import aplot_waffle as _aplot_waffle
+
+        return _aplot_waffle(
             pd_df=self._obj,
             category=category,
             value=value,
@@ -967,7 +840,9 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the waffle chart.
         """
-        return fplot_waffle(
+        from .waffle import fplot_waffle as _fplot_waffle
+
+        return _fplot_waffle(
             pd_df=self._obj,
             category=category,
             value=value,
@@ -1005,7 +880,7 @@ class DataFrameAccessor:
         go.Figure
             The Plotly Sankey figure.
         """
-        sankey_style_template, fplot_sankey = _sankey_imports()
+        from .sankey import SANKEY_STYLE_TEMPLATE, fplot_sankey
 
         return fplot_sankey(
             pd_df=self._obj,
@@ -1013,7 +888,7 @@ class DataFrameAccessor:
             target=target,
             value=value,
             title=title,
-            style=style or sankey_style_template,
+            style=style or SANKEY_STYLE_TEMPLATE,
         )
 
     def aplot_table(
@@ -1050,7 +925,9 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
-        return aplot_table(
+        from .table import aplot_table as _aplot_table
+
+        return _aplot_table(
             pd_df=self._obj,
             cols=cols,
             title=title,
@@ -1095,7 +972,9 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the table.
         """
-        return fplot_table(
+        from .table import fplot_table as _fplot_table
+
+        return _fplot_table(
             pd_df=self._obj,
             cols=cols,
             title=title,
@@ -1149,7 +1028,9 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
-        return aplot_timeserie(
+        from .timeserie import aplot_timeserie as _aplot_timeserie
+
+        return _aplot_timeserie(
             pd_df=self._obj,
             label=label,
             x=x,
@@ -1206,7 +1087,9 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the plot.
         """
-        return fplot_timeserie(
+        from .timeserie import fplot_timeserie as _fplot_timeserie
+
+        return _fplot_timeserie(
             pd_df=self._obj,
             label=label,
             x=x,
@@ -1257,14 +1140,14 @@ class DataFrameAccessor:
         Axes
             The Matplotlib axes object with the plot.
         """
-        wordcloud_style_template, aplot_wordcloud, _ = _wordcloud_imports()
+        from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, aplot_wordcloud
 
         return aplot_wordcloud(
             pd_df=self._obj,
             text_column=text_column,
             weight_column=weight_column,
             title=title,
-            style=style or wordcloud_style_template,
+            style=style or WORDCLOUD_STYLE_TEMPLATE,
             max_words=max_words,
             stopwords=stopwords,
             random_state=random_state,
@@ -1308,14 +1191,14 @@ class DataFrameAccessor:
         Figure
             The new Matplotlib figure with the plot.
         """
-        wordcloud_style_template, _, fplot_wordcloud = _wordcloud_imports()
+        from .word_cloud import WORDCLOUD_STYLE_TEMPLATE, fplot_wordcloud
 
         return fplot_wordcloud(
             pd_df=self._obj,
             text_column=text_column,
             weight_column=weight_column,
             title=title,
-            style=style or wordcloud_style_template,
+            style=style or WORDCLOUD_STYLE_TEMPLATE,
             max_words=max_words,
             stopwords=stopwords,
             random_state=random_state,
@@ -1377,17 +1260,19 @@ class DataFrameAccessor:
         kwargs: Dict[str, Any] = {}
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
+        from .network import (
+            NETWORK_STYLE_TEMPLATE,
+            aplot_network_node as _aplot_network_node,
+        )
 
-        network_style_template, _, aplot_network_node, _, _, _, _ = _network_imports()
-
-        return aplot_network_node(
+        return _aplot_network_node(
             pd_df=self._obj,
             node=node,
             edge_source_col=edge_source_col,
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style or network_style_template,
+            style=style or NETWORK_STYLE_TEMPLATE,
             ax=ax,
             **kwargs,
         )
@@ -1437,9 +1322,7 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
-        network_style_template, _, _, aplot_network_components, _, _, _ = (
-            _network_imports()
-        )
+        from .network import NETWORK_STYLE_TEMPLATE, aplot_network_components
 
         aplot_network_components(
             pd_df=self._obj,
@@ -1449,7 +1332,7 @@ class DataFrameAccessor:
             sort_by=sort_by,
             ascending=ascending,
             title=title,
-            style=style or network_style_template,
+            style=style or NETWORK_STYLE_TEMPLATE,
             axes=axes,
             **kwargs,
         )
@@ -1510,7 +1393,7 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
-        network_style_template, _, _, _, _, fplot_network_node, _ = _network_imports()
+        from .network import NETWORK_STYLE_TEMPLATE, fplot_network_node
 
         return fplot_network_node(
             pd_df=self._obj,
@@ -1519,7 +1402,7 @@ class DataFrameAccessor:
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style or network_style_template,
+            style=style or NETWORK_STYLE_TEMPLATE,
             figsize=figsize,
             **kwargs,
         )
@@ -1575,9 +1458,7 @@ class DataFrameAccessor:
         if layout_seed is not None:
             kwargs["layout_seed"] = layout_seed
 
-        network_style_template, _, _, _, _, _, fplot_network_components = (
-            _network_imports()
-        )
+        from .network import NETWORK_STYLE_TEMPLATE, fplot_network_components
 
         return fplot_network_components(
             pd_df=self._obj,
@@ -1585,7 +1466,7 @@ class DataFrameAccessor:
             edge_target_col=edge_target_col,
             edge_weight_col=edge_weight_col,
             title=title,
-            style=style or network_style_template,
+            style=style or NETWORK_STYLE_TEMPLATE,
             figsize=figsize,
             n_cols=n_cols,
             **kwargs,
@@ -1631,6 +1512,8 @@ class DataFrameAccessor:
         go.Figure
             The Plotly figure with the treemap.
         """
+        from .treemap import fplot_treemap
+
         return fplot_treemap(
             pd_df=self._obj,
             path=path,
@@ -1680,6 +1563,8 @@ class DataFrameAccessor:
         go.Figure
             The Plotly figure with the sunburst chart.
         """
+        from .sunburst import fplot_sunburst
+
         return fplot_sunburst(
             pd_df=self._obj,
             labels=labels,
@@ -1729,6 +1614,8 @@ class DataFrameAccessor:
         go.Figure, optional
             The Plotly figure with the composite treemap, or None if the input data is empty.
         """
+        from .composite import plot_composite_treemap
+
         pd_dfs: Dict[str, pd.DataFrame] = {}
         for path in paths:
             pd_dfs[path] = self._obj
