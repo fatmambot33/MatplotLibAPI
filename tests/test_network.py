@@ -107,8 +107,13 @@ def test_layout_handles_graph_without_edges():
     nx_graph = nx.Graph()
     nx_graph.add_nodes_from(["a", "b"])
     graph = NetworkGraph(nx_graph=nx_graph)
+    node_weights = [data.get("weight", 1) for _, data in graph.node_view(data=True)]
+    node_deciles = np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
 
-    node_sizes, edge_widths, fonts_size = graph.layout()
+    node_sizes, edge_widths, fonts_size = graph.layout(
+        node_deciles=node_deciles,
+        edge_deciles=None,
+    )
 
     assert len(node_sizes) == graph.number_of_nodes
     assert edge_widths == []
@@ -161,13 +166,35 @@ def test_network_layout_respects_precomputed_deciles() -> None:
     node_deciles = np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
     edge_deciles = np.percentile(np.array(edge_weights), _WEIGHT_PERCENTILES)
 
-    expected = graph.layout(edge_weight_col="weight")
     actual = graph.layout(
         edge_weight_col="weight",
         node_deciles=node_deciles,
         edge_deciles=edge_deciles,
     )
-    assert actual == expected
+    expected_node_sizes = _scale_weights(
+        node_weights,
+        scale_max=2000,
+        scale_min=100,
+        deciles=node_deciles,
+    )
+    expected_edge_widths = _scale_weights(
+        edge_weights,
+        scale_max=10,
+        deciles=edge_deciles,
+    )
+    expected_font_sizes = _scale_weights(
+        node_weights,
+        scale_max=20,
+        scale_min=8,
+        deciles=node_deciles,
+    )
+    expected_fonts_size = {}
+    for node, font_size in zip(graph.node_view, expected_font_sizes):
+        expected_fonts_size.setdefault(int(font_size), []).append(node)
+
+    assert actual[0] == expected_node_sizes
+    assert actual[1] == expected_edge_widths
+    assert actual[2] == expected_fonts_size
 
 
 def test_compute_positions_is_reproducible_with_seed():

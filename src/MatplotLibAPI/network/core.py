@@ -520,8 +520,9 @@ class NetworkGraph(BasePlot):
         max_font_size: int = _DEFAULT["MAX_FONT_SIZE"],
         min_font_size: int = _DEFAULT["MIN_FONT_SIZE"],
         edge_weight_col: str = "weight",
-        node_deciles: Optional[np.ndarray] = None,
-        edge_deciles: Optional[np.ndarray] = None,
+        *,
+        node_deciles: Optional[np.ndarray],
+        edge_deciles: Optional[np.ndarray],
     ) -> Tuple[List[float], List[float], Dict[int, List[str]]]:
         """Calculate node, edge and font sizes based on weights.
 
@@ -540,11 +541,9 @@ class NetworkGraph(BasePlot):
         edge_weight_col : str, optional
             Node attribute used for weighting. The default is "weight".
         node_deciles : np.ndarray, optional
-            Precomputed node-weight deciles used to scale node and font sizes.
-            When ``None``, deciles are computed from current node weights.
+            Node-weight deciles used to scale node and font sizes.
         edge_deciles : np.ndarray, optional
-            Precomputed edge-weight deciles used to scale edge widths. When
-            ``None``, deciles are computed from current edge weights.
+            Edge-weight deciles used to scale edge widths.
 
         Returns
         -------
@@ -555,31 +554,21 @@ class NetworkGraph(BasePlot):
         node_weights = [
             data.get(edge_weight_col, 1) for node, data in self.node_view(data=True)
         ]
-        computed_node_deciles = node_deciles
-        if computed_node_deciles is None and node_weights:
-            computed_node_deciles = np.percentile(
-                np.array(node_weights), _WEIGHT_PERCENTILES
-            )
         node_size = _scale_weights(
             weights=node_weights,
             scale_max=max_node_size,
             scale_min=min_node_size,
-            deciles=computed_node_deciles,
+            deciles=node_deciles,
         )
 
         # Normalize and scale edges' weights within the desired range of edge widths
         edge_weights = [
             data.get(edge_weight_col, 1) for _, _, data in self.edge_view(data=True)
         ]
-        computed_edge_deciles = edge_deciles
-        if computed_edge_deciles is None and edge_weights:
-            computed_edge_deciles = np.percentile(
-                np.array(edge_weights), _WEIGHT_PERCENTILES
-            )
         edges_width = _scale_weights(
             weights=edge_weights,
             scale_max=max_edge_width,
-            deciles=computed_edge_deciles,
+            deciles=edge_deciles,
         )
 
         # Scale the normalized node weights within the desired range of font sizes
@@ -590,7 +579,7 @@ class NetworkGraph(BasePlot):
                     weights=node_weights,
                     scale_max=max_font_size,
                     scale_min=min_font_size,
-                    deciles=computed_node_deciles,
+                    deciles=node_deciles,
                 ),
             )
         )
