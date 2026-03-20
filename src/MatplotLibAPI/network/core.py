@@ -29,6 +29,14 @@ __all__ = [
 ]
 
 
+def _compute_deciles(weights: Iterable[float]) -> Optional[np.ndarray]:
+    """Return deciles for ``weights`` or ``None`` when empty."""
+    weights_arr = np.asarray(list(weights), dtype=float)
+    if weights_arr.size == 0:
+        return None
+    return np.percentile(weights_arr, _WEIGHT_PERCENTILES)
+
+
 class NodeView(nx.classes.reportviews.NodeView):
     """Extended node view with convenience helpers."""
 
@@ -539,7 +547,7 @@ class NetworkGraph(BasePlot):
         min_font_size : int, optional
             Lower bound for font size. The default is `_DEFAULT["MIN_FONT_SIZE"]`.
         edge_weight_col : str, optional
-            Node attribute used for weighting. The default is "weight".
+            Edge attribute used for weighting. The default is "weight".
         node_deciles : np.ndarray, optional
             Node-weight deciles used to scale node and font sizes.
         edge_deciles : np.ndarray, optional
@@ -748,16 +756,8 @@ class NetworkGraph(BasePlot):
         edge_weights = [
             data.get(edge_weight_col, 1) for _, _, data in graph.edge_view(data=True)
         ]
-        node_deciles = (
-            np.percentile(np.array(node_weights), _WEIGHT_PERCENTILES)
-            if node_weights
-            else None
-        )
-        edge_deciles = (
-            np.percentile(np.array(edge_weights), _WEIGHT_PERCENTILES)
-            if edge_weights
-            else None
-        )
+        node_deciles = _compute_deciles(node_weights)
+        edge_deciles = _compute_deciles(edge_weights)
 
         node_sizes, edge_widths, font_sizes = graph.layout(
             min_node_size=_DEFAULT["MIN_NODE_SIZE"],
