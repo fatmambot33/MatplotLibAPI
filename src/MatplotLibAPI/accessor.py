@@ -711,6 +711,108 @@ class DataFrameAccessor:
             correlation_method=method,
         )
 
+    def aplot_area(
+        self,
+        x: str,
+        y: str,
+        label: Optional[str] = None,
+        stacked: bool = True,
+        title: Optional[str] = None,
+        style: Optional[StyleTemplate] = None,
+        ax: Optional[Axes] = None,
+        **kwargs: Any,
+    ) -> Axes:
+        """Plot an area chart, optionally stacked.
+
+        Parameters
+        ----------
+        x : str
+            Column used for x-axis values.
+        y : str
+            Column used for y-axis values.
+        label : str, optional
+            Column used to split areas into groups. The default is ``None``.
+        stacked : bool, optional
+            Whether grouped areas are stacked. The default is ``True``.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is ``AREA_STYLE_TEMPLATE``.
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, uses the current axes.
+        **kwargs : Any
+            Additional keyword arguments forwarded to the area plotter.
+
+        Returns
+        -------
+        Axes
+            The Matplotlib axes object with the area chart.
+        """
+        from .area import aplot_area as _aplot_area
+
+        return _aplot_area(
+            pd_df=self._obj,
+            x=x,
+            y=y,
+            label=label,
+            stacked=stacked,
+            title=title,
+            style=style or AREA_STYLE_TEMPLATE,
+            ax=ax,
+            **kwargs,
+        )
+
+    def fplot_area(
+        self,
+        x: str,
+        y: str,
+        label: Optional[str] = None,
+        stacked: bool = True,
+        title: Optional[str] = None,
+        style: Optional[StyleTemplate] = None,
+        figsize: Tuple[float, float] = FIG_SIZE,
+        **kwargs: Any,
+    ) -> Figure:
+        """Plot an area chart, optionally stacked, on a new figure.
+
+        Parameters
+        ----------
+        x : str
+            Column used for x-axis values.
+        y : str
+            Column used for y-axis values.
+        label : str, optional
+            Column used to split areas into groups. The default is ``None``.
+        stacked : bool, optional
+            Whether grouped areas are stacked. The default is ``True``.
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is ``AREA_STYLE_TEMPLATE``.
+        figsize : tuple[float, float], optional
+            Figure size. The default is FIG_SIZE.
+        **kwargs : Any
+            Additional keyword arguments forwarded to the area plotter.
+
+        Returns
+        -------
+        Figure
+            The new Matplotlib figure with the area chart.
+        """
+        from .area import fplot_area as _fplot_area
+
+        return _fplot_area(
+            pd_df=self._obj,
+            x=x,
+            y=y,
+            label=label,
+            stacked=stacked,
+            title=title,
+            style=style or AREA_STYLE_TEMPLATE,
+            figsize=figsize,
+            **kwargs,
+        )
+
     def aplot_pie_donut(
         self,
         category: str,

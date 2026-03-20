@@ -180,6 +180,34 @@ def aplot_correlation_matrix(
     ax: Optional[Axes] = None,
     **kwargs: Any,
 ) -> Axes:
+    """Plot a correlation matrix heatmap on existing Matplotlib axes.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        Source dataframe containing correlation inputs.
+    x : str
+        Column used for heatmap x-axis labels.
+    y : str
+        Column used for heatmap y-axis labels.
+    value : str
+        Column providing values before correlation aggregation.
+    correlation_method : CorrelationMethod, optional
+        Correlation method. The default is ``"pearson"``.
+    title : str, optional
+        Plot title. The default is ``None``.
+    style : StyleTemplate, optional
+        Style template for rendering. The default is ``None``.
+    ax : Axes, optional
+        Matplotlib axes to draw on. If ``None``, use current axes.
+    **kwargs : Any
+        Additional keyword arguments forwarded to seaborn.
+
+    Returns
+    -------
+    Axes
+        The Matplotlib axes containing the correlation heatmap.
+    """
     return Heatmap(
         pd_df=pd_df,
         x=x,

@@ -57,12 +57,30 @@ class BasePlot(ABC):
         """
 
     def fplot_w(self, *args: Any, **kwargs: Any) -> Figure:
-        style: StyleTemplate = kwargs.get("style", StyleTemplate())
+        """Plot on a new figure using the axis-level implementation.
+
+        Parameters
+        ----------
+        *args : Any
+            Plot-specific positional arguments forwarded to ``aplot``.
+        **kwargs : Any
+            Plot-specific keyword arguments forwarded to ``aplot``.
+            ``figsize`` is consumed to create the figure.
+
+        Returns
+        -------
+        Figure
+            The Matplotlib figure containing the rendered plot.
+        """
+        style: Optional[StyleTemplate] = kwargs.get("style")
+        if style is None:
+            style = StyleTemplate()
+        plot_kwargs = {k: v for k, v in kwargs.items() if k != "figsize"}
         fig, ax = BasePlot.create_fig(
             figsize=kwargs.get("figsize", FIG_SIZE),
             style=style,
         )
-        self.aplot(*args, {**kwargs, "ax": ax, "style": style})
+        self.aplot(*args, **{**plot_kwargs, "ax": ax, "style": style})
 
         return fig
 
@@ -70,6 +88,20 @@ class BasePlot(ABC):
     def create_fig(
         cls, figsize: Tuple[float, float], style: StyleTemplate
     ) -> Tuple[Figure, Axes]:
+        """Create a figure and axis configured from the provided style.
+
+        Parameters
+        ----------
+        figsize : tuple[float, float]
+            Figure size in inches.
+        style : StyleTemplate
+            Style template used for figure and axes backgrounds.
+
+        Returns
+        -------
+        tuple[Figure, Axes]
+            Created Matplotlib figure and a single subplot axes.
+        """
         fig = Figure(
             figsize=figsize,
             facecolor=style.background_color,
