@@ -9,7 +9,6 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from .base_plot import BasePlot
-from .utils import _merge_kwargs
 
 from .style_template import (
     FIG_SIZE,
@@ -103,8 +102,7 @@ class PivotBarChart(BasePlot):
             ascending=ascending,
         )
 
-        if ax is None:
-            ax = cast(Axes, plt.gca())
+        plot_ax = BasePlot.get_axis(ax)
 
         if pd.api.types.is_datetime64_any_dtype(pivot_df[self.x]):
             pivot_df[self.x] = pivot_df[self.x].dt.strftime("%Y-%m-%d")
@@ -116,21 +114,21 @@ class PivotBarChart(BasePlot):
             "ax": ax,
             "alpha": 0.7,
         }
-        pivot_df.plot(**_merge_kwargs(plot_kwargs, kwargs))
+        pivot_df.plot(**BasePlot.merge_kwargs(plot_kwargs, kwargs))
 
-        ax.set_ylabel(string_formatter(self.y))
-        ax.set_xlabel(string_formatter(self.x))
+        plot_ax.set_ylabel(string_formatter(self.y))
+        plot_ax.set_xlabel(string_formatter(self.x))
         if title:
-            ax.set_title(title)
+            plot_ax.set_title(title)
 
-        ax.legend(
+        plot_ax.legend(
             fontsize=style.font_size - 2,
             title_fontsize=style.font_size + 2,
             labelcolor="linecolor",
             facecolor=style.background_color,
         )
-        ax.tick_params(axis="x", rotation=90)
-        return ax
+        plot_ax.tick_params(axis="x", rotation=90)
+        return plot_ax
 
 
 def aplot_pivoted_bars(

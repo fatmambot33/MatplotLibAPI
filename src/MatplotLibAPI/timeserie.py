@@ -9,7 +9,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from .base_plot import BasePlot
-from .utils import _get_axis
+
 from .style_template import (
     TIMESERIE_STYLE_TEMPLATE,
     FIG_SIZE,
@@ -210,7 +210,7 @@ class TimeSeriePlot(BasePlot):
         format_funcs = format_func(
             style.format_funcs, label=self.label, x=self.x, y=self.y
         )
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
         _plot_timeserie_lines(
             plot_ax, df, self.label, self.x, self.y, std, style, format_funcs
         )

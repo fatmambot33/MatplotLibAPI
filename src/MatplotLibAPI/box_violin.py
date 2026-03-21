@@ -15,7 +15,6 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _merge_kwargs
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_box_violin", "fplot_box_violin"]
 
@@ -74,7 +73,7 @@ class BoxViolinPlot(BasePlot):
         """
         if not style:
             style = DISTRIBUTION_STYLE_TEMPLATE
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
 
         common_kwargs = {
             "data": self._obj,
@@ -89,7 +88,7 @@ class BoxViolinPlot(BasePlot):
             "legend": False,
             "ax": plot_ax,
         }
-        merged_plot_kwargs = _merge_kwargs(plot_kwargs, kwargs)
+        merged_plot_kwargs = BasePlot.merge_kwargs(plot_kwargs, kwargs)
 
         if self.violin:
             sns.violinplot(**merged_plot_kwargs)

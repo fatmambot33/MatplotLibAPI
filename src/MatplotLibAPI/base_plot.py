@@ -1,7 +1,7 @@
 """Abstract base class for all plot types."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Tuple, cast
+from typing import Any, Optional, Tuple, cast, Dict
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -85,9 +85,9 @@ class BasePlot(ABC):
 
         return fig
 
-    @classmethod
+    @staticmethod
     def create_fig(
-        cls, figsize: Tuple[float, float], style: StyleTemplate
+        figsize: Tuple[float, float], style: StyleTemplate
     ) -> Tuple[Figure, Axes]:
         """Create a figure and axis configured from the provided style.
 
@@ -110,3 +110,31 @@ class BasePlot(ABC):
         fig.set_edgecolor(style.background_color)
         ax.set_facecolor(style.background_color)
         return fig, ax
+
+    @staticmethod
+    def get_axis(ax: Optional[Axes] = None) -> Axes:
+        """Return a Matplotlib axes, defaulting to the current one."""
+        return ax if ax is not None else plt.gca()
+
+    @staticmethod
+    def merge_kwargs(
+        defaults: Dict[str, Any], overrides: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Return a merged kwargs dictionary with caller overrides taking precedence.
+
+        Parameters
+        ----------
+        defaults : dict[str, Any]
+            Default keyword arguments.
+        overrides : dict[str, Any], optional
+            Caller-provided keyword arguments that should override defaults.
+
+        Returns
+        -------
+        dict[str, Any]
+            Merged keyword arguments.
+        """
+        merged = defaults.copy()
+        if overrides:
+            merged.update(overrides)
+        return merged

@@ -14,7 +14,6 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _merge_kwargs, create_fig
 
 __all__ = ["AREA_STYLE_TEMPLATE", "aplot_area", "fplot_area"]
 
@@ -83,7 +82,7 @@ class AreaChart(BasePlot):
             "alpha": 0.7,
             "ax": plot_ax,
         }
-        pivot_df.plot(**_merge_kwargs(plot_kwargs, kwargs))
+        pivot_df.plot(**BasePlot.merge_kwargs(plot_kwargs, kwargs))
 
         legend = plot_ax.get_legend()
         if legend is not None:
@@ -101,7 +100,7 @@ class AreaChart(BasePlot):
             "color": style.font_color,
             "alpha": 0.4,
         }
-        merged_fill_between_kwargs = _merge_kwargs(fill_between_kwargs, kwargs)
+        merged_fill_between_kwargs = BasePlot.merge_kwargs(fill_between_kwargs, kwargs)
 
         plot_ax.fill_between(
             sorted_df[self.x],
@@ -137,7 +136,7 @@ class AreaChart(BasePlot):
         """
         if not style:
             style = AREA_STYLE_TEMPLATE
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
         plot_ax.set_facecolor(style.background_color)
 
         if self.label:

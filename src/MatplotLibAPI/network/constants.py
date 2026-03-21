@@ -19,4 +19,5 @@ _DEFAULT = {
 
 _WEIGHT_PERCENTILES = np.arange(10, 100, 10)
 
+
 __all__ = ["_DEFAULT", "_WEIGHT_PERCENTILES"]

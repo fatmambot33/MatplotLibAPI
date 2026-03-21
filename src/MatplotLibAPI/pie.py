@@ -11,7 +11,6 @@ from matplotlib.figure import Figure
 from .base_plot import BasePlot
 
 from .style_template import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
-from .utils import _get_axis, _merge_kwargs
 
 __all__ = ["PIE_STYLE_TEMPLATE", "aplot_pie", "fplot_pie"]
 
@@ -63,7 +62,7 @@ class PieChart(BasePlot):
         """
         labels = self._obj[self.category].astype(str).tolist()
         sizes = self._obj[self.value]
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
         wedgeprops: Optional[Dict[str, Any]] = None
         if donut:
             wedgeprops = {"width": 0.3}
@@ -74,7 +73,7 @@ class PieChart(BasePlot):
             "wedgeprops": wedgeprops,
             "textprops": {"color": style.font_color, "fontsize": style.font_size},
         }
-        plot_ax.pie(sizes, **_merge_kwargs(pie_kwargs, kwargs))
+        plot_ax.pie(sizes, **BasePlot.merge_kwargs(pie_kwargs, kwargs))
         plot_ax.axis("equal")
         if title:
             plot_ax.set_title(title)

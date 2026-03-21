@@ -1,22 +1,20 @@
 """Heatmap and correlation matrix helpers."""
 
-from typing import Any, Optional, Sequence, Tuple, cast, Literal
+from typing import Any, Optional, Sequence, Tuple, cast
 
 import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from pandas.api.extensions import register_dataframe_accessor
 
 from .base_plot import BasePlot
+from . import CorrelationMethod
 from .style_template import (
     HEATMAP_STYLE_TEMPLATE,
     StyleTemplate,
     string_formatter,
     validate_dataframe,
 )
-from .typing import CorrelationMethod
-from .utils import _get_axis, _merge_kwargs, create_fig
 
 __all__ = [
     "HEATMAP_STYLE_TEMPLATE",
@@ -27,7 +25,6 @@ __all__ = [
 ]
 
 
-@register_dataframe_accessor("heatmap")
 class Heatmap(BasePlot):
     """Class for plotting heatmaps and correlation matrices."""
 
@@ -60,13 +57,13 @@ class Heatmap(BasePlot):
         """Plot a heatmap on an existing Matplotlib axes."""
         if not style:
             style = HEATMAP_STYLE_TEMPLATE
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
         heatmap_kwargs: dict[str, Any] = {
             "data": self._obj,
             "cmap": style.palette,
             "ax": plot_ax,
         }
-        sns.heatmap(**_merge_kwargs(heatmap_kwargs, kwargs))
+        sns.heatmap(**BasePlot.merge_kwargs(heatmap_kwargs, kwargs))
 
         plot_ax.set_xlabel(string_formatter(self.x))
         plot_ax.set_ylabel(string_formatter(self.y))
@@ -85,7 +82,7 @@ class Heatmap(BasePlot):
         """Plot a correlation matrix heatmap on existing axes."""
         if not style:
             style = HEATMAP_STYLE_TEMPLATE
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
         heatmap_kwargs: dict[str, Any] = {
             "data": self.correlation_matrix(correlation_method),
             "cmap": style.palette,
@@ -93,7 +90,7 @@ class Heatmap(BasePlot):
             "fmt": ".2f",
             "ax": plot_ax,
         }
-        sns.heatmap(**_merge_kwargs(heatmap_kwargs, kwargs))
+        sns.heatmap(**BasePlot.merge_kwargs(heatmap_kwargs, kwargs))
         if title:
             plot_ax.set_title(title)
         return plot_ax
@@ -108,7 +105,7 @@ class Heatmap(BasePlot):
         """Plot a correlation matrix heatmap on a new figure."""
         if not style:
             style = HEATMAP_STYLE_TEMPLATE
-        fig, ax = create_fig(figsize=figsize, style=style)
+        fig, ax = BasePlot.create_fig(figsize=figsize, style=style)
         self.aplot_correlation_matrix(
             title=title,
             style=style,

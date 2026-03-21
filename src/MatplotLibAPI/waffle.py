@@ -4,7 +4,6 @@ from typing import Any, Optional, Tuple, cast
 
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
@@ -12,7 +11,6 @@ from matplotlib.patches import Rectangle
 from .base_plot import BasePlot
 
 from .style_template import PIE_STYLE_TEMPLATE, StyleTemplate, validate_dataframe
-from .utils import _get_axis
 
 
 class WaffleChart(BasePlot):
@@ -65,7 +63,7 @@ class WaffleChart(BasePlot):
         total = float(value_series.sum())
         squares = rows * rows
         colors = sns.color_palette(style.palette, n_colors=len(self._obj))
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
         plot_ax.set_aspect("equal")
 
         start = 0

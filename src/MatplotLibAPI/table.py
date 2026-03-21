@@ -2,7 +2,6 @@
 
 from typing import Any, List, Optional, Tuple
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
@@ -10,7 +9,6 @@ from matplotlib.table import Table
 
 from .base_plot import BasePlot
 
-from .utils import _get_axis
 
 from .style_template import (
     FIG_SIZE,
@@ -62,7 +60,7 @@ class TablePlot(BasePlot):
         ax: Optional[Axes] = None,
         **kwargs: Any,
     ) -> Axes:
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
 
         if sort_by is None:
             sort_by = self.cols[0]

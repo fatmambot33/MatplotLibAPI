@@ -7,7 +7,6 @@ from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, Union
 from matplotlib.transforms import BboxBase
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib import colormaps
 from matplotlib.axes import Axes
 from matplotlib.backend_bases import FigureCanvasBase
@@ -16,7 +15,6 @@ from wordcloud import WordCloud
 
 from .base_plot import BasePlot
 
-from .utils import _get_axis
 
 from .style_template import (
     FIG_SIZE,
@@ -306,7 +304,7 @@ class WordCloudPlot(BasePlot):
             max_words=max_words,
             stopwords=stopwords,
         )
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
         return _plot_words(
             plot_ax,
             words,

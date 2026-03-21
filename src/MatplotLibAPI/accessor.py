@@ -20,7 +20,8 @@ from .style_template import (
     TREEMAP_STYLE_TEMPLATE,
     StyleTemplate,
 )
-from .typing import CorrelationMethod
+
+from . import CorrelationMethod
 
 if TYPE_CHECKING:
     import plotly.graph_objects as go

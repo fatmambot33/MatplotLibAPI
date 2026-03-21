@@ -15,7 +15,6 @@ from .style_template import (
     string_formatter,
     validate_dataframe,
 )
-from .utils import _get_axis, _merge_kwargs
 
 __all__ = ["DISTRIBUTION_STYLE_TEMPLATE", "aplot_bar", "fplot_bar"]
 
@@ -74,7 +73,7 @@ class BarChart(BasePlot):
         Axes
             The Matplotlib Axes object containing the plot.
         """
-        plot_ax = _get_axis(ax)
+        plot_ax = BasePlot.get_axis(ax)
 
         if self.group:
             pivot_df = self._obj.pivot_table(
@@ -89,7 +88,7 @@ class BarChart(BasePlot):
                 "ax": plot_ax,
                 "alpha": 0.85,
             }
-            pivot_df.plot(**_merge_kwargs(plot_kwargs, kwargs))
+            pivot_df.plot(**BasePlot.merge_kwargs(plot_kwargs, kwargs))
         else:
             barplot_kwargs: dict[str, Any] = {
                 "data": self._obj,
@@ -98,7 +97,7 @@ class BarChart(BasePlot):
                 "palette": style.palette,
                 "ax": plot_ax,
             }
-            sns.barplot(**_merge_kwargs(barplot_kwargs, kwargs))
+            sns.barplot(**BasePlot.merge_kwargs(barplot_kwargs, kwargs))
 
         plot_ax.set_facecolor(style.background_color)
         plot_ax.set_xlabel(string_formatter(self.category))

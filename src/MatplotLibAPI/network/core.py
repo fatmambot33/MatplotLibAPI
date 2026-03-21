@@ -2,7 +2,6 @@
 
 from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
-from pandas.api.extensions import register_dataframe_accessor
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -243,7 +242,6 @@ class EdgeView(nx.classes.reportviews.EdgeView):
         return pd.DataFrame(data)
 
 
-@register_dataframe_accessor("network")
 class NetworkGraph(BasePlot):
     """Custom graph class based on NetworkX's ``Graph``.
 

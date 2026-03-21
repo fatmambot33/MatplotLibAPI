@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional, cast
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from pandas.api.extensions import register_dataframe_accessor
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -31,7 +30,6 @@ from .style_template import (
 __all__ = ["BUBBLE_STYLE_TEMPLATE", "Bubble", "aplot_bubble", "fplot_bubble"]
 
 
-@register_dataframe_accessor("bubble")
 class Bubble(BasePlot):
     """Bubble chart plot implementing the BasePlot interface.
 
@@ -398,29 +396,28 @@ class Bubble(BasePlot):
         """
         if not style:
             style = BUBBLE_STYLE_TEMPLATE
-        if ax is None:
-            ax = cast(Axes, plt.gca())
+        plot_ax = BasePlot.get_axis(ax)
 
         format_funcs = format_func(
             style.format_funcs, label=self.label, x=self.x, y=self.y, z=self.z
         )
 
-        Bubble._setup_axes(ax, style, self._obj, self.x, self.y, format_funcs)
+        Bubble._setup_axes(plot_ax, style, self._obj, self.x, self.y, format_funcs)
 
-        Bubble._draw_bubbles(ax, self._obj, self.x, self.y, self.z, style)
-        Bubble._draw_lines(ax, self._obj, self.x, self.y, hline, vline, style)
+        Bubble._draw_bubbles(plot_ax, self._obj, self.x, self.y, self.z, style)
+        Bubble._draw_lines(plot_ax, self._obj, self.x, self.y, hline, vline, style)
         Bubble._draw_labels(
-            ax, self._obj, self.label, self.x, self.y, style, format_funcs
+            plot_ax, self._obj, self.label, self.x, self.y, style, format_funcs
         )
 
         if title:
-            ax.set_title(
+            plot_ax.set_title(
                 title,
                 color=style.font_color,
                 fontsize=style.font_size * TITLE_SCALE_FACTOR,
             )
 
-        return ax
+        return plot_ax
 
 
 def aplot_bubble(
