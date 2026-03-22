@@ -88,6 +88,27 @@ class BasePlot(ABC):
     def filter(
         self, order_by: str, sort_ascending: bool = False, max_values: int = 10
     ) -> pd.DataFrame:
+        """Filter and sort the underlying DataFrame.
+
+        Parameters
+        ----------
+        order_by : str
+            Column name to sort by.
+        sort_ascending : bool, optional
+            Sort direction. Defaults to False (descending).
+        max_values : int, optional
+            Maximum number of rows to return. Defaults to 10.
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered, sorted DataFrame head by the provided limits.
+
+        Raises
+        ------
+        ValueError
+            If the `order_by` column is not present in the DataFrame.
+        """
         if order_by not in self._obj.columns:
             raise ValueError(f"Column '{order_by}' not found in DataFrame")
         df = self._obj.sort_values(by=order_by, ascending=sort_ascending)
