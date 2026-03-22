@@ -8,7 +8,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from .base_plot import BasePlot
-from . import CorrelationMethod
+from .types import CorrelationMethod
 from .style_template import (
     HEATMAP_STYLE_TEMPLATE,
     StyleTemplate,

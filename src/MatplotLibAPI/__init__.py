@@ -1,9 +1,6 @@
 """Public API and pandas accessor for MatplotLibAPI."""
 
-from typing_extensions import TypeAlias
-from typing import Literal
 from .accessor import DataFrameAccessor
+from .types import CorrelationMethod
 
-CorrelationMethod: TypeAlias = Literal["pearson", "kendall", "spearman"]
-
-__all__ = ["DataFrameAccessor"]
+__all__ = ["DataFrameAccessor", "CorrelationMethod"]

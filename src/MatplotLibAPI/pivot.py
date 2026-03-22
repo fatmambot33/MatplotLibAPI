@@ -111,7 +111,7 @@ class PivotBarChart(BasePlot):
             "kind": "bar",
             "x": self.x,
             "stacked": self.stacked,
-            "ax": ax,
+            "ax": plot_ax,
             "alpha": 0.7,
         }
         pivot_df.plot(**BasePlot.merge_kwargs(plot_kwargs, kwargs))

@@ -21,7 +21,7 @@ from .style_template import (
     StyleTemplate,
 )
 
-from . import CorrelationMethod
+from .types import CorrelationMethod
 
 if TYPE_CHECKING:
     import plotly.graph_objects as go
