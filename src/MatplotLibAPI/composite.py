@@ -11,7 +11,7 @@ from plotly.subplots import make_subplots
 
 from .base_plot import FIG_SIZE
 
-from .bubble import aplot_bubble
+from .bubble import aplot_bubble, Bubble
 from .network import NetworkGraph
 from .style_template import (
     MAX_RESULTS,
@@ -198,6 +198,117 @@ def plot_composite_treemap(
             max_values=max_values,
         )
         fig.add_trace(trm, row=current_row, col=1)
+    return fig
+
+
+def fplot_bubble(
+    pd_df: pd.DataFrame,
+    label: str,
+    x: str,
+    y: str,
+    z: str,
+    title: Optional[str] = None,
+    style: Optional[StyleTemplate] = None,
+    max_values: int = 50,
+    center_to_mean: bool = False,
+    filter_by: Optional[str] = None,
+    sort_by: Optional[str] = None,
+    ascending: bool = False,
+    table_rows: int = 10,
+    figsize: Tuple[float, float] = FIG_SIZE,
+) -> Figure:
+    """Plot a composite bubble chart with summary tables.
+
+    Parameters
+    ----------
+    pd_df : pd.DataFrame
+        Data to be plotted.
+    label : str
+        Column name for bubble labels.
+    x : str
+        Column name for the x-axis values.
+    y : str
+        Column name for the y-axis values.
+    z : str
+        Column name for bubble sizes.
+    title : str, optional
+        Title of the plot. The default is ``None``.
+    style : StyleTemplate, optional
+        Style configuration. The default is `BUBBLE_STYLE_TEMPLATE`.
+    max_values : int, optional
+        Maximum number of rows to display in the chart. The default is 50.
+    center_to_mean : bool, optional
+        Whether to center the bubbles on the mean. The default is `False`.
+    filter_by : str, optional
+        Column used to filter the data.
+    sort_by : str, optional
+        Column used to sort the data.
+    ascending : bool, optional
+        Sort order for the data. The default is `False`.
+    table_rows : int, optional
+        Number of rows to display in the tables. The default is 10.
+    figsize : tuple[float, float], optional
+        Size of the created figure. The default is FIG_SIZE.
+
+    Returns
+    -------
+    Figure
+        Matplotlib figure containing the composite bubble chart and tables.
+    """
+    validate_dataframe(pd_df, cols=[label, x, y, z], sort_by=sort_by)
+    if style is None:
+        style = WORDCLOUD_STYLE_TEMPLATE
+    fig = plt.figure(figsize=figsize)
+    gs = fig.add_gridspec(
+        2,
+        2,
+        height_ratios=[2, 1],
+        width_ratios=[1, 1],
+    )
+    ax = fig.add_subplot(gs[0, :])
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax3 = fig.add_subplot(gs[1, 1])
+
+    aplot_bubble(
+        pd_df=pd_df,
+        label=label,
+        x=x,
+        y=y,
+        z=z,
+        max_values=max_values,
+        center_to_mean=center_to_mean,
+        sort_by=sort_by,
+        ascending=ascending,
+        title=title,
+        style=style,
+        ax=ax,
+    )
+
+    ax2 = aplot_table(
+        pd_df=pd_df,
+        cols=[label, z, y, x],
+        title=f"Top {table_rows}",
+        ax=ax2,
+        sort_by=sort_by,
+        ascending=False,
+        max_values=table_rows,
+        style=style,
+    )
+
+    ax3 = aplot_table(
+        pd_df=pd_df,
+        cols=[label, z, y, x],
+        title=f"Last {table_rows}",
+        ax=ax3,
+        sort_by=sort_by,
+        ascending=True,
+        max_values=table_rows,
+        style=style,
+    )
+    if title:
+        fig.tight_layout(rect=(0, 0, 1, 0.95))
+    else:
+        fig.tight_layout()
     return fig
 
 

@@ -85,6 +85,14 @@ class BasePlot(ABC):
 
         return fig
 
+    def filter(
+        self, order_by: str, sort_ascending: bool = False, max_values: int = 10
+    ) -> pd.DataFrame:
+        if order_by not in self._obj.columns:
+            raise ValueError(f"Column '{order_by}' not found in DataFrame")
+        df = self._obj.sort_values(by=order_by, ascending=sort_ascending)
+        return df.head(max_values)
+
     @staticmethod
     def create_fig(
         figsize: Tuple[float, float], style: StyleTemplate

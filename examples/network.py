@@ -37,8 +37,5 @@ def plot_sample_network_data() -> Figure:
 
 
 if __name__ == "__main__":
-    plot_df = generate_sample_network_data()
-    f = plot_df.mpl.fplot_network(
-        source="city_a", target="city_b", edge_weight_col="distance_km"
-    )
     plot_fig = plot_sample_network_data()
+    plot_fig.show()
