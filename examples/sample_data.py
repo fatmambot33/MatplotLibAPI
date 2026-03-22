@@ -6,25 +6,16 @@ import pandas as pd
 
 def generate_bubble_data():
     """Generate and save sample data for a bubble chart."""
-    data = {
-        "country": ["USA", "China", "India", "Brazil", "Nigeria"],
-        "population": [331, 1441, 1393, 213, 206],  # in millions
-        "gdp_per_capita": [63593, 10500, 2191, 7741, 2229],
-        "continent": ["North America", "Asia", "Asia", "South America", "Africa"],
-    }
-    df = pd.DataFrame(data)
-    df.to_csv("data/bubble.csv", index=False)
+    from .bubble import generate_sample_data
+
+    generate_sample_data().to_csv("data/bubble.csv", index=False)
 
 
 def generate_network_data():
     """Generate and save sample data for a network graph."""
-    data = {
-        "city_a": ["New York", "London", "Tokyo", "Sydney", "New York"],
-        "city_b": ["London", "Tokyo", "Sydney", "New York", "Tokyo"],
-        "distance_km": [5585, 9562, 7824, 16027, 10850],
-    }
-    df = pd.DataFrame(data)
-    df.to_csv("data/network.csv", index=False)
+    from .network import generate_sample_data
+
+    generate_sample_data().to_csv("data/network.csv", index=False)
 
 
 def generate_pivot_data():
