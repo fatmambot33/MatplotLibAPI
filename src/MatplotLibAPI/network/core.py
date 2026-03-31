@@ -467,6 +467,19 @@ class NetworkGraph(BasePlot):
             distribution[int(degree)] += 1
         return dict(sorted(distribution.items()))
 
+    @property
+    def degree_sequence(self) -> List[int]:
+        """Return node degrees sorted in descending order.
+
+        Returns
+        -------
+        list[int]
+            Degree for each node sorted from highest to lowest.
+        """
+        return sorted(
+            (int(degree) for _, degree in self._nx_graph.degree()), reverse=True
+        )
+
     def add_node(self, node: Any, **attributes: Any):
         """Add a node with optional attributes.
 

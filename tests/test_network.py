@@ -163,6 +163,17 @@ def test_degree_distribution_returns_node_counts_by_degree():
     assert graph.degree_distribution == {0: 1, 1: 2, 2: 1}
 
 
+def test_degree_sequence_returns_descending_node_degrees():
+    """Return node degrees sorted from highest to lowest."""
+
+    graph = NetworkGraph()
+    graph.add_edge("a", "b")
+    graph.add_edge("b", "c")
+    graph.add_node("isolated")
+
+    assert graph.degree_sequence == [2, 1, 1, 0]
+
+
 def test_network_layout_respects_precomputed_deciles() -> None:
     """Reuse provided deciles to produce stable layout scaling."""
 
