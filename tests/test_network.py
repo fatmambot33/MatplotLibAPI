@@ -83,6 +83,20 @@ def test_accessor_fplot_network_components(load_sample_df):
     assert isinstance(fig, Figure)
 
 
+def test_accessor_fplot_network(load_sample_df):
+    """Render a network figure via the pandas accessor."""
+
+    df = load_sample_df("network.csv")
+
+    fig = df.mpl.fplot_network(
+        edge_source_col="city_a",
+        edge_target_col="city_b",
+        edge_weight_col="distance_km",
+    )
+
+    assert isinstance(fig, Figure)
+
+
 def test_softmax_matches_expected_probabilities():
     """Return softmax probabilities consistent with NumPy operations."""
 

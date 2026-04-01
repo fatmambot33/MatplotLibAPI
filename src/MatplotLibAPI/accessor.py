@@ -1278,6 +1278,57 @@ class DataFrameAccessor:
             **kwargs,
         )
 
+    def fplot_network(
+        self,
+        edge_source_col: str = "source",
+        edge_target_col: str = "target",
+        edge_weight_col: str = "weight",
+        title: Optional[str] = None,
+        style: Optional[StyleTemplate] = None,
+        layout_seed: Optional[int] = None,
+        figsize: Tuple[float, float] = FIG_SIZE,
+    ) -> Figure:
+        """Plot a network graph on a new figure.
+
+        Parameters
+        ----------
+        edge_source_col : str, optional
+            Column for source nodes. The default is "source".
+        edge_target_col : str, optional
+            Column for target nodes. The default is "target".
+        edge_weight_col : str, optional
+            Column for edge weights. The default is "weight".
+        title : str, optional
+            Chart title.
+        style : StyleTemplate, optional
+            Styling template. The default is `NETWORK_STYLE_TEMPLATE`.
+        layout_seed : int, optional
+            Seed forwarded to the spring layout. The default is ``_DEFAULT["SPRING_LAYOUT_SEED"]``.
+        figsize : tuple[float, float], optional
+            Figure size. The default is FIG_SIZE.
+
+        Returns
+        -------
+        Figure
+            The new Matplotlib figure with the plot.
+        """
+        kwargs: Dict[str, Any] = {}
+        if layout_seed is not None:
+            kwargs["layout_seed"] = layout_seed
+
+        from .network import NETWORK_STYLE_TEMPLATE, fplot_network
+
+        return fplot_network(
+            pd_df=self._obj,
+            edge_source_col=edge_source_col,
+            edge_target_col=edge_target_col,
+            edge_weight_col=edge_weight_col,
+            title=title,
+            style=style or NETWORK_STYLE_TEMPLATE,
+            figsize=figsize,
+            **kwargs,
+        )
+
     def aplot_network_components(
         self,
         edge_source_col: str = "source",
