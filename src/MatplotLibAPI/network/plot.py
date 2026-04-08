@@ -501,6 +501,8 @@ def fplot_network(
     ).fplot(
         title=title,
         style=style,
+        edge_weight_col=edge_weight_col,
+        layout_seed=layout_seed,
         figsize=figsize,
     )
 
