@@ -453,6 +453,33 @@ class NetworkGraph(BasePlot):
         """Return the degree assortativity coefficient of the graph."""
         return nx.degree_assortativity_coefficient(self._nx_graph)
 
+    @property
+    def degree_distribution(self) -> Dict[int, int]:
+        """Return the count of nodes for each degree.
+
+        Returns
+        -------
+        dict[int, int]
+            Mapping from node degree to number of nodes with that degree.
+        """
+        distribution: Dict[int, int] = defaultdict(int)
+        for _, degree in self._nx_graph.degree():
+            distribution[int(degree)] += 1
+        return dict(sorted(distribution.items()))
+
+    @property
+    def degree_sequence(self) -> List[int]:
+        """Return node degrees sorted in descending order.
+
+        Returns
+        -------
+        list[int]
+            Degree for each node sorted from highest to lowest.
+        """
+        return sorted(
+            (int(degree) for _, degree in self._nx_graph.degree()), reverse=True
+        )
+
     def add_node(self, node: Any, **attributes: Any):
         """Add a node with optional attributes.
 
