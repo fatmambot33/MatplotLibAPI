@@ -121,6 +121,30 @@ def test_accessor_fplot_network_forwards_layout_seed(monkeypatch):
     assert captured_layout_seed == [123]
 
 
+def test_fplot_network_forwards_layout_seed_to_graph_fplot(monkeypatch):
+    """Forward ``layout_seed`` from wrapper to ``NetworkGraph.fplot``."""
+
+    df = pd.DataFrame(
+        {
+            "source": ["a", "b", "c"],
+            "target": ["b", "c", "a"],
+            "weight": [1, 2, 3],
+        }
+    )
+    captured_layout_seed = []
+
+    def fake_fplot(self, *args, **kwargs):  # type: ignore[override]
+        captured_layout_seed.append(kwargs.get("layout_seed"))
+        return plt.figure()
+
+    monkeypatch.setattr(NetworkGraph, "fplot", fake_fplot)
+
+    fig = fplot_network(df, layout_seed=99)
+
+    assert isinstance(fig, Figure)
+    assert captured_layout_seed == [99]
+
+
 def test_softmax_matches_expected_probabilities():
     """Return softmax probabilities consistent with NumPy operations."""
 
