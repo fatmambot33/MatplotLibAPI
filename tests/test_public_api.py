@@ -3,12 +3,32 @@
 import MatplotLibAPI
 
 
+EXPECTED_PUBLIC_API = {
+    "CorrelationMethod",
+    "DataFrameAccessor",
+    "fplot_area",
+    "fplot_bar",
+    "fplot_box_violin",
+    "fplot_correlation_matrix",
+    "fplot_heatmap",
+    "fplot_histogram_kde",
+    "fplot_pie_donut",
+    "fplot_sankey",
+    "fplot_sunburst",
+    "fplot_table",
+    "fplot_timeserie",
+    "fplot_treemap",
+    "fplot_waffle",
+    "fplot_wordcloud",
+}
+
+
 def test_public_api_is_explicit() -> None:
-    """Expose only the documented package-root symbols."""
-    assert MatplotLibAPI.__all__ == ["DataFrameAccessor", "CorrelationMethod"]
+    """Expose exactly the documented package-root symbols."""
+    assert set(MatplotLibAPI.__all__) == EXPECTED_PUBLIC_API
 
 
 def test_public_api_symbols_are_importable() -> None:
-    """Keep supported root imports available to downstream users."""
-    for name in MatplotLibAPI.__all__:
+    """Resolve every supported root export."""
+    for name in EXPECTED_PUBLIC_API:
         assert getattr(MatplotLibAPI, name) is not None
