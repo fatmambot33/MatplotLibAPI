@@ -56,8 +56,11 @@ def test_readme_package_root_imports_are_public() -> None:
 
 
 def test_readme_specialized_imports_are_intentional() -> None:
-    """Limit documented module imports to the named specialized APIs."""
+    """Limit executable module imports to the named specialized APIs."""
     for block in _python_blocks(README.read_text(encoding="utf-8")):
+        if "# Before" in block:
+            continue
+
         tree = ast.parse(block)
         for node in ast.walk(tree):
             if not isinstance(node, ast.ImportFrom):
