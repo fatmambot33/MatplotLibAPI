@@ -3,7 +3,8 @@
 from inspect import Parameter, Signature, signature
 from typing import get_type_hints
 
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure as MatplotlibFigure
+from plotly.graph_objects import Figure as PlotlyFigure
 
 import MatplotLibAPI
 
@@ -13,6 +14,7 @@ PLOT_HELPERS = {
     for name in MatplotLibAPI.__all__
     if name.startswith("fplot_")
 }
+FIGURE_TYPES = {MatplotlibFigure, PlotlyFigure}
 
 
 def test_public_plot_helpers_use_dataframe_first() -> None:
@@ -33,7 +35,7 @@ def test_public_plot_helpers_return_figures() -> None:
     for name, helper in PLOT_HELPERS.items():
         hints = get_type_hints(helper)
 
-        assert hints.get("return") is Figure, f"{name} must return Figure"
+        assert hints.get("return") in FIGURE_TYPES, f"{name} must return a Figure"
 
 
 def test_public_plot_helpers_have_explicit_signatures() -> None:
