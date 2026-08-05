@@ -1,0 +1,20 @@
+{
+  "name": "fatmambot33-matplotlibapi",
+  "interface": {
+    "displayName": "MatplotLibAPI"
+  },
+  "plugins": [
+    {
+      "name": "matplotlibapi",
+      "source": {
+        "source": "local",
+        "path": "./plugins/matplotlibapi"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Data & Analytics"
+    }
+  ]
+}
