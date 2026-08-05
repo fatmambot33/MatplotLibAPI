@@ -1,6 +1,7 @@
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
 [project]
 name = "MatplotLibAPI"
 version = "4.0.5"
@@ -22,9 +23,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pydocstyle",
-    "pytest-pydocstyle",
     "pyright",
-    "black",
+    "black==25.11.0",
     "pytest",
     "pytest-cov",
     "tomli",
@@ -35,7 +35,6 @@ mcp = [
 
 [project.scripts]
 matplotlibapi-mcp = "MatplotLibAPI.mcp_server:main"
-
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/MatplotLibAPI"]

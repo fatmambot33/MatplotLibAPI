@@ -9,8 +9,8 @@ from .area import fplot_area
 from .bar import fplot_bar
 from .box_violin import fplot_box_violin
 from .heatmap import fplot_correlation_matrix, fplot_heatmap
-from .histogram import fplot_histogram_kde
-from .pie import fplot_pie_donut
+from .histogram import fplot_histogram as fplot_histogram_kde
+from .pie import fplot_pie as fplot_pie_donut
 from .sankey import fplot_sankey
 from .sunburst import fplot_sunburst
 from .table import fplot_table
