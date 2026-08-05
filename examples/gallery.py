@@ -54,34 +54,79 @@ def main() -> None:
     )
     timeline = pd.DataFrame(
         {
-            "date": pd.to_datetime(["2026-01-01", "2026-02-01", "2026-01-01", "2026-02-01"]),
+            "date": pd.to_datetime(
+                ["2026-01-01", "2026-02-01", "2026-01-01", "2026-02-01"]
+            ),
             "group": ["A", "A", "B", "B"],
             "value": [10, 14, 8, 13],
         }
     )
     hierarchy = pd.DataFrame(
-        {"labels": ["All", "A", "B"], "parents": ["", "All", "All"], "values": [30, 10, 20]}
+        {
+            "labels": ["All", "A", "B"],
+            "parents": ["", "All", "All"],
+            "values": [30, 10, 20],
+        }
     )
-    words = pd.DataFrame({"word": ["simple", "reliable", "typed"], "weight": [5, 3, 2]})
+    words = pd.DataFrame(
+        {"word": ["simple", "reliable", "typed"], "weight": [5, 3, 2]}
+    )
     flows = pd.DataFrame(
-        {"source": ["Visit", "Visit"], "target": ["Buy", "Leave"], "value": [35, 65]}
+        {
+            "source": ["Visit", "Visit"],
+            "target": ["Buy", "Leave"],
+            "value": [35, 65],
+        }
     )
+    shares = categories.groupby("category", as_index=False)["value"].sum()
 
     figures = {
-        "area": fplot_area(categories, x="category", y="value", label="group", stacked=True),
-        "bar": fplot_bar(categories, category="category", value="value", group="group", stacked=True),
-        "box_violin": fplot_box_violin(categories, column="value", category="category", use_violin=True),
-        "correlation": fplot_correlation_matrix(categories[["value"]].assign(other=[1, 2, 3, 4])),
-        "heatmap": fplot_heatmap(categories, index="category", columns="group", values="value"),
-        "histogram": fplot_histogram_kde(categories, column="value", bins=4, kde=True),
-        "pie": fplot_pie_donut(categories.groupby("category", as_index=False)["value"].sum(), category="category", value="value", donut=True),
-        "sankey": fplot_sankey(flows, source="source", target="target", value="value"),
-        "sunburst": fplot_sunburst(hierarchy, labels="labels", parents="parents", values="values"),
-        "table": fplot_table(pd_df=categories, cols=["category", "group", "value"]),
-        "timeserie": fplot_timeserie(pd_df=timeline, label="group", x="date", y="value"),
-        "treemap": fplot_treemap(pd_df=hierarchy, path="labels", values="values"),
-        "waffle": fplot_waffle(categories.groupby("category", as_index=False)["value"].sum(), category="category", value="value"),
-        "wordcloud": fplot_wordcloud(words, text_column="word", weight_column="weight"),
+        "area": fplot_area(
+            categories, x="category", y="value", label="group", stacked=True
+        ),
+        "bar": fplot_bar(
+            categories,
+            category="category",
+            value="value",
+            group="group",
+            stacked=True,
+        ),
+        "box_violin": fplot_box_violin(
+            categories, column="value", by="category", violin=True
+        ),
+        "correlation": fplot_correlation_matrix(
+            categories, x="group", y="category", value="value"
+        ),
+        "heatmap": fplot_heatmap(
+            categories, x="group", y="category", value="value"
+        ),
+        "histogram": fplot_histogram_kde(
+            categories, column="value", bins=4, kde=True
+        ),
+        "pie": fplot_pie_donut(
+            shares, category="category", value="value", donut=True
+        ),
+        "sankey": fplot_sankey(
+            flows, source="source", target="target", value="value"
+        ),
+        "sunburst": fplot_sunburst(
+            hierarchy, labels="labels", parents="parents", values="values"
+        ),
+        "table": fplot_table(
+            pd_df=categories, cols=["category", "group", "value"]
+        ),
+        "timeserie": fplot_timeserie(
+            pd_df=timeline, label="group", x="date", y="value"
+        ),
+        "treemap": fplot_treemap(
+            pd_df=hierarchy, path="labels", values="values"
+        ),
+        "waffle": fplot_waffle(
+            shares, category="category", value="value"
+        ),
+        "wordcloud": fplot_wordcloud(
+            words, text_column="word", weight_column="weight"
+        ),
     }
 
     for name, figure in figures.items():
