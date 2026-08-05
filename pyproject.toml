@@ -23,7 +23,6 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pydocstyle",
-    "pytest-pydocstyle",
     "pyright",
     "black==25.11.0",
     "pytest",
