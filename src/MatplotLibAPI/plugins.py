@@ -4,7 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from importlib import metadata
-from typing import Any, Callable, Dict, Iterable, List, Protocol, runtime_checkable
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Protocol,
+    cast,
+    runtime_checkable,
+)
 
 PLUGIN_API_VERSION = "1"
 ENTRY_POINT_GROUP = "matplotlibapi.plugins"
@@ -97,7 +107,11 @@ class PluginRegistry:
                 group=ENTRY_POINT_GROUP
             )
         else:  # pragma: no cover - Python 3.9 compatibility
-            entries = discovered.get(ENTRY_POINT_GROUP, [])
+            legacy = cast(
+                Mapping[str, Iterable[metadata.EntryPoint]],
+                discovered,
+            )
+            entries = legacy.get(ENTRY_POINT_GROUP, ())
         for entry in sorted(entries, key=lambda item: item.name):
             plugin_factory = entry.load()
             self.register(plugin_factory())
