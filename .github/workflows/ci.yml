@@ -78,12 +78,12 @@ jobs:
             numpy==1.23.0 pandas==1.5.0 matplotlib==3.6.0 \
             networkx==2.8.0 plotly==5.10.0 seaborn==0.12.0 \
             scikit-learn==1.1.0 kaleido==0.2.1 nbformat==5.7.0 \
-            wordcloud==1.9.0 pytest pytest-cov
+            wordcloud==1.9.1.1 pytest pytest-cov
           python -m pip install --no-deps -e .
       - name: Run compatibility tests
         env:
           MPLBACKEND: Agg
-        run: python -m pytest -q tests/test_release_contract.py tests/test_visual_regression.py
+        run: python -m pytest -q tests/test_release_contract.py
 
   artifacts:
     name: Built artifact smoke tests

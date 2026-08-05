@@ -73,9 +73,9 @@ def test_representative_matplotlib_charts_are_deterministic() -> None:
         ),
         lambda: fplot_heatmap(
             frame,
-            index="category",
-            columns="group",
-            values="value",
+            x="group",
+            y="category",
+            value="value",
         ),
         lambda: fplot_pie_donut(
             shares,
