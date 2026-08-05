@@ -44,6 +44,6 @@ def test_public_plot_helpers_have_explicit_signatures() -> None:
             parameter.kind for parameter in helper_signature.parameters.values()
         }
 
-        assert Parameter.VAR_POSITIONAL not in parameter_kinds, (
-            f"{name} must expose named parameters instead of *args"
-        )
+        assert (
+            Parameter.VAR_POSITIONAL not in parameter_kinds
+        ), f"{name} must expose named parameters instead of *args"
