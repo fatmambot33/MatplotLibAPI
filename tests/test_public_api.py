@@ -4,8 +4,14 @@ import MatplotLibAPI
 
 
 EXPECTED_PUBLIC_API = {
+    "CorePlotsPlugin",
     "CorrelationMethod",
     "DataFrameAccessor",
+    "PLUGIN_API_VERSION",
+    "Plugin",
+    "PluginContext",
+    "PluginRegistry",
+    "create_registry",
     "fplot_area",
     "fplot_bar",
     "fplot_box_violin",

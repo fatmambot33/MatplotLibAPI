@@ -15,6 +15,22 @@ Type alias describing accepted correlation methods.
 The pandas DataFrame accessor registered as `DataFrame.mpl`. The accessor
 forwards to the same plotting implementations used by the functional API.
 
+## Plugin surface
+
+The plugin API is framework-neutral and versioned independently from the
+package release.
+
+- `PLUGIN_API_VERSION` — current plugin contract version.
+- `Plugin` — typed protocol requiring a name, API version, and setup method.
+- `PluginContext` — registration context used to expose named plot callables.
+- `PluginRegistry` — deterministic registry for built-in and installed plugins.
+- `CorePlotsPlugin` — built-in plugin exposing the stable plotting helpers.
+- `create_registry` — creates a core registry and optionally discovers installed
+  plugins from the `matplotlibapi.plugins` entry-point group.
+
+Plugin setup is atomic. Failed setup does not leave partially registered plots,
+and duplicate plugin or plot names are rejected.
+
 ## Matplotlib figure helpers
 
 All `fplot_*` helpers below accept a pandas `DataFrame` as `pd_df` and return a

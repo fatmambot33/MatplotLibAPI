@@ -20,6 +20,9 @@ dependencies = [
     "wordcloud>=1.9.1.1",
 ]
 
+[project.entry-points."matplotlibapi.plugins"]
+core = "MatplotLibAPI.plugins:CorePlotsPlugin"
+
 [project.optional-dependencies]
 dev = [
     "pydocstyle",
