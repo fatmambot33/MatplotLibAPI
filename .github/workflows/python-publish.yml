@@ -27,14 +27,20 @@ jobs:
 
       - name: Read and validate release version
         id: version
-        shell: bash
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
           python - <<'PY' >> "$GITHUB_OUTPUT"
+          import os
           import tomllib
           from pathlib import Path
 
           version = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
-          branch_version = "${GITHUB_REF_NAME#release/}"
+          branch_name = os.environ["BRANCH_NAME"]
+          prefix = "release/"
+          if not branch_name.startswith(prefix):
+              raise SystemExit(f"Unexpected release branch: {branch_name!r}.")
+          branch_version = branch_name.removeprefix(prefix)
           if version != branch_version:
               raise SystemExit(
                   f"Release branch {branch_version!r} does not match package version {version!r}."
