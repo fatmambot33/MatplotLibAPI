@@ -1,0 +1,29 @@
+{
+  "name": "matplotlibapi",
+  "version": "4.1.0",
+  "description": "Create reliable charts and visual analysis with MatplotLibAPI in Codex.",
+  "author": {
+    "name": "FaTmamBo33",
+    "url": "https://github.com/fatmambot33"
+  },
+  "homepage": "https://github.com/fatmambot33/MatplotLibAPI",
+  "repository": "https://github.com/fatmambot33/MatplotLibAPI",
+  "license": "MIT",
+  "keywords": ["matplotlib", "charts", "visualization", "data", "codex", "python"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "MatplotLibAPI",
+    "shortDescription": "Production-ready charts from Codex",
+    "longDescription": "Install MatplotLibAPI from Git and use its typed plotting registry to inspect data, choose a chart, render figures, and save reproducible outputs.",
+    "developerName": "FaTmamBo33",
+    "category": "Data & Analytics",
+    "capabilities": ["Read", "Interactive"],
+    "websiteURL": "https://github.com/fatmambot33/MatplotLibAPI",
+    "defaultPrompt": [
+      "Choose the best chart for this dataset.",
+      "Create a polished chart and save it.",
+      "Inspect available MatplotLibAPI plots."
+    ],
+    "brandColor": "#F97316"
+  }
+}
