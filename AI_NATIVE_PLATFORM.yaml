@@ -1,0 +1,80 @@
+version: 1
+
+platform:
+  name: First Class AI Native Platform
+  required: true
+
+product:
+  name: MatplotLibAPI
+  ai_native: true
+  plugin_first: true
+  sdk_first: true
+  api_first: true
+  cli_first: true
+  mcp_first: false
+
+plugin:
+  enabled: true
+  codex:
+    supported: true
+    marketplace: true
+  discovery:
+    entry_points: true
+    manifest: true
+    capabilities: true
+  credentials:
+    required: false
+    local_only: true
+    env_file: .env
+    env_example: plugins/matplotlibapi/.env.example
+    required_variables: []
+    setup_command: null
+    validation_command: null
+    policy:
+      never_store_remote: true
+      never_commit: true
+      never_echo: true
+      require_gitignore: true
+      require_local_env: false
+
+commands:
+  required:
+    - validate
+    - test
+    - docs
+    - examples
+    - upgrade
+    - uninstall
+  recommended:
+    - eval
+    - benchmark
+
+interfaces:
+  sdk: true
+  cli: true
+  plugin: true
+  mcp: false
+  openai_tools: true
+  json_schema: true
+
+quality:
+  typed: true
+  tests: true
+  docs: true
+  examples: true
+  security_scan: true
+  compatibility_tests: true
+  ai_evaluations: true
+  benchmark: true
+
+release:
+  block_if_quality_fails: true
+  block_if_doctor_fails: false
+  block_if_plugin_invalid: true
+  validate_manifest: python scripts/validate_ai_native_platform.py
+
+agent:
+  guarantees:
+    - no_credentials_required
+    - deterministic_tool_discovery
+    - structured_outputs
