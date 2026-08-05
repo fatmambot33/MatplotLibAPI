@@ -11,6 +11,14 @@ from .box_violin import fplot_box_violin
 from .heatmap import fplot_correlation_matrix, fplot_heatmap
 from .histogram import fplot_histogram as fplot_histogram_kde
 from .pie import fplot_pie as fplot_pie_donut
+from .plugins import (
+    PLUGIN_API_VERSION,
+    CorePlotsPlugin,
+    Plugin,
+    PluginContext,
+    PluginRegistry,
+    create_registry,
+)
 from .sankey import fplot_sankey
 from .sunburst import fplot_sunburst
 from .table import fplot_table
@@ -21,8 +29,14 @@ from .waffle import fplot_waffle
 from .word_cloud import fplot_wordcloud
 
 __all__ = [
+    "PLUGIN_API_VERSION",
+    "CorePlotsPlugin",
     "CorrelationMethod",
     "DataFrameAccessor",
+    "Plugin",
+    "PluginContext",
+    "PluginRegistry",
+    "create_registry",
     "fplot_area",
     "fplot_bar",
     "fplot_box_violin",
