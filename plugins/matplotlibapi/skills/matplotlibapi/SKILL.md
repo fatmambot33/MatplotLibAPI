@@ -1,13 +1,29 @@
 ---
 name: matplotlibapi
-description: Install and use MatplotLibAPI from Git to inspect tabular data, select appropriate visualizations, render charts, and save reproducible figures.
+description: Install and use MatplotLibAPI from Git for local, credential-free data inspection and visualization.
 ---
 
 # MatplotLibAPI
 
+## Credential policy
+
+MatplotLibAPI requires no credentials. Never request API keys, tokens, hosted authentication, or secret-store access for this plugin. All plotting and data processing must run locally against files and data the user has explicitly provided.
+
+An optional local `.env` may be used only for non-secret runtime configuration:
+
+```bash
+cp plugins/matplotlibapi/.env.example .env
+```
+
+```dotenv
+MPLBACKEND=Agg
+```
+
+Ensure `.env` is ignored by Git. Do not place credentials in it for this plugin.
+
 ## Setup
 
-Ensure the current Python environment has the repository version installed:
+Install the repository version locally:
 
 ```bash
 python -m pip install --upgrade "git+https://github.com/fatmambot33/MatplotLibAPI.git"
@@ -24,11 +40,12 @@ print(registry.context.list_plots())
 
 ## Workflow
 
-1. Inspect columns, dtypes, missing values, and row counts.
-2. Choose the simplest chart that answers the user's question.
-3. Prefer registered `fplot_*` helpers over custom plotting code.
-4. Keep transformations explicit and preserve the source data.
-5. Render headlessly when needed with `MPLBACKEND=Agg`.
-6. Save the figure to a clear output path and report that path.
+1. Confirm no external credentials or hosted services are needed.
+2. Inspect columns, dtypes, missing values, and row counts locally.
+3. Choose the simplest chart that answers the user's question.
+4. Prefer registered `fplot_*` helpers over custom plotting code.
+5. Keep transformations explicit and preserve source data.
+6. Render headlessly when needed with `MPLBACKEND=Agg`.
+7. Save the figure to a clear local output path and report that path.
 
-Use Matplotlib figures for static outputs and the registered Plotly helpers when interactive output materially improves the result.
+Use Matplotlib for static outputs and registered Plotly helpers only when interactive output materially improves the result.
