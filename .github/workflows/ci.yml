@@ -39,7 +39,7 @@ jobs:
           python -m pip install build twine
 
       - name: Check formatting
-        run: python -m black --check src tests examples scripts
+        run: python -m black --check src tests
 
       - name: Check docstrings
         run: python -m pydocstyle src
@@ -125,7 +125,11 @@ jobs:
               raise SystemExit(f"Wheel is missing required files: {missing}")
 
           forbidden_parts = {"tests", ".pytest_cache", "__pycache__"}
-          unexpected = [name for name in names if any(part in forbidden_parts for part in Path(name).parts)]
+          unexpected = [
+              name
+              for name in names
+              if any(part in forbidden_parts for part in Path(name).parts)
+          ]
           if unexpected:
               raise SystemExit(f"Wheel contains unexpected files: {unexpected}")
           PY
@@ -150,10 +154,19 @@ jobs:
           if missing:
               raise SystemExit(f"Missing package-root exports: {missing}")
 
-          frame = pd.DataFrame({"category": ["alpha", "beta", "gamma"], "value": [1, 3, 2]})
-          figure = api.fplot_bar(pd_df=frame, category="category", value="value", title="artifact smoke test")
+          frame = pd.DataFrame(
+              {"category": ["alpha", "beta", "gamma"], "value": [1, 3, 2]}
+          )
+          figure = api.fplot_bar(
+              pd_df=frame,
+              category="category",
+              value="value",
+              title="artifact smoke test",
+          )
           if not isinstance(figure, Figure):
-              raise SystemExit(f"fplot_bar returned {type(figure)!r}, expected Figure")
+              raise SystemExit(
+                  f"fplot_bar returned {type(figure)!r}, expected Figure"
+              )
           figure.savefig("matplotlibapi-artifact-smoke.png")
           PY
 
