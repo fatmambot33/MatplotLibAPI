@@ -39,7 +39,7 @@ jobs:
           python -m pip install build twine
 
       - name: Check formatting
-        run: python -m black --check src tests
+        run: python -m black --check src tests examples scripts
 
       - name: Check docstrings
         run: python -m pydocstyle src
@@ -47,8 +47,43 @@ jobs:
       - name: Check types
         run: python -m pyright src
 
+      - name: Validate public API documentation
+        if: matrix.python-version == '3.12'
+        run: python scripts/validate_public_docs.py
+
+      - name: Execute example gallery
+        if: matrix.python-version == '3.12'
+        env:
+          MPLBACKEND: Agg
+        run: python examples/gallery.py
+
       - name: Run tests with coverage
+        env:
+          MPLBACKEND: Agg
         run: python -m pytest -q --cov=src --cov-report=term-missing --cov-fail-under=70
+
+  minimum-dependencies:
+    name: Python 3.9 minimum dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+          cache: pip
+      - name: Install minimum supported dependency set
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            numpy==1.23.0 pandas==1.5.0 matplotlib==3.6.0 \
+            networkx==2.8.0 plotly==5.10.0 seaborn==0.12.0 \
+            scikit-learn==1.1.0 kaleido==0.2.1 nbformat==5.7.0 \
+            wordcloud==1.9.0 pytest pytest-cov
+          python -m pip install --no-deps -e .
+      - name: Run compatibility tests
+        env:
+          MPLBACKEND: Agg
+        run: python -m pytest -q tests/test_release_contract.py tests/test_visual_regression.py
 
   artifacts:
     name: Built artifact smoke tests
@@ -84,20 +119,13 @@ jobs:
           with ZipFile(wheel) as archive:
               names = archive.namelist()
 
-          required = {
-              "MatplotLibAPI/__init__.py",
-              "MatplotLibAPI/py.typed",
-          }
+          required = {"MatplotLibAPI/__init__.py", "MatplotLibAPI/py.typed"}
           missing = sorted(required.difference(names))
           if missing:
               raise SystemExit(f"Wheel is missing required files: {missing}")
 
           forbidden_parts = {"tests", ".pytest_cache", "__pycache__"}
-          unexpected = [
-              name
-              for name in names
-              if any(part in forbidden_parts for part in Path(name).parts)
-          ]
+          unexpected = [name for name in names if any(part in forbidden_parts for part in Path(name).parts)]
           if unexpected:
               raise SystemExit(f"Wheel contains unexpected files: {unexpected}")
           PY
@@ -122,22 +150,10 @@ jobs:
           if missing:
               raise SystemExit(f"Missing package-root exports: {missing}")
 
-          frame = pd.DataFrame(
-              {
-                  "category": ["alpha", "beta", "gamma"],
-                  "value": [1, 3, 2],
-              }
-          )
-          figure = api.fplot_bar(
-              pd_df=frame,
-              category="category",
-              value="value",
-              title="artifact smoke test",
-          )
+          frame = pd.DataFrame({"category": ["alpha", "beta", "gamma"], "value": [1, 3, 2]})
+          figure = api.fplot_bar(pd_df=frame, category="category", value="value", title="artifact smoke test")
           if not isinstance(figure, Figure):
-              raise SystemExit(
-                  f"fplot_bar returned {type(figure)!r}, expected Figure"
-              )
+              raise SystemExit(f"fplot_bar returned {type(figure)!r}, expected Figure")
           figure.savefig("matplotlibapi-artifact-smoke.png")
           PY
 
