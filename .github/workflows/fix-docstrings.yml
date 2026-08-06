@@ -1,0 +1,61 @@
+name: Fix roadmap docstrings
+
+on:
+  push:
+    branches:
+      - agent/schema-driven-agent-plotting
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/schema-driven-agent-plotting
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Add magic-method docstrings
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          executor = Path("src/MatplotLibAPI/executor.py")
+          text = executor.read_text()
+          old = "    def __post_init__(self) -> None:\n        object.__setattr__(self, \"workspace\", self.workspace.expanduser().resolve())"
+          new = "    def __post_init__(self) -> None:\n        \"\"\"Normalize the configured workspace path.\"\"\"\n        object.__setattr__(self, \"workspace\", self.workspace.expanduser().resolve())"
+          if old not in text:
+              raise SystemExit("RenderPolicy __post_init__ pattern not found")
+          executor.write_text(text.replace(old, new, 1))
+
+          specs = Path("src/MatplotLibAPI/specs.py")
+          text = specs.read_text()
+          marker = "    def __post_init__(self) -> None:\n"
+          replacements = (
+              "        \"\"\"Validate that exactly one data source is configured.\"\"\"\n",
+              "        \"\"\"Validate output format and rendering limits.\"\"\"\n",
+              "        \"\"\"Validate and normalize the canonical plot request.\"\"\"\n",
+          )
+          for addition in replacements:
+              index = text.find(marker)
+              if index < 0:
+                  raise SystemExit("Plot contract __post_init__ pattern not found")
+              insert_at = index + len(marker)
+              text = text[:insert_at] + addition + text[insert_at:]
+          specs.write_text(text)
+          PY
+          python -m pip install black==25.11.0
+          python -m black src tests
+      - name: Commit fixes and remove helper workflow
+        run: |
+          rm .github/workflows/fix-docstrings.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "docs: document plot contract normalization"
+          git push origin HEAD:agent/schema-driven-agent-plotting
