@@ -1,6 +1,6 @@
 # Roadmap
 
-## Status: 4.2.0 implementation in progress
+## Status: 4.2.0 implementation complete; validation in progress
 
 The 4.1.0 quality foundation is complete and published. The 4.2.0 milestone
 turns MatplotLibAPI into one schema-driven local visualization engine for Python,
@@ -48,7 +48,7 @@ plugins, the CLI, MCP clients, Codex, and other agents.
 ## 4.2.0 release gate
 
 - Python 3.9–3.12 matrix passes.
-- Black, pydocstyle, Pyright, pytest, and coverage pass.
+- Black 25.11.0, pydocstyle, Pyright, pytest, and coverage pass.
 - Documentation and examples pass headlessly.
 - Plugin API version 1 compatibility remains tested.
 - MCP and CLI use the canonical registry and schemas.
