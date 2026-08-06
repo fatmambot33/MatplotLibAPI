@@ -1,85 +1,80 @@
 # Public API reference
 
-This page documents the stable package-root interface for MatplotLibAPI 4.1.x.
+This page documents the stable package-root interface for MatplotLibAPI 4.2.x.
 The authoritative export list is `MatplotLibAPI.__all__`; CI verifies that every
 name in that list appears here and remains importable.
 
-## Types and integration
+## Schema and execution contracts
 
-### `CorrelationMethod`
+- `PLOT_SPEC_SCHEMA_VERSION` — current portable plot-spec schema version.
+- `DataSource` — inline table or local CSV source.
+- `OutputSpec` — requested format, path, DPI, and transparency.
+- `PlotSpec` — canonical serializable chart request.
+- `ValidationIssue` — stable machine-readable validation item.
+- `PlotValidationError` — exception containing validation issues.
+- `RenderPolicy` — local workspace and resource limits.
+- `RenderResult` — figure, artifact, warnings, and execution metadata.
+- `execute_plot` — validated canonical rendering executor.
+- `validate_plot_request` — validate parameters and column references.
+- `inspect_dataframe` — deterministic local DataFrame profile.
+- `recommend_plot` — deterministic chart recommendation.
+- `migrate_plot_spec` — migrate supported older spec shapes.
+- `openai_tool_definitions` — generate tools from registry descriptors.
 
-Type alias describing accepted correlation methods.
+## Types and pandas integration
 
-### `DataFrameAccessor`
-
-The pandas DataFrame accessor registered as `DataFrame.mpl`. The accessor
-forwards to the same plotting implementations used by the functional API.
+- `CorrelationMethod` — accepted correlation methods.
+- `DataFrameAccessor` — pandas accessor registered as `DataFrame.mpl`.
 
 ## Plugin surface
 
-The plugin API is framework-neutral and versioned independently from the
-package release.
-
 - `PLUGIN_API_VERSION` — current plugin contract version.
-- `Plugin` — typed protocol requiring a name, API version, and setup method.
-- `PluginContext` — registration context used to expose named plot callables.
-- `PluginRegistry` — deterministic registry for built-in and installed plugins.
-- `CorePlotsPlugin` — built-in plugin exposing the stable plotting helpers.
-- `create_registry` — creates a core registry and optionally discovers installed
-  plugins from the `matplotlibapi.plugins` entry-point group.
+- `Plugin` — typed plugin protocol.
+- `PluginContext` — callable and descriptor registration context.
+- `PluginRegistry` — deterministic built-in and entry-point registry.
+- `PlotDescriptor` — schema-rich plot capability contract.
+- `CorePlotsPlugin` — built-in stable plotting plugin.
+- `create_registry` — construct and optionally discover plugins.
+- `infer_plot_descriptor` — derive a descriptor from a callable signature.
 
-Plugin setup is atomic. Failed setup does not leave partially registered plots,
-and duplicate plugin or plot names are rejected.
+Plugin API version 2 adds descriptors and aliases. Version 1 plugins remain
+accepted. Setup is atomic, and duplicate plugins, plots, or aliases are rejected.
 
 ## Matplotlib figure helpers
 
-All `fplot_*` helpers below accept a pandas `DataFrame` as `pd_df` and return a
-new `matplotlib.figure.Figure` unless explicitly noted otherwise.
+All helpers accept a pandas `DataFrame` as `pd_df` and return a new
+`matplotlib.figure.Figure` unless explicitly noted otherwise.
 
-- `fplot_area` — area chart, including grouped and stacked forms.
-- `fplot_bar` — categorical, grouped, or stacked bar chart.
-- `fplot_box_violin` — box or violin distribution chart.
-- `fplot_correlation_matrix` — numeric correlation matrix.
-- `fplot_heatmap` — pivoted heatmap.
-- `fplot_histogram_kde` — histogram with optional density curve.
-- `fplot_pie_donut` — pie or donut chart.
-- `fplot_table` — formatted Matplotlib table.
-- `fplot_timeserie` — grouped or ungrouped time-series chart.
-- `fplot_waffle` — waffle chart.
-- `fplot_wordcloud` — weighted word cloud.
+- `fplot_area`
+- `fplot_bar`
+- `fplot_box_violin`
+- `fplot_correlation_matrix`
+- `fplot_heatmap`
+- `fplot_histogram_kde`
+- `fplot_pie_donut`
+- `fplot_table`
+- `fplot_timeserie`
+- `fplot_timeseries` — correctly spelled compatibility alias.
+- `fplot_waffle`
+- `fplot_wordcloud`
 
 ## Plotly figure helpers
 
-These helpers return `plotly.graph_objects.Figure` objects.
-
-- `fplot_sankey` — source/target flow diagram.
-- `fplot_sunburst` — hierarchical sunburst chart.
-- `fplot_treemap` — hierarchical treemap.
+- `fplot_sankey`
+- `fplot_sunburst`
+- `fplot_treemap`
 
 ## Specialized module APIs
 
-The following APIs remain supported at their module paths but are intentionally
-not package-root exports:
+These remain supported at their module paths:
 
 - `MatplotLibAPI.bubble.Bubble`
 - `MatplotLibAPI.network.NetworkGraph`
 - `MatplotLibAPI.Pivot.plot_pivoted_bars`
 
-They follow the same typing, documentation, and compatibility policy as the
-package-root interface, but may evolve independently in minor releases.
+## Command-line and MCP interfaces
 
-## Errors and validation
-
-Plot helpers validate required columns before rendering. Missing columns or
-invalid parameter combinations raise a descriptive exception rather than
-silently producing an incomplete chart. Additional Matplotlib, Seaborn, or
-Plotly keyword arguments are forwarded where the documented helper accepts
-`**kwargs`.
-
-## Examples
-
-Executable examples live in `examples/gallery.py`. Run them headlessly with:
-
-```bash
-MPLBACKEND=Agg python examples/gallery.py
-```
+The `matplotlibapi` entry point exposes schema discovery, validation, rendering,
+profiling, chart recommendation, diagnostics, evaluations, and benchmarks.
+`matplotlibapi-mcp` exposes the same registry metadata and validated executor over
+stdio when the optional MCP dependency is installed.
