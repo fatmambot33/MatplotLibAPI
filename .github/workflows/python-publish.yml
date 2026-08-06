@@ -1,6 +1,4 @@
 # Publishes each package version once and creates matching release evidence.
-# Set PYPI_TRUSTED_PUBLISHING=true as a repository variable after registering
-# this workflow and the `pypi` environment as a Trusted Publisher on PyPI.
 name: Release Python package
 
 on:
@@ -144,13 +142,7 @@ jobs:
           name: python-package-distributions
           path: dist
       - name: Publish through PyPI Trusted Publishing
-        if: ${{ vars.PYPI_TRUSTED_PUBLISHING == 'true' }}
         uses: pypa/gh-action-pypi-publish@release/v1
-      - name: Publish with migration token
-        if: ${{ vars.PYPI_TRUSTED_PUBLISHING != 'true' }}
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
 
   release:
     needs: [check, build, publish]
