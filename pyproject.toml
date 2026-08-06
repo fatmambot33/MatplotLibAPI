@@ -16,6 +16,7 @@ dependencies = [
     "scikit-learn>=1.1",
     "numpy>=1.23",
     "wordcloud>=1.9.1.1",
+    "typing-extensions>=4.4; python_version < '3.10'",
 ]
 
 [project.entry-points."matplotlibapi.plugins"]
