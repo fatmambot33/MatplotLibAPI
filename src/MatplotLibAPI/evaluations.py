@@ -76,7 +76,7 @@ def _repair_registry() -> PluginRegistry:
 
     def plot(pd_df: pd.DataFrame, category: str, value: str) -> pd.DataFrame:
         """Return the selected columns for repair evaluation."""
-        return pd_df[[category, value]]
+        return pd.DataFrame(pd_df.loc[:, [category, value]])
 
     registry = PluginRegistry()
     registry.context.register_plot("bar", plot)

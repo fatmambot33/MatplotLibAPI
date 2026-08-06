@@ -295,15 +295,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             spec = PlotSpec.from_path(args.spec)
             notices = audit_plot_spec_for_v5(spec)
             migrated = migrate_plot_spec_for_v5(spec)
+            output_path: Optional[str] = None
             if args.write:
                 output = policy.resolve_output_path(args.write)
                 output.parent.mkdir(parents=True, exist_ok=True)
                 output.write_text(migrated.to_json() + "\n", encoding="utf-8")
+                output_path = str(output)
             _print_json(
                 {
                     "notices": [notice.to_dict() for notice in notices],
                     "migrated": migrated.to_dict(),
-                    "output_path": str(output) if args.write else None,
+                    "output_path": output_path,
                 }
             )
         elif args.command == "presets":

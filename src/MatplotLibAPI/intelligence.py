@@ -4,7 +4,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from difflib import get_close_matches
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+)
 
 import pandas as pd
 
@@ -198,11 +209,11 @@ def profile_dataframe(
         raise ValueError("max_sample_values cannot be negative")
     sample = frame.head(max_rows)
     profiles: List[ColumnProfile] = []
-    for column in frame.columns:
+    for index, column in enumerate(frame.columns):
         name = str(column)
-        series = sample[column]
-        missing_count = int(series.isna().sum())
-        unique_count = int(series.nunique(dropna=True))
+        series = cast(pd.Series, sample.iloc[:, index])
+        missing_count = int(cast(Any, series.isna().sum()))
+        unique_count = int(cast(Any, series.nunique(dropna=True)))
         semantic_type = _semantic_type(series, unique_count)
         unique_values: List[Any] = []
         if max_sample_values:
@@ -216,7 +227,7 @@ def profile_dataframe(
             minimum = _json_scalar(non_null.min())
             maximum = _json_scalar(non_null.max())
         if semantic_type == "numeric" and not non_null.empty:
-            mean = float(non_null.mean())
+            mean = float(cast(Any, non_null.mean()))
         sampled_rows = int(sample.shape[0])
         profiles.append(
             ColumnProfile(
