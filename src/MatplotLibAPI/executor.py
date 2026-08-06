@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+from contextlib import nullcontext
 from dataclasses import dataclass, field
 from io import BytesIO
+import json
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Sequence, Tuple, Union
 
 import pandas as pd
 
+from .intelligence import profile_dataframe, recommend_plots
 from .plugins import PluginError, PluginRegistry, PlotDescriptor, create_registry
 from .specs import (
     DataSource,
@@ -287,6 +290,113 @@ def _serialize_figure(
     )
 
 
+def _presentation_context(spec: PlotSpec) -> Any:
+    """Return a temporary Matplotlib context for accessibility presets."""
+    preset = spec.presentation.accessibility
+    if preset == "default":
+        return nullcontext()
+    try:
+        import matplotlib as mpl
+        from cycler import cycler
+    except ImportError:  # pragma: no cover - matplotlib is a core dependency
+        return nullcontext()
+    palettes = {
+        "high-contrast": ("#000000", "#0072B2", "#D55E00", "#009E73"),
+        "colorblind": (
+            "#0072B2",
+            "#E69F00",
+            "#009E73",
+            "#D55E00",
+            "#CC79A7",
+            "#56B4E9",
+        ),
+    }
+    palette = palettes.get(preset)
+    if palette is None:
+        return nullcontext()
+    return mpl.rc_context(
+        {
+            "axes.prop_cycle": cycler(color=palette),
+            "axes.labelsize": 11,
+            "axes.titlesize": 13,
+            "lines.linewidth": 2.0,
+        }
+    )
+
+
+def _number_formatter(kind: str, currency: str) -> Any:
+    """Return a deterministic scalar formatter callable."""
+    if kind == "integer":
+        return lambda value, _position: f"{value:,.0f}"
+    if kind == "percent":
+        return lambda value, _position: f"{value * 100:,.1f}%"
+    if kind == "currency":
+        return lambda value, _position: f"{currency} {value:,.2f}"
+    if kind == "compact":
+
+        def compact(value: float, _position: int) -> str:
+            """Format a value with a compact magnitude suffix."""
+            absolute = abs(value)
+            if absolute >= 1_000_000_000:
+                return f"{value / 1_000_000_000:.1f}B"
+            if absolute >= 1_000_000:
+                return f"{value / 1_000_000:.1f}M"
+            if absolute >= 1_000:
+                return f"{value / 1_000:.1f}K"
+            return f"{value:g}"
+
+        return compact
+    return lambda value, _position: f"{value:,.2f}"
+
+
+def _apply_presentation(figure: Any, spec: PlotSpec) -> Tuple[ValidationIssue, ...]:
+    """Apply semantic formatting and text alternatives after rendering."""
+    warnings = []
+    presentation = spec.presentation
+    if hasattr(figure, "axes"):
+        try:
+            from matplotlib.ticker import FuncFormatter
+
+            formatter = None
+            if presentation.number_format != "auto":
+                formatter = FuncFormatter(
+                    _number_formatter(
+                        presentation.number_format,
+                        presentation.currency,
+                    )
+                )
+            for axis in figure.axes:
+                axis.grid(presentation.show_grid, alpha=0.25)
+                if formatter is not None:
+                    axis.yaxis.set_major_formatter(formatter)
+            if presentation.alt_text:
+                figure.set_label(presentation.alt_text)
+        except (AttributeError, TypeError, ValueError) as exc:
+            warnings.append(
+                ValidationIssue(
+                    code="presentation.partial_application",
+                    message=f"Presentation preferences were only partly applied: {exc}",
+                    severity="warning",
+                )
+            )
+    elif hasattr(figure, "update_layout"):
+        metadata = {"alt_text": presentation.alt_text} if presentation.alt_text else {}
+        figure.update_layout(meta=metadata)
+        if presentation.number_format == "percent":
+            figure.update_yaxes(tickformat=".1%")
+        elif presentation.number_format == "currency":
+            figure.update_yaxes(
+                tickprefix=f"{presentation.currency} ", tickformat=",.2f"
+            )
+        elif presentation.number_format == "integer":
+            figure.update_yaxes(tickformat=",.0f")
+        elif presentation.number_format == "number":
+            figure.update_yaxes(tickformat=",.2f")
+        elif presentation.number_format == "compact":
+            figure.update_yaxes(tickformat="~s")
+    return tuple(warnings)
+
+
 def execute_plot(
     spec: Union[PlotSpec, Mapping[str, Any]],
     data: Optional[Union[pd.DataFrame, Sequence[Mapping[str, Any]]]] = None,
@@ -316,7 +426,9 @@ def execute_plot(
     validate_plot_request(resolved_spec, frame, descriptor)
     parameters = resolved_spec.parameters()
     parameters[descriptor.data_parameter] = frame
-    figure = descriptor.function(**parameters)
+    with _presentation_context(resolved_spec):
+        figure = descriptor.function(**parameters)
+    presentation_warnings = _apply_presentation(figure, resolved_spec)
     output_format = resolved_spec.output.format
     payload: Optional[bytes] = None
     output_path: Optional[str] = None
@@ -364,66 +476,39 @@ def execute_plot(
         figure=figure,
         payload=payload,
         output_path=output_path,
+        warnings=presentation_warnings,
         metadata={
             "rows": int(frame.shape[0]),
             "columns": int(frame.shape[1]),
             "schema_version": resolved_spec.schema_version,
+            "presentation": resolved_spec.presentation.to_dict(),
+            "alt_text": resolved_spec.presentation.alt_text,
         },
     )
 
 
-def inspect_dataframe(frame: pd.DataFrame) -> Dict[str, Any]:
-    """Return deterministic local profiling metadata for chart selection."""
-    return {
-        "rows": int(frame.shape[0]),
-        "columns": int(frame.shape[1]),
-        "column_names": [str(column) for column in frame.columns],
-        "dtypes": {str(column): str(dtype) for column, dtype in frame.dtypes.items()},
-        "missing": {
-            str(column): int(value) for column, value in frame.isna().sum().items()
-        },
-        "numeric_columns": [
-            str(column) for column in frame.select_dtypes(include="number").columns
-        ],
-        "datetime_columns": [
-            str(column)
-            for column in frame.columns
-            if pd.api.types.is_datetime64_any_dtype(frame[column])
-        ],
-    }
+def inspect_dataframe(
+    frame: pd.DataFrame,
+    *,
+    max_rows: int = 5_000,
+    max_sample_values: int = 5,
+) -> Dict[str, Any]:
+    """Return a bounded deterministic local dataframe profile."""
+    return profile_dataframe(
+        frame,
+        max_rows=max_rows,
+        max_sample_values=max_sample_values,
+    ).to_dict()
 
 
 def recommend_plot(frame: pd.DataFrame) -> Dict[str, Any]:
-    """Recommend a chart deterministically without an LLM or credentials."""
-    profile = inspect_dataframe(frame)
-    numeric = profile["numeric_columns"]
-    datetime_columns = profile["datetime_columns"]
-    categorical = [
-        column
-        for column in profile["column_names"]
-        if column not in numeric and column not in datetime_columns
-    ]
-    if datetime_columns and numeric:
-        chart = "timeserie"
-        encoding = {"x": datetime_columns[0], "y": numeric[0]}
-        reason = "A datetime and numeric measure support a time-series view."
-    elif len(numeric) >= 2:
-        chart = "correlation_matrix"
-        encoding = {}
-        reason = "Multiple numeric columns support correlation analysis."
-    elif numeric and categorical:
-        chart = "bar"
-        encoding = {"category": categorical[0], "value": numeric[0]}
-        reason = "A categorical dimension and numeric measure support comparison."
-    elif numeric:
-        chart = "histogram_kde"
-        encoding = {"column": numeric[0]}
-        reason = "A single numeric measure is best inspected as a distribution."
-    else:
-        chart = "table"
-        encoding = {}
-        reason = "No numeric analytical measure was detected."
-    return {"chart": chart, "encoding": encoding, "reason": reason, "profile": profile}
+    """Recommend charts deterministically with scores and explanations."""
+    profile = profile_dataframe(frame)
+    recommendations = recommend_plots(profile)
+    top = recommendations[0].to_dict()
+    top["profile"] = profile.to_dict()
+    top["recommendations"] = [item.to_dict() for item in recommendations]
+    return top
 
 
 def openai_tool_definitions(

@@ -11,7 +11,14 @@ import pandas as pd
 from matplotlib.figure import Figure
 
 from .bubble import Bubble
-from .executor import RenderPolicy, execute_plot
+from .executor import (
+    RenderPolicy,
+    execute_plot,
+    inspect_dataframe,
+    recommend_plot,
+)
+from .intelligence import suggest_plot_spec_repairs
+from .migration import v5_compatibility_status
 from .mcp.metadata import (
     DEDICATED_PLOT_TOOLS,
     PLOT_MODULE_PARAMETER_HINTS,
@@ -23,7 +30,11 @@ from .specs import PlotSpec
 from .style_template import BUBBLE_STYLE_TEMPLATE, StyleTemplate
 
 TableRecords = List[Dict[str, Any]]
-_MCP_ALIASES = {"histogram": "histogram_kde", "pie": "pie_donut"}
+_MCP_ALIASES = {
+    "histogram": "histogram_kde",
+    "pie": "pie_donut",
+    "timeserie": "timeseries",
+}
 
 
 def _load_dataframe(
@@ -206,6 +217,46 @@ def get_plot_module_metadata() -> Dict[str, Any]:
         "dedicated_tools": DEDICATED_PLOT_TOOLS,
         "plot_descriptors": registry.context.list_descriptors(),
         "openai_tools": registry.context.openai_tools(),
+        "plugin_compatibility": registry.compatibility_report(),
+        "v5_compatibility": v5_compatibility_status(),
+    }
+
+
+def inspect_plot_data(
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+) -> Dict[str, Any]:
+    """Return bounded deterministic profiling metadata for MCP clients."""
+    return inspect_dataframe(_load_dataframe(csv_path=csv_path, table=table))
+
+
+def recommend_plot_data(
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+) -> Dict[str, Any]:
+    """Return ranked deterministic chart recommendations for MCP clients."""
+    return recommend_plot(_load_dataframe(csv_path=csv_path, table=table))
+
+
+def repair_plot_spec_data(
+    spec: Dict[str, Any],
+    csv_path: Optional[str] = None,
+    table: Optional[TableRecords] = None,
+) -> Dict[str, Any]:
+    """Return opt-in PlotSpec repair suggestions without mutating input."""
+    from .plugins import create_registry
+
+    resolved_spec = PlotSpec.from_dict(spec)
+    frame = _load_dataframe(csv_path=csv_path, table=table)
+    suggestions = suggest_plot_spec_repairs(
+        resolved_spec,
+        frame,
+        registry=create_registry(),
+    )
+    return {
+        "spec": resolved_spec.to_dict(),
+        "suggestions": [item.to_dict() for item in suggestions],
+        "applied": False,
     }
 
 
@@ -325,6 +376,46 @@ def create_mcp_server() -> Any:
             csv_path=csv_path,
             table=table,
         )
+
+    @mcp.tool()
+    def inspect_data(
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> Dict[str, Any]:
+        """Profile local tabular data with deterministic bounded summaries."""
+        return inspect_plot_data(csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def recommend_chart(
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> Dict[str, Any]:
+        """Recommend charts with scores, reasons, and warnings."""
+        return recommend_plot_data(csv_path=csv_path, table=table)
+
+    @mcp.tool()
+    def suggest_plot_repairs(
+        spec: Dict[str, Any],
+        csv_path: Optional[str] = None,
+        table: Optional[TableRecords] = None,
+    ) -> Dict[str, Any]:
+        """Suggest safe opt-in PlotSpec repairs."""
+        return repair_plot_spec_data(
+            spec,
+            csv_path=csv_path,
+            table=table,
+        )
+
+    @mcp.tool()
+    def compatibility_status() -> Dict[str, Any]:
+        """Return plugin and 5.0 migration compatibility gates."""
+        from .plugins import create_registry
+
+        registry = create_registry()
+        return {
+            "plugins": registry.compatibility_report(),
+            "v5": v5_compatibility_status(),
+        }
 
     @mcp.tool()
     def describe_plot_modules() -> Dict[str, Any]:

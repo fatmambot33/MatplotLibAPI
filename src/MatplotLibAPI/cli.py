@@ -13,6 +13,7 @@ from typing import Any, Dict, Optional, Sequence
 
 import pandas as pd
 
+from .conformance import validate_registry_conformance, write_plugin_scaffold
 from .evaluations import run_agent_evaluations
 from .executor import (
     RenderPolicy,
@@ -20,6 +21,12 @@ from .executor import (
     inspect_dataframe,
     openai_tool_definitions,
     recommend_plot,
+)
+from .intelligence import suggest_plot_spec_repairs
+from .migration import (
+    audit_plot_spec_for_v5,
+    migrate_plot_spec_for_v5,
+    v5_compatibility_status,
 )
 from .plugins import create_registry
 from .specs import PlotSpec, PlotValidationError, ValidationIssue
@@ -44,7 +51,19 @@ def _load_csv(path: str, policy: RenderPolicy) -> pd.DataFrame:
                 )
             ]
         )
-    return pd.read_csv(resolved)
+    frame = pd.read_csv(resolved)
+    rows, columns = frame.shape
+    if rows > policy.max_rows or columns > policy.max_columns:
+        raise PlotValidationError(
+            [
+                ValidationIssue(
+                    code="policy.profile_limit_exceeded",
+                    message="Input exceeds the configured profiling limits.",
+                    details={"rows": rows, "columns": columns},
+                )
+            ]
+        )
+    return frame
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -66,10 +85,16 @@ def build_parser() -> argparse.ArgumentParser:
     describe = plots_sub.add_parser("describe", help="Describe one plot.")
     describe.add_argument("chart")
 
-    plugins = subparsers.add_parser("plugins", help="Inspect installed plugins.")
-    plugins.add_subparsers(dest="plugins_command", required=True).add_parser(
-        "list", help="List installed plugins."
+    plugins = subparsers.add_parser("plugins", help="Inspect and build plugins.")
+    plugins_sub = plugins.add_subparsers(dest="plugins_command", required=True)
+    plugins_sub.add_parser("list", help="List installed plugins.")
+    plugins_sub.add_parser("conform", help="Validate registry conformance.")
+    scaffold = plugins_sub.add_parser(
+        "scaffold", help="Create an official plugin project template."
     )
+    scaffold.add_argument("name")
+    scaffold.add_argument("destination")
+    scaffold.add_argument("--force", action="store_true")
 
     schema = subparsers.add_parser("schema", help="Print canonical schemas.")
     schema.add_argument(
@@ -86,12 +111,33 @@ def build_parser() -> argparse.ArgumentParser:
 
     inspect_parser = subparsers.add_parser("inspect", help="Profile a CSV file.")
     inspect_parser.add_argument("data")
+    inspect_parser.add_argument("--max-rows", type=int, default=5_000)
 
     recommend = subparsers.add_parser(
-        "recommend", help="Recommend a chart deterministically."
+        "recommend", help="Recommend charts deterministically."
     )
     recommend.add_argument("data")
 
+    repair = subparsers.add_parser(
+        "repair", help="Suggest safe opt-in repairs for a plot spec."
+    )
+    repair.add_argument("spec")
+    repair.add_argument("--data", required=True)
+
+    migrate = subparsers.add_parser(
+        "migrate", help="Audit and migrate a plot spec for 5.0 canonical names."
+    )
+    migrate.add_argument("spec")
+    migrate.add_argument("--write", help="Optional path for the migrated JSON spec.")
+
+    presets = subparsers.add_parser(
+        "presets", help="List accessible and semantic presentation presets."
+    )
+    presets.add_argument("kind", choices=("list",), default="list")
+
+    subparsers.add_parser(
+        "compatibility", help="Show plugin and 5.0 compatibility gates."
+    )
     subparsers.add_parser("doctor", help="Check the local installation contract.")
     subparsers.add_parser("test", help="Run a lightweight installation self-test.")
     subparsers.add_parser("eval", help="Run deterministic agent evaluations.")
@@ -105,24 +151,63 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _doctor() -> Dict[str, Any]:
-    dependencies = {}
-    for name in ("pandas", "matplotlib", "networkx", "plotly"):
+    core_dependencies = ("pandas", "matplotlib")
+    optional_dependencies = (
+        "networkx",
+        "plotly",
+        "seaborn",
+        "sklearn",
+        "wordcloud",
+        "kaleido",
+        "nbformat",
+    )
+    dependencies: Dict[str, Dict[str, Any]] = {}
+    for name in core_dependencies + optional_dependencies:
         try:
             module = importlib.import_module(name)
             dependencies[name] = {
                 "available": True,
                 "version": getattr(module, "__version__", "unknown"),
+                "required": name in core_dependencies,
             }
         except ImportError:
-            dependencies[name] = {"available": False}
+            dependencies[name] = {
+                "available": False,
+                "required": name in core_dependencies,
+            }
     registry = create_registry()
+    core_ok = all(dependencies[name]["available"] for name in core_dependencies)
     return {
-        "ok": all(value["available"] for value in dependencies.values()),
+        "ok": core_ok,
         "python": platform.python_version(),
         "dependencies": dependencies,
         "plugins": registry.list_plugins(),
         "plots": registry.context.list_plots(),
+        "compatibility": registry.compatibility_report(),
         "credentials_required": False,
+    }
+
+
+def _presentation_presets() -> Dict[str, Any]:
+    return {
+        "accessibility": ["default", "high-contrast", "colorblind"],
+        "number_formats": [
+            "auto",
+            "number",
+            "integer",
+            "percent",
+            "currency",
+            "compact",
+        ],
+        "example": {
+            "presentation": {
+                "accessibility": "colorblind",
+                "number_format": "currency",
+                "currency": "EUR",
+                "alt_text": "Monthly revenue by market.",
+                "show_grid": True,
+            }
+        },
     }
 
 
@@ -139,7 +224,31 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             else:
                 _print_json(registry.context.describe_plot(args.chart))
         elif args.command == "plugins":
-            _print_json({"plugins": registry.list_plugins()})
+            if args.plugins_command == "list":
+                _print_json(
+                    {
+                        "plugins": registry.list_plugins(),
+                        "compatibility": registry.compatibility_report(),
+                    }
+                )
+            elif args.plugins_command == "conform":
+                result = validate_registry_conformance(registry)
+                _print_json(result.to_dict())
+                return 0 if result.passed else 1
+            else:
+                destination = policy.resolve_output_path(args.destination)
+                created = write_plugin_scaffold(
+                    args.name,
+                    destination,
+                    overwrite=args.force,
+                )
+                _print_json(
+                    {
+                        "created": list(created),
+                        "destination": str(destination),
+                        "plugin_api": "2",
+                    }
+                )
         elif args.command == "schema":
             if args.kind == "plot-spec":
                 _print_json(PlotSpec.json_schema())
@@ -163,21 +272,65 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             result = execute_plot(spec, data=data, registry=registry, policy=policy)
             _print_json(result.to_dict())
         elif args.command == "inspect":
-            _print_json(inspect_dataframe(_load_csv(args.data, policy)))
+            frame = _load_csv(args.data, policy)
+            _print_json(inspect_dataframe(frame, max_rows=max(1, args.max_rows)))
         elif args.command == "recommend":
             _print_json(recommend_plot(_load_csv(args.data, policy)))
+        elif args.command == "repair":
+            spec = PlotSpec.from_path(args.spec)
+            frame = _load_csv(args.data, policy)
+            suggestions = suggest_plot_spec_repairs(
+                spec,
+                frame,
+                registry=registry,
+            )
+            _print_json(
+                {
+                    "spec": spec.to_dict(),
+                    "suggestions": [item.to_dict() for item in suggestions],
+                    "applied": False,
+                }
+            )
+        elif args.command == "migrate":
+            spec = PlotSpec.from_path(args.spec)
+            notices = audit_plot_spec_for_v5(spec)
+            migrated = migrate_plot_spec_for_v5(spec)
+            output_path: Optional[str] = None
+            if args.write:
+                output = policy.resolve_output_path(args.write)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_text(migrated.to_json() + "\n", encoding="utf-8")
+                output_path = str(output)
+            _print_json(
+                {
+                    "notices": [notice.to_dict() for notice in notices],
+                    "migrated": migrated.to_dict(),
+                    "output_path": output_path,
+                }
+            )
+        elif args.command == "presets":
+            _print_json(_presentation_presets())
+        elif args.command == "compatibility":
+            _print_json(
+                {
+                    "plugins": registry.compatibility_report(),
+                    "v5": v5_compatibility_status(),
+                }
+            )
         elif args.command == "doctor":
             result = _doctor()
             _print_json(result)
             return 0 if result["ok"] else 1
         elif args.command == "test":
             descriptors = registry.context.list_descriptors()
+            conformance = validate_registry_conformance(registry)
             result = {
-                "ok": bool(descriptors),
+                "ok": bool(descriptors) and conformance.passed,
                 "descriptor_count": len(descriptors),
                 "schema_version": PlotSpec.json_schema()["properties"][
                     "schema_version"
                 ]["const"],
+                "conformance": conformance.to_dict(),
             }
             _print_json(result)
             return 0 if result["ok"] else 1
@@ -204,6 +357,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 {
                     "readme": "README.md",
                     "plot_spec": "docs/PLOT_SPEC.md",
+                    "intelligence": "docs/DATA_INTELLIGENCE.md",
+                    "plugins": "docs/PLUGIN_ECOSYSTEM.md",
+                    "migration": "docs/MIGRATING_TO_5.md",
                     "api_reference": "docs/API_REFERENCE.md",
                 }
             )

@@ -278,6 +278,10 @@ class PluginContext:
         """Return registered canonical plot names in deterministic order."""
         return sorted(self._plots)
 
+    def list_aliases(self) -> Dict[str, str]:
+        """Return compatibility aliases in deterministic order."""
+        return {name: self._aliases[name] for name in sorted(self._aliases)}
+
     def list_descriptors(self) -> List[Dict[str, Any]]:
         """Return deterministic serializable plot descriptors."""
         return [self._descriptors[name].to_dict() for name in self.list_plots()]
@@ -291,8 +295,10 @@ class PluginRegistry:
     """Load, validate, and expose MatplotLibAPI plugins."""
 
     def __init__(self) -> None:
+        """Initialize an empty deterministic plugin registry."""
         self.context = PluginContext()
         self._plugins: Dict[str, Plugin] = {}
+        self._plugin_api_versions: Dict[str, str] = {}
 
     def register(self, plugin: Plugin) -> None:
         """Register one plugin atomically."""
@@ -317,6 +323,22 @@ class PluginRegistry:
             self.context._aliases = previous_aliases
             raise
         self._plugins[plugin.name] = plugin
+        self._plugin_api_versions[plugin.name] = plugin.api_version
+
+    def compatibility_report(self) -> Dict[str, Any]:
+        """Return legacy plugin and alias compatibility diagnostics."""
+        legacy_plugins = sorted(
+            name
+            for name, version in self._plugin_api_versions.items()
+            if version == LEGACY_PLUGIN_API_VERSION
+        )
+        return {
+            "canonical_plugin_api": PLUGIN_API_VERSION,
+            "legacy_plugin_api": LEGACY_PLUGIN_API_VERSION,
+            "legacy_plugins": legacy_plugins,
+            "aliases": self.context.list_aliases(),
+            "ready_for_plugin_api_v1_removal": not legacy_plugins,
+        }
 
     def discover(self) -> None:
         """Load plugins installed through Python entry points."""
@@ -362,7 +384,7 @@ class CorePlotsPlugin:
             fplot_sankey,
             fplot_sunburst,
             fplot_table,
-            fplot_timeserie,
+            fplot_timeseries,
             fplot_treemap,
             fplot_waffle,
             fplot_wordcloud,
@@ -395,10 +417,10 @@ class CorePlotsPlugin:
             "sankey": (fplot_sankey, "Render a Sankey flow chart.", ()),
             "sunburst": (fplot_sunburst, "Render a sunburst chart.", ()),
             "table": (fplot_table, "Render a formatted table.", ()),
-            "timeserie": (
-                fplot_timeserie,
+            "timeseries": (
+                fplot_timeseries,
                 "Render a time-series chart.",
-                ("timeseries",),
+                ("timeserie",),
             ),
             "treemap": (fplot_treemap, "Render a treemap.", ()),
             "waffle": (fplot_waffle, "Render a waffle chart.", ()),

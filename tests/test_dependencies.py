@@ -15,6 +15,7 @@ RUNTIME_DEPENDENCIES = {
     "pandas",
     "plotly",
     "seaborn",
+    "typing-extensions",
 }
 
 

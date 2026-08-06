@@ -84,3 +84,11 @@ evidence:
     security_workflow: .github/workflows/security.yml
     self_improvement_workflow: .github/workflows/ai-self-improvement.yml
     improvement_issue_template: .github/ISSUE_TEMPLATE/ai-improvement.yml
+extensions:
+  roadmap:
+    current_release: 4.4.0
+    data_intelligence: true
+    plugin_conformance: true
+    accessibility_presets: true
+    migration_tooling: true
+    v5_removal_not_before: '2027-02-06'

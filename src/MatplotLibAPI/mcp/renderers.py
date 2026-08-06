@@ -13,7 +13,7 @@ from ..pie import fplot_pie
 from ..sankey import fplot_sankey
 from ..sunburst import fplot_sunburst
 from ..table import fplot_table
-from ..timeserie import fplot_timeserie
+from ..timeseries import fplot_timeseries
 from ..treemap import fplot_treemap
 from ..waffle import fplot_waffle
 from ..word_cloud import fplot_wordcloud
@@ -30,7 +30,8 @@ MATPLOTLIB_RENDERERS: Dict[str, Renderer] = {
     "pie": fplot_pie,
     "waffle": fplot_waffle,
     "table": fplot_table,
-    "timeserie": fplot_timeserie,
+    "timeseries": fplot_timeseries,
+    "timeserie": fplot_timeseries,
     "wordcloud": fplot_wordcloud,
 }
 
