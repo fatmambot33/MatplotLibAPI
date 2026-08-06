@@ -1,0 +1,83 @@
+name: Fix docstring placement
+
+on:
+  push:
+    branches:
+      - agent/schema-driven-agent-plotting
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/schema-driven-agent-plotting
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Correct magic-method docstrings
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("src/MatplotLibAPI/specs.py")
+          text = path.read_text()
+          stacked = '''    def __post_init__(self) -> None:
+              """Validate and normalize the canonical plot request."""
+              """Validate output format and rendering limits."""
+              """Validate that exactly one data source is configured."""
+          '''
+          data_source = '''    def __post_init__(self) -> None:
+              """Validate that exactly one data source is configured."""
+          '''
+          if stacked not in text:
+              raise SystemExit("stacked DataSource docstrings not found")
+          text = text.replace(stacked, data_source, 1)
+
+          output_old = '''    transparent: bool = False
+
+              def __post_init__(self) -> None:
+                  issues: List[ValidationIssue] = []
+          '''
+          output_new = '''    transparent: bool = False
+
+              def __post_init__(self) -> None:
+                  """Validate output format and rendering limits."""
+                  issues: List[ValidationIssue] = []
+          '''
+          if output_old not in text:
+              raise SystemExit("OutputSpec __post_init__ pattern not found")
+          text = text.replace(output_old, output_new, 1)
+
+          plot_old = '''    schema_version: str = PLOT_SPEC_SCHEMA_VERSION
+
+              def __post_init__(self) -> None:
+                  issues: List[ValidationIssue] = []
+          '''
+          plot_new = '''    schema_version: str = PLOT_SPEC_SCHEMA_VERSION
+
+              def __post_init__(self) -> None:
+                  """Validate and normalize the canonical plot request."""
+                  issues: List[ValidationIssue] = []
+          '''
+          if plot_old not in text:
+              raise SystemExit("PlotSpec __post_init__ pattern not found")
+          path.write_text(text.replace(plot_old, plot_new, 1))
+          PY
+          python -m pip install black==25.11.0
+          python -m black src tests
+          python -m pip install pydocstyle
+          python -m pydocstyle src
+      - name: Commit fixes and remove helper workflow
+        run: |
+          rm .github/workflows/fix-docstrings-placement.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "docs: correct plot contract docstring placement"
+          git push origin HEAD:agent/schema-driven-agent-plotting
