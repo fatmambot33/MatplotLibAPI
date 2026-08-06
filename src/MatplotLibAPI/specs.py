@@ -230,9 +230,7 @@ class PlotSpec:
             encoding=dict(migrated.get("encoding", {})),
             options=dict(migrated.get("options", {})),
             title=(
-                str(migrated["title"])
-                if migrated.get("title") is not None
-                else None
+                str(migrated["title"]) if migrated.get("title") is not None else None
             ),
             data=(
                 DataSource.from_dict(data_value)

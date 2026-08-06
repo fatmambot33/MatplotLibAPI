@@ -222,7 +222,9 @@ def validate_plot_request(
                     code="data.missing_column",
                     message=f"Column {value!r} referenced by {name!r} does not exist.",
                     path=("encoding", name),
-                    details={"available_columns": [str(column) for column in frame.columns]},
+                    details={
+                        "available_columns": [str(column) for column in frame.columns]
+                    },
                 )
             )
         elif isinstance(value, (list, tuple)):
@@ -380,8 +382,7 @@ def inspect_dataframe(frame: pd.DataFrame) -> Dict[str, Any]:
             str(column): int(value) for column, value in frame.isna().sum().items()
         },
         "numeric_columns": [
-            str(column)
-            for column in frame.select_dtypes(include="number").columns
+            str(column) for column in frame.select_dtypes(include="number").columns
         ],
         "datetime_columns": [
             str(column)

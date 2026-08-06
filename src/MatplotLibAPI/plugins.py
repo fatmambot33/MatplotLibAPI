@@ -118,7 +118,11 @@ def infer_plot_descriptor(
     resolved_data_parameter = data_parameter
     if resolved_data_parameter is None:
         resolved_data_parameter = next(
-            (candidate for candidate in candidate_names if candidate in signature.parameters),
+            (
+                candidate
+                for candidate in candidate_names
+                if candidate in signature.parameters
+            ),
             next(iter(signature.parameters), "pd_df"),
         )
 
@@ -407,9 +411,11 @@ class CorePlotsPlugin:
                 function,
                 description=description,
                 backend="plotly" if name in plotly_names else "matplotlib",
-                output_formats=("figure", "png", "json")
-                if name in plotly_names
-                else ("figure", "png", "svg"),
+                output_formats=(
+                    ("figure", "png", "json")
+                    if name in plotly_names
+                    else ("figure", "png", "svg")
+                ),
                 aliases=aliases,
             )
 

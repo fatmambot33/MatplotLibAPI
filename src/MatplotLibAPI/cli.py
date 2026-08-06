@@ -156,7 +156,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 value["output"] = dict(value["output"])
                 value["output"]["path"] = args.output
                 if value["output"].get("format") == "figure":
-                    value["output"]["format"] = Path(args.output).suffix.lstrip(".") or "png"
+                    value["output"]["format"] = (
+                        Path(args.output).suffix.lstrip(".") or "png"
+                    )
                 spec = PlotSpec.from_dict(value)
             result = execute_plot(spec, data=data, registry=registry, policy=policy)
             _print_json(result.to_dict())
@@ -173,7 +175,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             result = {
                 "ok": bool(descriptors),
                 "descriptor_count": len(descriptors),
-                "schema_version": PlotSpec.json_schema()["properties"]["schema_version"]["const"],
+                "schema_version": PlotSpec.json_schema()["properties"][
+                    "schema_version"
+                ]["const"],
             }
             _print_json(result)
             return 0 if result["ok"] else 1

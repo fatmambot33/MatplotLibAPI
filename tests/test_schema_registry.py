@@ -34,6 +34,6 @@ def test_openai_tools_are_generated_from_descriptors() -> None:
 
     assert tool["type"] == "function"
     assert tool["function"]["name"] == "plot_bar"
-    assert tool["function"]["parameters"] == context.get_descriptor(
-        "bar"
-    ).parameter_schema
+    assert (
+        tool["function"]["parameters"] == context.get_descriptor("bar").parameter_schema
+    )
