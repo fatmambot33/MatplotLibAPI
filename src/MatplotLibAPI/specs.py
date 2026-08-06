@@ -58,8 +58,6 @@ class DataSource:
     table: Optional[Tuple[Mapping[str, Any], ...]] = None
 
     def __post_init__(self) -> None:
-        """Validate and normalize the canonical plot request."""
-        """Validate output format and rendering limits."""
         """Validate that exactly one data source is configured."""
         if self.csv_path is not None and self.table is not None:
             raise PlotValidationError(
@@ -119,6 +117,7 @@ class OutputSpec:
     transparent: bool = False
 
     def __post_init__(self) -> None:
+        """Validate output format and rendering limits."""
         issues: List[ValidationIssue] = []
         if self.format not in _ALLOWED_OUTPUT_FORMATS:
             issues.append(
@@ -178,6 +177,7 @@ class PlotSpec:
     schema_version: str = PLOT_SPEC_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
+        """Validate and normalize the canonical plot request."""
         issues: List[ValidationIssue] = []
         if not isinstance(self.chart, str) or not self.chart.strip():
             issues.append(
