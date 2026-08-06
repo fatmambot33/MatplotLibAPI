@@ -58,6 +58,9 @@ class DataSource:
     table: Optional[Tuple[Mapping[str, Any], ...]] = None
 
     def __post_init__(self) -> None:
+        """Validate and normalize the canonical plot request."""
+        """Validate output format and rendering limits."""
+        """Validate that exactly one data source is configured."""
         if self.csv_path is not None and self.table is not None:
             raise PlotValidationError(
                 [

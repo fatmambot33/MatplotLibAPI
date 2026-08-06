@@ -32,6 +32,7 @@ class RenderPolicy:
     allow_absolute_paths: bool = False
 
     def __post_init__(self) -> None:
+        """Normalize the configured workspace path."""
         object.__setattr__(self, "workspace", self.workspace.expanduser().resolve())
 
     def resolve_input_path(self, value: str) -> Path:
