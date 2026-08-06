@@ -1,35 +1,80 @@
 # Roadmap
 
-## Status: 4.1.0 complete
+## Status: 4.2.0 implementation in progress
 
-The first-class 4.1.0 roadmap is implemented. The release now has a stable
-public API, deterministic visual checks, executable examples, validated API
-documentation, dependency compatibility coverage, backward-compatibility
-contracts, and clean installed-artifact smoke tests.
+The 4.1.0 quality foundation is complete and published. The 4.2.0 milestone
+turns MatplotLibAPI into one schema-driven local visualization engine for Python,
+plugins, the CLI, MCP clients, Codex, and other agents.
 
-## Completed 4.1.0 scope
+## North star
 
-- stable and explicit package-root public API
-- consistent plotting parameters and return contracts
-- Python 3.9–3.12 quality matrix
-- deterministic pixel-level checks for representative chart families
-- executable headless gallery for every package-root plotting helper
-- public API reference validated against `MatplotLibAPI.__all__`
-- justified runtime dependency lower bounds
-- Python 3.9 minimum-dependency compatibility job
-- documented semantic-versioning and deprecation policy
-- regression tests for supported 4.0.x module imports and aliases
-- wheel and source-distribution validation in clean environments
-- PEP 561 `py.typed` packaging support
-- contribution, changelog, product, and release documentation
+> Make production-quality plotting equally simple, typed, predictable, and safe
+> for people and agents.
 
-## Release gate
+## 4.2.0 workstreams
 
-Release 4.1.0 may be published after the final GitHub Actions run passes and the
-release notes are reviewed. Publication must not overwrite an existing tag or
-PyPI version.
+### 1. Canonical contracts — #101
 
-## After 4.1.0
+- `PlotSpec`, `DataSource`, and `OutputSpec`
+- deterministic JSON round trips
+- strict JSON Schema export
+- schema-version migration hooks
+- `ValidationIssue`, `PlotValidationError`, and `RenderResult`
 
-Future work is managed as focused GitHub issues. New features must preserve the
-public API contract, pass the complete quality gate, and support `PRODUCT.md`.
+### 2. Registry and executor — #102
+
+- schema-rich `PlotDescriptor`
+- plugin API version 2 with version 1 compatibility
+- deterministic aliases, capabilities, examples, and output formats
+- OpenAI-compatible tool generation
+- one validated `execute_plot` path
+
+### 3. Safe interfaces — #103
+
+- workspace, row, column, cell, input-byte, and output-byte policies
+- `matplotlibapi` CLI
+- MCP generic and dedicated tools backed by the executor
+- schema-backed Codex discovery guidance
+- no credentials or hosted dependencies
+
+### 4. Quality and release — #104
+
+- deterministic agent evaluations
+- discovery and rendering benchmarks
+- contract, executor, CLI, safety, compatibility, and MCP tests
+- API reference, migration guidance, examples, and changelog
+- installed wheel and source-distribution smoke tests
+
+## 4.2.0 release gate
+
+- Python 3.9–3.12 matrix passes.
+- Black, pydocstyle, Pyright, pytest, and coverage pass.
+- Documentation and examples pass headlessly.
+- Plugin API version 1 compatibility remains tested.
+- MCP and CLI use the canonical registry and schemas.
+- Agent evaluations require no LLM or credentials.
+- Package artifacts install and pass public API smoke tests.
+- Release publication remains a separate governed action.
+
+## Later milestones
+
+### 4.3.0 — data-aware intelligence
+
+- richer local data profiling
+- deterministic chart recommendation explanations
+- safe plot-spec repair suggestions
+- accessibility and semantic formatting presets
+
+### 4.4.0 — plugin ecosystem
+
+- plugin template repository
+- conformance and compatibility suite
+- third-party descriptor documentation
+- plugin packaging and discovery guidance
+
+### 5.0.0 — intentional simplification
+
+- remove aliases only after the documented deprecation window
+- make `timeseries` canonical and retire `timeserie`
+- finalize plugin API version 2
+- separate heavyweight optional rendering backends where practical
