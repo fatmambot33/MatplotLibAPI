@@ -1,0 +1,86 @@
+name: Fix roadmap typing
+
+on:
+  push:
+    branches:
+      - agent/full-roadmap-4-3-to-5-0
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out roadmap branch
+        uses: actions/checkout@v5
+        with:
+          ref: agent/full-roadmap-4-3-to-5-0
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Apply explicit type narrowing
+        shell: python
+        run: |
+          from pathlib import Path
+
+          cli = Path("src/MatplotLibAPI/cli.py")
+          value = cli.read_text(encoding="utf-8")
+          value = value.replace(
+              '''            migrated = migrate_plot_spec_for_v5(spec)\n            if args.write:\n                output = policy.resolve_output_path(args.write)\n                output.parent.mkdir(parents=True, exist_ok=True)\n                output.write_text(migrated.to_json() + "\\n", encoding="utf-8")\n''',
+              '''            migrated = migrate_plot_spec_for_v5(spec)\n            output_path: Optional[str] = None\n            if args.write:\n                output = policy.resolve_output_path(args.write)\n                output.parent.mkdir(parents=True, exist_ok=True)\n                output.write_text(migrated.to_json() + "\\n", encoding="utf-8")\n                output_path = str(output)\n''',
+          )
+          value = value.replace(
+              '                    "output_path": str(output) if args.write else None,\n',
+              '                    "output_path": output_path,\n',
+          )
+          cli.write_text(value, encoding="utf-8")
+
+          evaluations = Path("src/MatplotLibAPI/evaluations.py")
+          value = evaluations.read_text(encoding="utf-8")
+          value = value.replace(
+              '        return pd_df[[category, value]]\n',
+              '        return pd.DataFrame(pd_df.loc[:, [category, value]])\n',
+          )
+          evaluations.write_text(value, encoding="utf-8")
+
+          intelligence = Path("src/MatplotLibAPI/intelligence.py")
+          value = intelligence.read_text(encoding="utf-8")
+          value = value.replace(
+              'from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union\n',
+              'from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union, cast\n',
+          )
+          value = value.replace(
+              '''    for column in frame.columns:\n        name = str(column)\n        series = sample[column]\n        missing_count = int(series.isna().sum())\n        unique_count = int(series.nunique(dropna=True))\n''',
+              '''    for index, column in enumerate(frame.columns):\n        name = str(column)\n        series = cast(pd.Series, sample.iloc[:, index])\n        missing_count = int(cast(Any, series.isna().sum()))\n        unique_count = int(cast(Any, series.nunique(dropna=True)))\n''',
+          )
+          value = value.replace(
+              '            mean = float(non_null.mean())\n',
+              '            mean = float(cast(Any, non_null.mean()))\n',
+          )
+          intelligence.write_text(value, encoding="utf-8")
+
+          workflow = Path(".github/workflows/fix-roadmap-types.yml")
+          workflow.unlink()
+
+      - name: Validate formatting and types
+        run: |
+          python -m pip install --disable-pip-version-check -e ".[dev]"
+          python -m black src tests
+          python -m pydocstyle src
+          python -m pyright src
+
+      - name: Commit the fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: narrow roadmap typing contracts"
+          git push origin HEAD:agent/full-roadmap-4-3-to-5-0
