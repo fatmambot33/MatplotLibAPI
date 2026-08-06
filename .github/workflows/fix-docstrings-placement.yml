@@ -20,58 +20,44 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Correct magic-method docstrings
+      - name: Normalize magic-method docstrings
         run: |
           python - <<'PY'
           from pathlib import Path
 
           path = Path("src/MatplotLibAPI/specs.py")
-          text = path.read_text()
-          stacked = '''    def __post_init__(self) -> None:
-              """Validate and normalize the canonical plot request."""
-              """Validate output format and rendering limits."""
-              """Validate that exactly one data source is configured."""
-          '''
-          data_source = '''    def __post_init__(self) -> None:
-              """Validate that exactly one data source is configured."""
-          '''
-          if stacked not in text:
-              raise SystemExit("stacked DataSource docstrings not found")
-          text = text.replace(stacked, data_source, 1)
+          lines = path.read_text().splitlines()
 
-          output_old = '''    transparent: bool = False
+          expected = {
+              "DataSource": "Validate that exactly one data source is configured.",
+              "OutputSpec": "Validate output format and rendering limits.",
+              "PlotSpec": "Validate and normalize the canonical plot request.",
+          }
 
-              def __post_init__(self) -> None:
-                  issues: List[ValidationIssue] = []
-          '''
-          output_new = '''    transparent: bool = False
+          for class_name, message in expected.items():
+              class_index = next(
+                  index
+                  for index, line in enumerate(lines)
+                  if line == f"class {class_name}:"
+              )
+              method_index = next(
+                  index
+                  for index in range(class_index + 1, len(lines))
+                  if lines[index].startswith("    def __post_init__(self) -> None:")
+              )
+              insertion_index = method_index + 1
+              while (
+                  insertion_index < len(lines)
+                  and lines[insertion_index].strip().startswith('"""')
+                  and lines[insertion_index].strip().endswith('"""')
+              ):
+                  del lines[insertion_index]
+              lines.insert(insertion_index, f'        """{message}"""')
 
-              def __post_init__(self) -> None:
-                  """Validate output format and rendering limits."""
-                  issues: List[ValidationIssue] = []
-          '''
-          if output_old not in text:
-              raise SystemExit("OutputSpec __post_init__ pattern not found")
-          text = text.replace(output_old, output_new, 1)
-
-          plot_old = '''    schema_version: str = PLOT_SPEC_SCHEMA_VERSION
-
-              def __post_init__(self) -> None:
-                  issues: List[ValidationIssue] = []
-          '''
-          plot_new = '''    schema_version: str = PLOT_SPEC_SCHEMA_VERSION
-
-              def __post_init__(self) -> None:
-                  """Validate and normalize the canonical plot request."""
-                  issues: List[ValidationIssue] = []
-          '''
-          if plot_old not in text:
-              raise SystemExit("PlotSpec __post_init__ pattern not found")
-          path.write_text(text.replace(plot_old, plot_new, 1))
+          path.write_text("\n".join(lines) + "\n")
           PY
-          python -m pip install black==25.11.0
+          python -m pip install black==25.11.0 pydocstyle
           python -m black src tests
-          python -m pip install pydocstyle
           python -m pydocstyle src
       - name: Commit fixes and remove helper workflow
         run: |
