@@ -1,7 +1,7 @@
 {
   "name": "matplotlibapi",
-  "version": "4.1.0",
-  "description": "Create reliable charts and visual analysis with MatplotLibAPI in Codex.",
+  "version": "4.2.0",
+  "description": "Create validated, schema-driven local charts with MatplotLibAPI in Codex.",
   "author": {
     "name": "FaTmamBo33",
     "url": "https://github.com/fatmambot33"
@@ -9,20 +9,20 @@
   "homepage": "https://github.com/fatmambot33/MatplotLibAPI",
   "repository": "https://github.com/fatmambot33/MatplotLibAPI",
   "license": "MIT",
-  "keywords": ["matplotlib", "charts", "visualization", "data", "codex", "python"],
+  "keywords": ["matplotlib", "charts", "visualization", "data", "codex", "python", "json-schema"],
   "skills": "./skills/",
   "interface": {
     "displayName": "MatplotLibAPI",
-    "shortDescription": "Production-ready charts from Codex",
-    "longDescription": "Install MatplotLibAPI from Git and use its typed plotting registry to inspect data, choose a chart, render figures, and save reproducible outputs.",
+    "shortDescription": "Schema-driven local charts",
+    "longDescription": "Use MatplotLibAPI's typed plot specifications and registry to inspect local data, discover chart schemas, validate requests, render reproducible figures, and save workspace-constrained outputs.",
     "developerName": "FaTmamBo33",
     "category": "Data & Analytics",
     "capabilities": ["Read", "Interactive"],
     "websiteURL": "https://github.com/fatmambot33/MatplotLibAPI",
     "defaultPrompt": [
-      "Choose the best chart for this dataset.",
-      "Create a polished chart and save it.",
-      "Inspect available MatplotLibAPI plots."
+      "Inspect this dataset and recommend the simplest useful chart.",
+      "Create a validated PlotSpec and render a polished chart.",
+      "Show the available MatplotLibAPI plot schemas."
     ],
     "brandColor": "#F97316"
   }
