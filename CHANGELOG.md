@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 4.4.1 - 2026-08-06
+
+### Changed
+
+- Migrated package publication to PyPI Trusted Publishing with GitHub OIDC.
+- Removed the long-lived PyPI token fallback from the release workflow.
+
 ## 4.4.0 - 2026-08-06
 
 ### Added
