@@ -1,10 +1,10 @@
 # Roadmap
 
-## Status: 4.2.0 implementation complete; validation in progress
+## Status: 4.2.0 complete and published
 
-The 4.1.0 quality foundation is complete and published. The 4.2.0 milestone
-turns MatplotLibAPI into one schema-driven local visualization engine for Python,
-plugins, the CLI, MCP clients, Codex, and other agents.
+MatplotLibAPI 4.2.0 is implemented, validated, merged, tagged, and published.
+The milestone turns MatplotLibAPI into one schema-driven local visualization
+engine for Python, plugins, the CLI, MCP clients, Codex, and other agents.
 
 ## North star
 
@@ -45,16 +45,21 @@ plugins, the CLI, MCP clients, Codex, and other agents.
 - API reference, migration guidance, examples, and changelog
 - installed wheel and source-distribution smoke tests
 
-## 4.2.0 release gate
+## 4.2.0 completion record
 
-- Python 3.9–3.12 matrix passes.
-- Black 25.11.0, pydocstyle, Pyright, pytest, and coverage pass.
-- Documentation and examples pass headlessly.
-- Plugin API version 1 compatibility remains tested.
-- MCP and CLI use the canonical registry and schemas.
-- Agent evaluations require no LLM or credentials.
-- Package artifacts install and pass public API smoke tests.
-- Release publication remains a separate governed action.
+- [x] Python 3.9–3.12 matrix passes.
+- [x] Black 25.11.0, pydocstyle, Pyright, pytest, and coverage pass.
+- [x] Documentation and examples pass headlessly.
+- [x] Plugin API version 1 compatibility remains tested.
+- [x] MCP and CLI use the canonical registry and schemas.
+- [x] Agent evaluations require no LLM or credentials.
+- [x] Package artifacts install and pass public API smoke tests.
+- [x] PR #105 was squash-merged into `main`.
+- [x] Tag and GitHub release `v4.2.0` were created.
+- [x] Wheel, source distribution, and CycloneDX SBOM were attached.
+- [x] Package attestations were generated.
+- [x] MatplotLibAPI 4.2.0 was published to PyPI.
+- [x] Issues #100–#104 were closed as completed.
 
 ## Later milestones
 
