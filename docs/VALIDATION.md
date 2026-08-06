@@ -16,7 +16,8 @@ plotting roadmap in pull request #105.
 - Wheel build, content inspection, installation, and public API smoke testing
   reached the installed-artifact validation stages successfully.
 - Black 25.11.0 formatting passes for `src` and `tests`.
-- NumPy-style docstrings were added for all new public magic methods.
+- NumPy-style pydocstyle validation passes for the complete `src` tree.
+- All new public magic methods have focused contract docstrings.
 
 The complete Python 3.9–3.12 quality matrix, package checks, AI-native contract,
 and CodeQL remain the authoritative merge gate.
