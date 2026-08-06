@@ -30,7 +30,7 @@ plugin:
       require_local_env: false
 commands:
   required: [validate, test, docs, examples, upgrade, uninstall]
-  recommended: [eval, benchmark]
+  recommended: [eval, benchmark, inspect, recommend, repair, migrate, compatibility]
 interfaces:
   sdk: true
   cli: true
@@ -47,6 +47,10 @@ quality:
   compatibility_tests: true
   ai_evaluations: true
   benchmark: true
+  explainable_recommendations: true
+  bounded_data_profiling: true
+  plugin_conformance: true
+  compatibility_gate: true
 self_improvement:
   enabled: true
   github: {issues: true}
@@ -79,3 +83,7 @@ agent:
     - issue_driven_improvement
     - ci_validated_changes
     - governed_autonomy
+    - bounded_local_profiling
+    - explainable_recommendations
+    - opt_in_repairs
+    - executable_compatibility_gates

@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from time import perf_counter
 from typing import Any, Dict, List, Mapping, Sequence
 
 import pandas as pd
 
+from .conformance import validate_registry_conformance
 from .executor import inspect_dataframe, recommend_plot
+from .intelligence import suggest_plot_spec_repairs
+from .migration import migrate_plot_spec_for_v5, v5_compatibility_status
+from .plugins import PluginRegistry
 from .specs import PlotSpec, PlotValidationError
 
 
@@ -49,6 +54,16 @@ def _recommendation_cases() -> Sequence[Mapping[str, Any]]:
             "expected": "correlation_matrix",
         },
         {
+            "name": "datetime-and-value",
+            "frame": pd.DataFrame(
+                {
+                    "date": pd.to_datetime(["2026-01-01", "2026-01-02"]),
+                    "value": [1, 2],
+                }
+            ),
+            "expected": "timeseries",
+        },
+        {
             "name": "non-numeric",
             "frame": pd.DataFrame({"name": ["A", "B"]}),
             "expected": "table",
@@ -56,8 +71,20 @@ def _recommendation_cases() -> Sequence[Mapping[str, Any]]:
     )
 
 
+def _repair_registry() -> PluginRegistry:
+    """Build a tiny deterministic registry for repair evaluation."""
+
+    def plot(pd_df: pd.DataFrame, category: str, value: str) -> pd.DataFrame:
+        """Return the selected columns for repair evaluation."""
+        return pd_df[[category, value]]
+
+    registry = PluginRegistry()
+    registry.context.register_plot("bar", plot)
+    return registry
+
+
 def run_agent_evaluations() -> Dict[str, Any]:
-    """Run deterministic schema and chart-selection evaluations."""
+    """Run deterministic intelligence, schema, and compatibility evaluations."""
     started = perf_counter()
     results: List[EvaluationResult] = []
     for case in _recommendation_cases():
@@ -101,6 +128,58 @@ def run_agent_evaluations() -> Dict[str, Any]:
             passed=missing == 1,
             expected=1,
             actual=missing,
+        )
+    )
+
+    repair_spec = PlotSpec.from_dict(
+        {
+            "chart": "bar",
+            "encoding": {"category": "categroy", "value": "value"},
+        }
+    )
+    repairs = suggest_plot_spec_repairs(
+        repair_spec,
+        pd.DataFrame({"category": ["A"], "value": [1]}),
+        registry=_repair_registry(),
+    )
+    repair_code = repairs[0].code if repairs else None
+    results.append(
+        EvaluationResult(
+            name="repair-missing-column",
+            passed=repair_code == "repair.missing_column",
+            expected="repair.missing_column",
+            actual=repair_code,
+        )
+    )
+
+    migrated = migrate_plot_spec_for_v5(PlotSpec.from_dict({"chart": "timeserie"}))
+    results.append(
+        EvaluationResult(
+            name="v5-canonical-timeseries",
+            passed=migrated.chart == "timeseries",
+            expected="timeseries",
+            actual=migrated.chart,
+        )
+    )
+
+    gate = v5_compatibility_status(as_of=date(2026, 8, 6))
+    results.append(
+        EvaluationResult(
+            name="v5-removal-gate",
+            passed=gate["breaking_removals_allowed"] is False,
+            expected=False,
+            actual=gate["breaking_removals_allowed"],
+        )
+    )
+
+    conformance_registry = _repair_registry()
+    conformance = validate_registry_conformance(conformance_registry)
+    results.append(
+        EvaluationResult(
+            name="plugin-conformance",
+            passed=conformance.passed,
+            expected=True,
+            actual=conformance.passed,
         )
     )
 

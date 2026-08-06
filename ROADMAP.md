@@ -1,85 +1,59 @@
 # Roadmap
 
-## Status: 4.2.0 complete and published
+## Status: 4.3.0 and 4.4.0 implemented; 5.0 readiness implemented and gated
 
-MatplotLibAPI 4.2.0 is implemented, validated, merged, tagged, and published.
-The milestone turns MatplotLibAPI into one schema-driven local visualization
-engine for Python, plugins, the CLI, MCP clients, Codex, and other agents.
+MatplotLibAPI 4.4.0 completes every non-breaking item in the published roadmap.
+The intentional 5.0 removal step is prepared by executable migration tooling and
+is blocked until the documented compatibility date and explicit approval.
 
 ## North star
 
-> Make production-quality plotting equally simple, typed, predictable, and safe
-> for people and agents.
+> Make production-quality plotting equally simple, typed, predictable, safe,
+> explainable, and extensible for people and agents.
 
-## 4.2.0 workstreams
+## 4.3.0 — data-aware intelligence — #107, #108
 
-### 1. Canonical contracts — #101
+- [x] bounded deterministic dataframe profiles
+- [x] semantic column roles, missingness, cardinality, ranges, and examples
+- [x] ranked chart recommendations with scores, reasons, and warnings
+- [x] opt-in PlotSpec repair suggestions
+- [x] high-contrast and colorblind accessibility presets
+- [x] semantic number, integer, percent, currency, and compact formatting
+- [x] Python, CLI, MCP, Codex, and schema parity
 
-- `PlotSpec`, `DataSource`, and `OutputSpec`
-- deterministic JSON round trips
-- strict JSON Schema export
-- schema-version migration hooks
-- `ValidationIssue`, `PlotValidationError`, and `RenderResult`
+## 4.4.0 — plugin ecosystem — #109
 
-### 2. Registry and executor — #102
+- [x] official installable plugin scaffold
+- [x] descriptor, alias, example, output, and OpenAI-tool conformance suite
+- [x] structured machine-readable conformance results
+- [x] CLI scaffold and conformance commands
+- [x] third-party packaging and entry-point discovery guidance
+- [x] plugin API version 1 compatibility diagnostics
 
-- schema-rich `PlotDescriptor`
-- plugin API version 2 with version 1 compatibility
-- deterministic aliases, capabilities, examples, and output formats
-- OpenAI-compatible tool generation
-- one validated `execute_plot` path
+## 5.0.0 — intentional simplification readiness — #110
 
-### 3. Safe interfaces — #103
+- [x] `timeseries` is canonical across descriptors, recommendations, CLI, and MCP
+- [x] `timeserie`, `histogram`, and `pie` migration diagnostics
+- [x] explicit non-mutating PlotSpec migration helper and CLI
+- [x] executable breaking-removal date gate
+- [x] plugin API version 2 readiness diagnostics
+- [x] Plotly static export dependencies isolated in `plotly-export`
+- [ ] remove compatibility aliases and plugin API v1 support
 
-- workspace, row, column, cell, input-byte, and output-byte policies
-- `matplotlibapi` CLI
-- MCP generic and dedicated tools backed by the executor
-- schema-backed Codex discovery guidance
-- no credentials or hosted dependencies
+The final unchecked removal is intentionally blocked until **2027-02-06**. It
+requires a new major-release PR, explicit human approval, green migration
+evidence, and no unresolved legacy-plugin findings. Skipping this gate would
+violate the repository compatibility policy.
 
-### 4. Quality and release — #104
+## Quality and release gate — #111
 
-- deterministic agent evaluations
-- discovery and rendering benchmarks
-- contract, executor, CLI, safety, compatibility, and MCP tests
-- API reference, migration guidance, examples, and changelog
-- installed wheel and source-distribution smoke tests
+- [x] deterministic local evaluations cover intelligence and migration behavior
+- [x] contract tests cover profiles, repairs, presets, conformance, and gating
+- [x] strict public API documentation remains generated and checked
+- [x] Python 3.9 syntax and compatibility are retained
+- [x] wheel/sdist, SBOM, attestations, and release automation remain authoritative
 
-## 4.2.0 completion record
+## Program tracking
 
-- [x] Python 3.9–3.12 matrix passes.
-- [x] Black 25.11.0, pydocstyle, Pyright, pytest, and coverage pass.
-- [x] Documentation and examples pass headlessly.
-- [x] Plugin API version 1 compatibility remains tested.
-- [x] MCP and CLI use the canonical registry and schemas.
-- [x] Agent evaluations require no LLM or credentials.
-- [x] Package artifacts install and pass public API smoke tests.
-- [x] PR #105 was squash-merged into `main`.
-- [x] Tag and GitHub release `v4.2.0` were created.
-- [x] Wheel, source distribution, and CycloneDX SBOM were attached.
-- [x] Package attestations were generated.
-- [x] MatplotLibAPI 4.2.0 was published to PyPI.
-- [x] Issues #100–#104 were closed as completed.
-
-## Later milestones
-
-### 4.3.0 — data-aware intelligence
-
-- richer local data profiling
-- deterministic chart recommendation explanations
-- safe plot-spec repair suggestions
-- accessibility and semantic formatting presets
-
-### 4.4.0 — plugin ecosystem
-
-- plugin template repository
-- conformance and compatibility suite
-- third-party descriptor documentation
-- plugin packaging and discovery guidance
-
-### 5.0.0 — intentional simplification
-
-- remove aliases only after the documented deprecation window
-- make `timeseries` canonical and retire `timeserie`
-- finalize plugin API version 2
-- separate heavyweight optional rendering backends where practical
+The complete execution program is tracked by #106. Implementation branch:
+`agent/full-roadmap-4-3-to-5-0`.

@@ -4,6 +4,31 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 4.4.0 - 2026-08-06
+
+### Added
+
+- Bounded deterministic `DataProfile` and `ColumnProfile` contracts.
+- Ranked `PlotRecommendation` results with scores, reasons, and warnings.
+- Opt-in `RepairSuggestion` generation and explicit repair application.
+- Serializable `PresentationSpec` accessibility and semantic formatting presets.
+- Official plugin scaffold, conformance suite, CLI commands, and packaging guide.
+- 5.0 migration audit, canonicalization, and executable compatibility status.
+- MCP tools for profiling, recommendations, repairs, and compatibility evidence.
+
+### Changed
+
+- Made `timeseries` canonical while retaining `timeserie` as a compatibility alias.
+- Extended deterministic evaluations to intelligence, conformance, and migration.
+- Isolated Plotly static export tooling in the `plotly-export` optional extra.
+
+### Compatibility
+
+- Breaking alias and plugin API v1 removals are blocked until 2027-02-06.
+- All 4.x compatibility aliases and plugin API v1 loading remain enabled.
+
+## 4.2.0 - 2026-08-06
+
 ### Added
 
 - Canonical `PlotSpec`, `DataSource`, `OutputSpec`, `RenderResult`, and

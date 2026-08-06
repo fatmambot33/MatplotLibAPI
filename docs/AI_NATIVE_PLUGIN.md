@@ -1,53 +1,47 @@
-# AI-native plugin guide
+# AI-native plugin surface
 
-## Install
+MatplotLibAPI exposes one deterministic plotting contract across Python, the
+CLI, Codex, MCP, and third-party plugins. It requires no credentials, remote
+services, or hosted model calls.
 
-```bash
-pip install MatplotLibAPI
-```
+## Discovery
 
-For MCP:
-
-```bash
-pip install "MatplotLibAPI[mcp]"
-```
-
-For local development:
-
-```bash
-git clone https://github.com/fatmambot33/MatplotLibAPI.git
-cd MatplotLibAPI
-pip install -e '.[dev]'
-```
-
-## Install the Codex plugin
-
-```bash
-codex plugin marketplace add fatmambot33/MatplotLibAPI --ref main
-codex plugin add matplotlibapi@fatmambot33-matplotlibapi
-```
-
-## Canonical discovery
-
-The plugin should discover plots through the package registry rather than
-hard-coding function names:
+The canonical registry publishes schema-rich `PlotDescriptor` objects and
+OpenAI-compatible function tools. The same registry drives validation and
+execution, preventing interface-specific chart definitions.
 
 ```python
-from MatplotLibAPI import PlotSpec, create_registry, execute_plot
+from MatplotLibAPI import create_registry, openai_tool_definitions
 
 registry = create_registry()
 print(registry.context.list_descriptors())
-print(registry.context.openai_tools())
-print(PlotSpec.json_schema())
+print(openai_tool_definitions(registry=registry))
 ```
 
-Use `PlotSpec` and `execute_plot` for validated rendering. Use a restrictive
-`RenderPolicy` whenever local paths are accepted. CLI and MCP interfaces derive
-their discovery metadata from the same registry.
+## Data intelligence
 
-## Credential and data policy
+Agents should profile locally with `profile_dataframe`, review ranked results
+from `recommend_plots`, and report the reasons behind a recommendation. Profiles
+are bounded and deterministic. Repairs from `suggest_plot_spec_repairs` are
+structured and opt-in; never silently mutate a user request.
 
-MatplotLibAPI requires no credentials. Never request API keys, hosted
-authentication, secret-store access, or remote data uploads for this plugin.
-All plotting and profiling run locally against files or table records the user
-has explicitly provided.
+## Plugin ecosystem
+
+Plugin API version 2 is canonical. Use:
+
+```bash
+matplotlibapi plugins scaffold example-plugin ./example-plugin
+matplotlibapi plugins conform
+```
+
+The official scaffold uses only public APIs. The conformance runner checks
+plugin versions, descriptors, schemas, aliases, examples, output formats, and
+generated tool names. Version 1 plugins remain loadable during the documented
+4.x compatibility window and appear in compatibility diagnostics.
+
+## Canonical naming and 5.0
+
+Use `timeseries` as the canonical chart name. `timeserie`, `histogram`, and
+`pie` remain compatibility aliases. Use `matplotlibapi migrate` and
+`matplotlibapi compatibility` before a 5.0 transition. Breaking removals are
+forbidden before 2027-02-06 and still require explicit human approval.

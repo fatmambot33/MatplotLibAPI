@@ -11,16 +11,20 @@ Run:
 matplotlibapi eval
 ```
 
-The baseline verifies:
+The machine-readable baseline verifies:
 
-- categorical plus numeric data recommends a bar chart
-- one numeric column recommends a histogram
-- multiple numeric columns recommend a correlation matrix
-- non-numeric data recommends a table
+- categorical and numeric data recommends a bar chart
+- numeric distributions and correlations are ranked deterministically
+- datetime and numeric data uses the canonical `timeseries` chart
+- recommendation results include scores and explicit reasons
+- bounded profiles report semantic roles, missingness, and truncation
 - invalid specifications are rejected with stable codes
-- local profiling reports missing values correctly
+- safe repair suggestions are non-mutating and explicitly applicable
+- the core registry passes plugin conformance
+- legacy chart names produce 5.0 migration notices
+- the breaking-removal gate remains closed before 2027-02-06
 
-The command emits machine-readable JSON and exits non-zero if any case fails.
+The command exits non-zero if any case fails.
 
 ## Discovery benchmark
 

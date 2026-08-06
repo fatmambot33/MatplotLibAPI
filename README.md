@@ -11,10 +11,11 @@ without credentials or hosted services.
 pip install MatplotLibAPI
 ```
 
-Install optional MCP support with:
+Install optional MCP and Plotly static-export support with:
 
 ```bash
 pip install "MatplotLibAPI[mcp]"
+pip install "MatplotLibAPI[plotly-export]"
 ```
 
 ## Python quick start
@@ -64,6 +65,12 @@ spec = PlotSpec.from_dict(
             "value": "revenue",
         },
         "options": {"stacked": False},
+        "presentation": {
+            "accessibility": "colorblind",
+            "number_format": "currency",
+            "currency": "EUR",
+            "alt_text": "Revenue by product.",
+        },
         "output": {"format": "png", "path": "charts/revenue.png"},
     }
 )
@@ -88,7 +95,15 @@ print(openai_tool_definitions(registry=registry))
 
 Each registered plot has one `PlotDescriptor` containing its callable,
 parameter schema, backend, capabilities, aliases, examples, and supported output
-formats. Legacy plugin API version 1 remains accepted; new plugins use version 2.
+formats. Plugin API version 2 is canonical; version 1 remains accepted during the
+documented 4.x compatibility window.
+
+Create and validate a third-party plugin with:
+
+```bash
+matplotlibapi plugins scaffold example-plugin ./example-plugin
+matplotlibapi plugins conform
+```
 
 ## Command line
 
@@ -99,6 +114,10 @@ matplotlibapi schema plot-spec
 matplotlibapi schema openai-tools
 matplotlibapi inspect data.csv
 matplotlibapi recommend data.csv
+matplotlibapi repair plot.json --data data.csv
+matplotlibapi presets list
+matplotlibapi migrate plot.json
+matplotlibapi compatibility
 matplotlibapi validate plot.json
 matplotlibapi render plot.json --data data.csv --output chart.png
 matplotlibapi doctor
@@ -120,8 +139,40 @@ matplotlibapi-mcp
 ```
 
 The MCP generic renderer and dedicated tools use the same canonical executor and
-registry metadata. `describe_plot_modules` also returns plot descriptors and
-OpenAI-compatible tool schemas.
+registry metadata. MCP also exposes bounded profiling, ranked recommendations,
+repair suggestions, and compatibility status. `describe_plot_modules` returns
+plot descriptors and OpenAI-compatible tool schemas.
+
+## Data-aware intelligence
+
+```python
+import pandas as pd
+from MatplotLibAPI import PlotSpec, profile_dataframe, recommend_plots
+
+frame = pd.DataFrame(
+    {
+        "date": pd.to_datetime(["2026-01-01", "2026-02-01"]),
+        "revenue": [100, 125],
+    }
+)
+profile = profile_dataframe(frame)
+recommendations = recommend_plots(profile)
+spec = PlotSpec.from_dict(
+    {
+        "chart": recommendations[0].chart,
+        "encoding": recommendations[0].encoding,
+    }
+)
+```
+
+Profiles are bounded and deterministic. Recommendations include scores, reasons,
+and warnings. Repair suggestions are opt-in and never mutate the source spec.
+
+## Canonical time-series API and 5.0 preparation
+
+`timeseries` and `fplot_timeseries` are canonical. The historic `timeserie`
+spelling remains available until the executable compatibility gate permits a
+5.0 removal after 2027-02-06. Use `matplotlibapi migrate` before that boundary.
 
 ## Stable package-root API
 
@@ -130,6 +181,7 @@ OpenAI-compatible tool schemas.
 - `PLOT_SPEC_SCHEMA_VERSION`
 - `DataSource`
 - `OutputSpec`
+- `PresentationSpec`
 - `PlotSpec`
 - `PlotValidationError`
 - `ValidationIssue`
@@ -139,7 +191,13 @@ OpenAI-compatible tool schemas.
 - `validate_plot_request`
 - `inspect_dataframe`
 - `recommend_plot`
+- `profile_dataframe`
+- `recommend_plots`
+- `suggest_plot_spec_repairs`
+- `apply_repair_suggestions`
 - `migrate_plot_spec`
+- `migrate_plot_spec_for_v5`
+- `v5_compatibility_status`
 - `openai_tool_definitions`
 
 ### Plugin surface
@@ -152,6 +210,9 @@ OpenAI-compatible tool schemas.
 - `CorePlotsPlugin`
 - `create_registry`
 - `infer_plot_descriptor`
+- `validate_plugin_conformance`
+- `validate_registry_conformance`
+- `write_plugin_scaffold`
 
 ### Plotting helpers
 
@@ -165,8 +226,8 @@ OpenAI-compatible tool schemas.
 - `fplot_sankey`
 - `fplot_sunburst`
 - `fplot_table`
-- `fplot_timeserie`
-- `fplot_timeseries`
+- `fplot_timeseries` (canonical)
+- `fplot_timeserie` (compatibility alias)
 - `fplot_treemap`
 - `fplot_waffle`
 - `fplot_wordcloud`
@@ -194,8 +255,9 @@ matplotlibapi eval
 python scripts/benchmark_agent_plotting.py
 ```
 
-It covers chart recommendations, invalid specification rejection, profiling,
-schema discovery, and local performance budgets.
+It covers explained chart recommendations, invalid specification rejection,
+bounded profiling, opt-in repair suggestions, plugin conformance, 5.0 migration
+gates, schema discovery, and local performance budgets.
 
 ## Development
 
@@ -208,5 +270,6 @@ python -m build
 python -m twine check dist/*
 ```
 
-See `docs/PLOT_SPEC.md`, `docs/API_REFERENCE.md`, `docs/AGENT_EVALS.md`, and
-`CONTRIBUTING.md` for the complete contracts.
+See `docs/PLOT_SPEC.md`, `docs/DATA_INTELLIGENCE.md`,
+`docs/PLUGIN_ECOSYSTEM.md`, `docs/MIGRATING_TO_5.md`,
+`docs/API_REFERENCE.md`, and `CONTRIBUTING.md` for the complete contracts.

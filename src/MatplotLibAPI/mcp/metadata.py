@@ -52,8 +52,12 @@ PLOT_MODULE_PARAMETER_HINTS: Dict[str, Dict[str, str]] = {
         "value": "Flow/weight column name.",
     },
     "table": {},
-    "timeserie": {
+    "timeseries": {
         "x": "Datetime or ordered x-axis column name.",
+        "y": "List of y-axis series columns.",
+    },
+    "timeserie": {
+        "x": "Compatibility alias for the canonical timeseries tool.",
         "y": "List of y-axis series columns.",
     },
     "wordcloud": {
@@ -83,6 +87,7 @@ DEDICATED_PLOT_TOOLS: Dict[str, str] = {
     "plot_waffle": "waffle",
     "plot_sankey": "sankey",
     "plot_table": "table",
+    "plot_timeseries": "timeseries",
     "plot_timeserie": "timeserie",
     "plot_wordcloud": "wordcloud",
     "plot_treemap": "treemap",

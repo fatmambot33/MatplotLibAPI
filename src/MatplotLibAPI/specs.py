@@ -9,6 +9,15 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 PLOT_SPEC_SCHEMA_VERSION = "1.0"
 _ALLOWED_OUTPUT_FORMATS = ("figure", "png", "svg", "json")
+_ALLOWED_ACCESSIBILITY_PRESETS = ("default", "high-contrast", "colorblind")
+_ALLOWED_NUMBER_FORMATS = (
+    "auto",
+    "number",
+    "integer",
+    "percent",
+    "currency",
+    "compact",
+)
 
 
 @dataclass(frozen=True)
@@ -38,6 +47,7 @@ class PlotValidationError(ValueError):
     """Raised when a plot specification or execution input is invalid."""
 
     def __init__(self, issues: Iterable[ValidationIssue]) -> None:
+        """Initialize the error from structured validation issues."""
         self.issues = tuple(issues)
         message = "; ".join(issue.message for issue in self.issues)
         super().__init__(message or "Plot validation failed")
@@ -164,6 +174,76 @@ class OutputSpec:
 
 
 @dataclass(frozen=True)
+class PresentationSpec:
+    """Accessible and semantic presentation preferences."""
+
+    accessibility: str = "default"
+    number_format: str = "auto"
+    currency: str = "USD"
+    alt_text: Optional[str] = None
+    show_grid: bool = True
+
+    def __post_init__(self) -> None:
+        """Validate presentation presets."""
+        issues: List[ValidationIssue] = []
+        if self.accessibility not in _ALLOWED_ACCESSIBILITY_PRESETS:
+            issues.append(
+                ValidationIssue(
+                    code="presentation.unsupported_accessibility",
+                    message=f"Unsupported accessibility preset: {self.accessibility!r}.",
+                    path=("presentation", "accessibility"),
+                    details={"supported": list(_ALLOWED_ACCESSIBILITY_PRESETS)},
+                )
+            )
+        if self.number_format not in _ALLOWED_NUMBER_FORMATS:
+            issues.append(
+                ValidationIssue(
+                    code="presentation.unsupported_number_format",
+                    message=f"Unsupported number format: {self.number_format!r}.",
+                    path=("presentation", "number_format"),
+                    details={"supported": list(_ALLOWED_NUMBER_FORMATS)},
+                )
+            )
+        if not self.currency or len(self.currency) > 8:
+            issues.append(
+                ValidationIssue(
+                    code="presentation.invalid_currency",
+                    message="presentation.currency must be a short non-empty code or symbol.",
+                    path=("presentation", "currency"),
+                )
+            )
+        if issues:
+            raise PlotValidationError(issues)
+
+    @classmethod
+    def from_dict(cls, value: Optional[Mapping[str, Any]]) -> "PresentationSpec":
+        """Build presentation preferences from a mapping."""
+        if value is None:
+            return cls()
+        return cls(
+            accessibility=str(value.get("accessibility", "default")),
+            number_format=str(value.get("number_format", "auto")),
+            currency=str(value.get("currency", "USD")),
+            alt_text=(
+                str(value["alt_text"]) if value.get("alt_text") is not None else None
+            ),
+            show_grid=bool(value.get("show_grid", True)),
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Return a JSON-serializable representation."""
+        result: Dict[str, Any] = {
+            "accessibility": self.accessibility,
+            "number_format": self.number_format,
+            "currency": self.currency,
+            "show_grid": self.show_grid,
+        }
+        if self.alt_text is not None:
+            result["alt_text"] = self.alt_text
+        return result
+
+
+@dataclass(frozen=True)
 class PlotSpec:
     """Canonical, serializable request for one chart."""
 
@@ -173,6 +253,7 @@ class PlotSpec:
     title: Optional[str] = None
     data: Optional[DataSource] = None
     output: OutputSpec = field(default_factory=OutputSpec)
+    presentation: PresentationSpec = field(default_factory=PresentationSpec)
     metadata: Mapping[str, Any] = field(default_factory=dict)
     schema_version: str = PLOT_SPEC_SCHEMA_VERSION
 
@@ -228,6 +309,7 @@ class PlotSpec:
         migrated = migrate_plot_spec(value)
         data_value = migrated.get("data")
         output_value = migrated.get("output")
+        presentation_value = migrated.get("presentation")
         return cls(
             chart=str(migrated.get("chart", "")),
             encoding=dict(migrated.get("encoding", {})),
@@ -242,6 +324,9 @@ class PlotSpec:
             ),
             output=OutputSpec.from_dict(
                 output_value if isinstance(output_value, Mapping) else None
+            ),
+            presentation=PresentationSpec.from_dict(
+                presentation_value if isinstance(presentation_value, Mapping) else None
             ),
             metadata=dict(migrated.get("metadata", {})),
             schema_version=str(
@@ -285,6 +370,7 @@ class PlotSpec:
             "encoding": dict(self.encoding),
             "options": dict(self.options),
             "output": self.output.to_dict(),
+            "presentation": self.presentation.to_dict(),
         }
         if self.title is not None:
             result["title"] = self.title
@@ -338,6 +424,25 @@ class PlotSpec:
                             "additionalProperties": False,
                         },
                     ],
+                },
+                "presentation": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        "accessibility": {
+                            "type": "string",
+                            "enum": list(_ALLOWED_ACCESSIBILITY_PRESETS),
+                            "default": "default",
+                        },
+                        "number_format": {
+                            "type": "string",
+                            "enum": list(_ALLOWED_NUMBER_FORMATS),
+                            "default": "auto",
+                        },
+                        "currency": {"type": "string", "default": "USD"},
+                        "alt_text": {"type": ["string", "null"]},
+                        "show_grid": {"type": "boolean", "default": True},
+                    },
                 },
                 "output": {
                     "type": "object",
@@ -438,6 +543,7 @@ __all__ = [
     "PLOT_SPEC_SCHEMA_VERSION",
     "DataSource",
     "OutputSpec",
+    "PresentationSpec",
     "PlotSpec",
     "PlotValidationError",
     "RenderResult",
