@@ -26,7 +26,7 @@ core = "MatplotLibAPI.plugins:CorePlotsPlugin"
 dev = [
     "pydocstyle",
     "pyright",
-    "black==25.11.0",
+    "black==26.5.1",
     "pytest",
     "pytest-cov",
     "tomli",
