@@ -62,7 +62,7 @@ documented compatibility window and are surfaced in compatibility diagnostics.
 - `migrate_plot_spec_for_v5` — return a canonicalized PlotSpec.
 - `v5_compatibility_status` — report the explicit breaking-removal gate.
 
-`timeseries` is canonical in descriptors, CLI, MCP, and recommendations.
+`timeseries` is canonical in descriptors, CLI, and recommendations.
 `timeserie` remains a compatibility alias until the 5.0 gate permits removal.
 
 ## Types and pandas integration
@@ -99,10 +99,10 @@ These remain supported at their module paths:
 - `MatplotLibAPI.network.NetworkGraph`
 - `MatplotLibAPI.Pivot.plot_pivoted_bars`
 
-## Command-line and MCP interfaces
+## Command-line and agent interfaces
 
 The `matplotlibapi` entry point exposes discovery, validation, rendering,
 profiling, explained recommendations, repair suggestions, presentation presets,
 plugin scaffolding and conformance, migration diagnostics, compatibility gates,
-evaluations, and benchmarks. `matplotlibapi-mcp` exposes the same intelligence
-and canonical registry contract over stdio when MCP support is installed.
+evaluations, and benchmarks. Agent integrations use the same canonical registry
+through plugins and generated OpenAI-compatible tool definitions.
