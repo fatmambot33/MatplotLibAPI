@@ -177,3 +177,19 @@ jobs:
           /tmp/matplotlibapi-sdist/bin/python -m pip install dist/*.tar.gz
           cd /tmp
           /tmp/matplotlibapi-sdist/bin/python -c "import MatplotLibAPI; assert MatplotLibAPI.__all__"
+
+  ci:
+    name: ci
+    if: ${{ always() }}
+    needs: [quality, minimum-dependencies, artifacts]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful CI
+        shell: bash
+        run: |
+          echo "quality=${{ needs.quality.result }}"
+          echo "minimum-dependencies=${{ needs.minimum-dependencies.result }}"
+          echo "artifacts=${{ needs.artifacts.result }}"
+          test "${{ needs.quality.result }}" = "success"
+          test "${{ needs.minimum-dependencies.result }}" = "success"
+          test "${{ needs.artifacts.result }}" = "success"
