@@ -1,7 +1,7 @@
 version: 1
 standard:
   repository: fatmambot33/ai-native-platform
-  ref: 585484a227741a9eac78393e631b9d3794b85ec8
+  ref: 597c6f90fca88bd68d53a62f57ccc556cfa05be7
 quality:
   typed: true
   tests: true
@@ -81,7 +81,7 @@ evidence:
     plugin_tests: tests/test_mcp_server.py
     docs: docs
     examples: examples
-    security_workflow: .github/workflows/security.yml
+    security_evidence: .github/workflows/security.yml
     self_improvement_workflow: .github/workflows/ai-self-improvement.yml
     improvement_issue_template: .github/ISSUE_TEMPLATE/ai-improvement.yml
 extensions:
