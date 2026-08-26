@@ -2,7 +2,7 @@
 
 MatplotLibAPI plugin API version 2 is schema-first and deterministic. A plugin
 registers callables through `PluginContext`; descriptors, OpenAI tools, CLI,
-MCP, validation, and documentation all derive from the same registration.
+validation, and documentation all derive from the same registration.
 
 ## Scaffold
 

@@ -40,8 +40,8 @@ product:
   name: MatplotLibAPI
   profile: full-platform
   ai_native: true
-  description: Typed plotting SDK, CLI, MCP server, and Codex plugin for deterministic
-    visualization workflows.
+  description: Typed plotting SDK, CLI, and Codex plugin for deterministic visualization
+    workflows.
 plugin:
   enabled: true
   codex:
@@ -63,7 +63,6 @@ interfaces:
   cli: true
   plugin: true
   json_schema: true
-  mcp: true
   openapi: false
 evidence:
   mode: repository
@@ -76,9 +75,10 @@ evidence:
     sdk: src/MatplotLibAPI
     cli: src/MatplotLibAPI/cli.py
     schemas: schemas/ai-native-platform.schema.json
-    mcp: src/MatplotLibAPI/mcp_server.py
     plugin_manifest: plugins/matplotlibapi/.codex-plugin/plugin.json
-    plugin_tests: tests/test_mcp_server.py
+    plugin_tests:
+    - tests/test_plugins.py
+    - tests/test_conformance.py
     docs: docs
     examples: examples
     security_evidence: .github/workflows/security.yml

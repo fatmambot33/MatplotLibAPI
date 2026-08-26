@@ -19,7 +19,7 @@ is blocked until the documented compatibility date and explicit approval.
 - [x] opt-in PlotSpec repair suggestions
 - [x] high-contrast and colorblind accessibility presets
 - [x] semantic number, integer, percent, currency, and compact formatting
-- [x] Python, CLI, MCP, Codex, and schema parity
+- [x] Python, CLI, Codex, plugin, and schema parity
 
 ## 4.4.0 — plugin ecosystem — #109
 
@@ -32,7 +32,7 @@ is blocked until the documented compatibility date and explicit approval.
 
 ## 5.0.0 — intentional simplification readiness — #110
 
-- [x] `timeseries` is canonical across descriptors, recommendations, CLI, and MCP
+- [x] `timeseries` is canonical across descriptors, recommendations, CLI, and plugin tool schemas
 - [x] `timeserie`, `histogram`, and `pie` migration diagnostics
 - [x] explicit non-mutating PlotSpec migration helper and CLI
 - [x] executable breaking-removal date gate

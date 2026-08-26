@@ -13,8 +13,8 @@ Compatibility aliases for histogram and pie remain available as
 ## Canonical time-series naming
 
 `timeseries` and `fplot_timeseries` are canonical from 4.4 onward. The historic
-`timeserie` chart name, module, MCP tool, and `fplot_timeserie` helper remain
-available during the compatibility window. `matplotlibapi migrate` and
+`timeserie` chart name, module, and `fplot_timeserie` helper remain available
+during the compatibility window. `matplotlibapi migrate` and
 `audit_plot_spec_for_v5` identify affected specifications.
 
 Breaking alias and plugin API v1 removals are forbidden before **2027-02-06**.

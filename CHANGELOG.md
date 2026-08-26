@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Removed
+
+- Removed the repository-owned MCP server implementation, the `mcp` optional
+  dependency, and the `matplotlibapi-mcp` executable. The Codex plugin, plugin
+  registry, CLI, and generated OpenAI-compatible tool definitions remain.
+
 ## 4.4.1 - 2026-08-06
 
 ### Changed

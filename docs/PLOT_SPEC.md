@@ -1,7 +1,7 @@
 # PlotSpec contract
 
-`PlotSpec` is the canonical request shared by Python, CLI, MCP, Codex, plugins,
-and generated OpenAI tool definitions. Schema version `1.0` remains backward
+`PlotSpec` is the canonical request shared by Python, CLI, Codex, plugins, and
+generated OpenAI tool definitions. Schema version `1.0` remains backward
 compatible in MatplotLibAPI 4.4.
 
 ```json
