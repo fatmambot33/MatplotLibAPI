@@ -53,3 +53,5 @@ def test_distribution_has_no_owned_mcp_surface() -> None:
     assert "mcp" not in runtime
     assert "mcp" not in extras
     assert "matplotlibapi-mcp" not in scripts
+    assert not Path("src/MatplotLibAPI/mcp_server.py").exists()
+    assert not Path("src/MatplotLibAPI/mcp").exists()

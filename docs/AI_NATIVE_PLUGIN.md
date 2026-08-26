@@ -1,7 +1,7 @@
 # AI-native plugin surface
 
 MatplotLibAPI exposes one deterministic plotting contract across Python, the
-CLI, Codex, MCP, and third-party plugins. It requires no credentials, remote
+CLI, Codex, and third-party plugins. It requires no credentials, remote
 services, or hosted model calls.
 
 ## Discovery

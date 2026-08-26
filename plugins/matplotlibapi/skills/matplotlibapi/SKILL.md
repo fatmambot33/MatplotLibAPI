@@ -43,7 +43,7 @@ matplotlibapi plugins conform
 5. Use `matplotlibapi repair` or `suggest_plot_spec_repairs` for opt-in,
    structured corrections. Never silently mutate a user specification.
 6. Validate before execution.
-7. Render through `execute_plot`, the CLI, or MCP. Do not bypass the canonical
+7. Render through `execute_plot` or the CLI. Do not bypass the canonical
    executor unless the registry cannot express the requested result.
 8. Keep input and output paths inside an explicit workspace.
 9. Report the output path, profile truncation status, recommendation reasons,
