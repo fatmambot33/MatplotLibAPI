@@ -11,10 +11,9 @@ without credentials or hosted services.
 pip install MatplotLibAPI
 ```
 
-Install optional MCP and Plotly static-export support with:
+Install optional Plotly static-export support with:
 
 ```bash
-pip install "MatplotLibAPI[mcp]"
 pip install "MatplotLibAPI[plotly-export]"
 ```
 
@@ -43,8 +42,8 @@ figure = fplot_bar(
 
 ## Canonical plot specification
 
-`PlotSpec` is the portable contract shared by Python, plugins, the CLI, MCP,
-Codex, and generated OpenAI tool definitions.
+`PlotSpec` is the portable contract shared by Python, plugins, the CLI, Codex,
+and generated OpenAI tool definitions.
 
 ```python
 import pandas as pd
@@ -105,6 +104,9 @@ matplotlibapi plugins scaffold example-plugin ./example-plugin
 matplotlibapi plugins conform
 ```
 
+MatplotLibAPI does not ship or own an MCP server. Agent integrations use the
+plugin registry and generated schema/tool definitions directly.
+
 ## Command line
 
 ```bash
@@ -129,19 +131,6 @@ matplotlibapi benchmark
 All file operations are constrained to `--workspace` by default. Absolute paths
 and workspace traversal are rejected unless an embedding application explicitly
 uses a more permissive `RenderPolicy`.
-
-## MCP
-
-Start the optional stdio server with:
-
-```bash
-matplotlibapi-mcp
-```
-
-The MCP generic renderer and dedicated tools use the same canonical executor and
-registry metadata. MCP also exposes bounded profiling, ranked recommendations,
-repair suggestions, and compatibility status. `describe_plot_modules` returns
-plot descriptors and OpenAI-compatible tool schemas.
 
 ## Data-aware intelligence
 
