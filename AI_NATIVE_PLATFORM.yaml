@@ -81,7 +81,7 @@ evidence:
     - tests/test_conformance.py
     docs: docs
     examples: examples
-    ai_review_workflow: .github/workflows/ai-native-platform.yml
+    ai_review_workflow: .github/workflows/codex-review.yml
     security_evidence: .github/workflows/security.yml
     self_improvement_workflow: .github/workflows/ai-self-improvement.yml
     improvement_issue_template: .github/ISSUE_TEMPLATE/ai-improvement.yml
